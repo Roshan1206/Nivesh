@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: library
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_ID:mail-id@gmail.com}
+    password: ${MAIL_PWD:gmail-pwd}
+    properties:
+      mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+  security:
+    user:
+      name: nivesh
+      password: password
+
+nivesh:
+  otp:
+    ttl-seconds: 300
+    max-attempts: 3
+    max-cache-size: 500
+    otp-length: 6
