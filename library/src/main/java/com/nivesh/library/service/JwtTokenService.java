@@ -3,21 +3,12 @@ package com.nivesh.library.service;
 import java.util.Map;
 
 /**
- * Interface for handling and validating jwt token.
- *
- * @author Roshan
+ * Defines operations for JWT token validation.
  */
 public interface JwtTokenService {
 
     /**
-     * Validates refresh token including signature, expiration and type
-     *
-     * @param refreshToken Refresh token
-     */
-    void validateRefreshToken(String refreshToken);
-
-    /**
-     * Extract the user details from jwt token which are required to create customer account.
+     * Extract the user details from jwt token which are required to create customer registration.
      *
      * @return User details
      */

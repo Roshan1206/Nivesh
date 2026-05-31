@@ -42,12 +42,12 @@ import java.util.Set;
  * @author Roshan
  */
 @Configuration
-public class JwtTokenConfiguration {
+public class JwtSecurityConfiguration {
 
     /**
      * Auth server url for decoder
      */
-    @Value("${nivesh.config.auth.url}")
+    @Value("${nivesh.auth.url}")
     private String authUrl;
 
     /**
@@ -63,9 +63,10 @@ public class JwtTokenConfiguration {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers(HttpMethod.POST,"/v1/auth/register", "v1/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "v1/auth/forgot").permitAll()
-                        .requestMatchers("**/internal/**").access(new InternalServiceAuthorizationManager())
+                        .requestMatchers("/auth/**", "/error").permitAll()
+                        .requestMatchers("/*/internal/**")
+//                        .permitAll()
+                        .access(new InternalServiceAuthorizationManager())
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter())))
@@ -107,7 +108,7 @@ public class JwtTokenConfiguration {
      * Will be created only if the upstream server doesn't have its own decoder.
      */
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(JwtDecoder.class)
     public JwtDecoder jwtDecoder(){
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withIssuerLocation(authUrl).build();
         OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefaultWithIssuer(authUrl);
@@ -118,16 +119,12 @@ public class JwtTokenConfiguration {
 
     /**
      * Creates AuthenticationManager for token authentication.
-     * {@code DaoAuthenticationProvider} for login while {@code JwtAuthenticationProvider} used for validating JWT tokens
+     * {@code JwtAuthenticationProvider} used for validating JWT tokens
      */
     @Bean
-    public AuthenticationManager authenticationManager (UserDetailsService userDetailsService,
-                                                        PasswordEncoder passwordEncoder,
-                                                        JwtDecoder jwtDecoder) {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-
-        JwtAuthenticationProvider jwtAuthenticationProvider = new JwtAuthenticationProvider(jwtDecoder);
-        return new ProviderManager(List.of(daoAuthenticationProvider, jwtAuthenticationProvider));
+    @ConditionalOnMissingBean(AuthenticationManager.class)
+    public AuthenticationManager authenticationManager (JwtDecoder jwtDecoder) {
+        JwtAuthenticationProvider provider = new JwtAuthenticationProvider(jwtDecoder);
+        return new ProviderManager(provider);
     }
 }

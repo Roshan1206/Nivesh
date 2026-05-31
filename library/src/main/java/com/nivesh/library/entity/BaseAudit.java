@@ -14,9 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.Instant;
 
 /**
- * Base class for auditing user
- *
- * @author Roshan
+ * Abstract base class that enables JPA auditing fields for all entities.
  */
 @Getter
 @Setter

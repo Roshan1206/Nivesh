@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * Configuration class for getting the current user email to be used in auditing.
  * Any request in which is user is not logged in like user registration or forgot password
- * the last modified or created by column be "SELF" indicating that this request has been raised by user itself.
+ * the last modified or created by column would be "SYSTEM" indicating that this request has been raised by user itself.
  *
  * @author Roshan
  */
@@ -44,7 +44,7 @@ public class AuditConfiguration implements AuditorAware<String> {
     public Optional<String> getCurrentAuditor() {
         String authHeader = servletRequest.getHeader(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Optional.of("SELF");
+            return Optional.of("SYSTEM");
         }
         String token = authHeader.substring(7);
         return Optional.of(jwtTokenService.extractEmail(token));

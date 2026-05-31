@@ -41,26 +41,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
 
     /**
-     * Validates refresh token including signature, expiration and type
-     *
-     * @param refreshToken Refresh token
-     */
-    @Override
-    public void validateRefreshToken(String refreshToken) {
-        Jwt decoded = jwtDecoder.decode(refreshToken);
-        if (!Constants.REFRESH_TOKEN.equals(getTokenType())) {
-            throw new InvalidBearerTokenException("Token is tampered. Not a refresh token");
-        }
-
-        if (isTokenExpired(refreshToken)){
-            throw new InvalidBearerTokenException("Session Expired. Login again.");
-        }
-
-//      TODO: check revoke
-    }
-
-
-    /**
      * Extract the user details from jwt token which are required to create customer account.
      *
      * @return User details
@@ -70,7 +50,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         Map<String, String> info = new HashMap<>();
         String token = getToken();
         Map<String, Object> claims = jwtDecoder.decode(token).getClaims();
-        info.put(Constants.USER_ID, extractEmail(token));
+        info.put(Constants.USER_ID, getUserId());
         info.put(Constants.EMAIL, (String) claims.get(Constants.EMAIL));
         info.put(Constants.MOBILE, (String) claims.get(Constants.MOBILE));
         return info;
@@ -78,7 +58,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
 
     /**
-     * Extracts the email of current authenticated user
+     * Extracts the email of current authenticated user after token validation.
      *
      * @param token authenticated token
      * @return User email
@@ -126,7 +106,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         if (token == null || !token.startsWith("Bearer ")) {
             throw new InvalidBearerTokenException("Invalid token. Login again");
         }
-        return token.substring(0, 7);
+        return token.substring(7);
     }
 
 }

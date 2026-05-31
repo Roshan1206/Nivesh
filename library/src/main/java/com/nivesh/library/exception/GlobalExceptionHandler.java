@@ -18,15 +18,29 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final WebRequest request;
+
+    public GlobalExceptionHandler(WebRequest request) {
+        this.request = request;
+    }
+
     /**
      * Handles validation exceptions
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(Exception exception, WebRequest request){
-        ErrorResponse response = new ErrorResponse();
-        response.setPath(request.getDescription(false));
-        response.setMessage(exception.getMessage());
-        response.setTime(LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception){
+        ErrorResponse response = new ErrorResponse(exception.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
+    }
+
+    @ExceptionHandler(OtpException.class)
+    public ResponseEntity<ErrorResponse> handleOtpException(OtpException exception) {
+        ErrorResponse response = new ErrorResponse(exception.getMessage(), request);
+        HttpStatus status = switch (exception.getErrorCode()) {
+            case EXPIRED -> HttpStatus.GONE;
+            case INVALID -> HttpStatus.UNAUTHORIZED;
+            case MAX_ATTEMPTS_EXCEEDED -> HttpStatus.TOO_MANY_REQUESTS;
+        };
+        return ResponseEntity.status(status).body(response);
     }
 }

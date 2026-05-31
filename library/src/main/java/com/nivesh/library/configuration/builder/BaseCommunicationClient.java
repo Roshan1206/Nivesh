@@ -1,6 +1,7 @@
 package com.nivesh.library.configuration.builder;
 
 import com.nivesh.library.constant.Constants;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
@@ -21,7 +22,8 @@ public class BaseCommunicationClient {
     /**
      * Responsible for getting application name.
      */
-    private final ApplicationContext context;
+    @Value("${spring.application.name}")
+    private String name;
 
     /**
      * Responsible for building web client
@@ -32,9 +34,7 @@ public class BaseCommunicationClient {
     /**
      * Injecting required dependency via constructor injection.
      */
-    public BaseCommunicationClient(ApplicationContext context,
-                                   WebClient.Builder builder) {
-        this.context = context;
+    public BaseCommunicationClient(WebClient.Builder builder) {
         this.builder = builder;
     }
 
@@ -52,10 +52,10 @@ public class BaseCommunicationClient {
                     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                     if (authentication instanceof JwtAuthenticationToken jwtAuth) {
                         String rawToken = jwtAuth.getToken().getTokenValue();
-                        reqBuilder.header(HttpHeaders.AUTHORIZATION, rawToken);
+                        reqBuilder.header(HttpHeaders.AUTHORIZATION, "Bearer " + rawToken);
                     }
                     reqBuilder.header(Constants.INTERNAL_ROLE_HEADER_NAME, Constants.INTERNAL_ROLE_HEADER_VALUE);
-                    reqBuilder.header(Constants.SOURCE_SERVICE_HEADER_NAME, context.getApplicationName());
+                    reqBuilder.header(Constants.SOURCE_SERVICE_HEADER_NAME, name);
                     return next.exchange(reqBuilder.build());
                 }).build();
     }
