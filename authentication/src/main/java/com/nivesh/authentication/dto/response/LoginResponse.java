@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponse {
 
+    /** JWT used to authorize protected resource requests. */
     private String accessToken;
+
+    /** Longer-lived JWT used to request a fresh access token. */
     private String refreshToken;
 }

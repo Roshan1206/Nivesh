@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- *
+ * Cache limits and lockout settings used by authentication flows.
  */
 @Getter
 @Setter
@@ -13,17 +13,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AuthCacheProperties {
 
     /**
-     * Max attempts for otp validation. default - 3
+     * Maximum failed login attempts before locking the account. Default: 3.
      */
     private int maxAttempts = 3;
 
     /**
-     * Max otp can be stored in cache. default - 10,000
+     * Maximum entries stored across authentication caches. Default: 10,000.
      */
     private int maxCacheSize = 10_000;
 
     /**
-     * User locked out of their account
+     * Minutes an account remains locked after reaching the failed-login limit.
      */
     private int lockDurationMin = 60;
 }

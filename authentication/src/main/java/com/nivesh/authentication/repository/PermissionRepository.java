@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Persistence access for permission definitions assigned through roles or overrides.
+ */
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, UUID> {
 }
