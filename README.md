@@ -40,7 +40,39 @@ Public and Private keys are required for the auth module to run.
 Run the below script to generate and move it to correct location.
 ```shell
     openssl genrsa -out private.pem 2048;
-    openssl rsa -in private.pem -pubout -out public.pem
-    mv private.pem authentication/src/main/resources/keys/
+    openssl rsa -in private.pem -pubout -out public.pem;
+    mv private.pem authentication/src/main/resources/keys/;
     mv public.pem  authentication/src/main/resources/keys/
 ```
+
+Customer taps Pay
+↓
+Transaction Service receives the request
+↓
+Transaction Service calls Fraud Detection
+— is this transaction safe?
+↓
+Fraud says OK
+↓
+Transaction Service calls Account Service
+POST /api/v1/internal/accounts/{accountId}/debit
+body: { amount: 5000, txnId: "txn_uuid", idempotencyKey: "key_123" }
+↓
+Account Service checks:
+— is account ACTIVE?
+— is balance >= 5000?
+— is daily limit not breached?
+↓
+All good → Account Service deducts 5000 from balance
+↓
+Account Service returns success to Transaction Service
+↓
+Transaction Service calls Account Service again
+POST /api/v1/internal/accounts/{accountId}/credit
+body: { amount: 5000, txnId: "txn_uuid", idempotencyKey: "key_124" }
+↓
+Account Service adds 5000 to recipient balance
+↓
+Transaction Service marks transaction as POSTED
+↓
+Publishes transaction.completed to Kafka
