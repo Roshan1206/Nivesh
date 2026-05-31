@@ -3,34 +3,34 @@ package com.nivesh.authentication.service;
 import com.nivesh.authentication.dto.RefreshReqRes;
 import com.nivesh.authentication.dto.request.LoginRequest;
 import com.nivesh.authentication.dto.request.RegisterRequest;
-import com.nivesh.authentication.dto.response.LoginResponse;
 import com.nivesh.authentication.dto.response.RegisterResponse;
 import com.nivesh.authentication.dto.response.TokenResponse;
 import com.nivesh.library.dto.response.OtpResponse;
 
 /**
- * Interface for handling Authentications.
+ * Defines the public authentication workflows exposed by the authentication module.
  *
  * @author Roshan
  */
 public interface AuthService {
 
     /**
-     * Initiate the user registration with otp.
+     * Starts registration by generating an OTP and returning its request identifier.
      */
     OtpResponse initiateRegistration(RegisterRequest request);
 
     /**
-     * Register user after validating request body
+     * Completes registration after validating the pending request and OTP.
      *
-     * @param request info for creating user
+     * @param requestId OTP request identifier returned during registration initiation
+     * @param otp plain-text OTP submitted by the user
      * @return email and tokens
      */
     RegisterResponse registerUser(String requestId, String otp);
 
 
     /**
-     * Login user after validating request body
+     * Authenticates user credentials and returns a token pair.
      *
      * @param request user credentials
      * @return tokens
@@ -39,7 +39,7 @@ public interface AuthService {
 
 
     /**
-     * Refresh access token
+     * Refreshes an access token using a valid refresh token.
      *
      * @param request refresh token
      * @return access token
@@ -47,9 +47,9 @@ public interface AuthService {
     RefreshReqRes refreshAccessToken(RefreshReqRes request);
 
     /**
-     * Reset the password for unauthenticated user
+     * Resets the password for an unauthenticated user.
      *
-     * @param loginRequest user login info
+     * @param loginRequest user email and replacement password
      */
     void forgotPassword(LoginRequest loginRequest);
 }

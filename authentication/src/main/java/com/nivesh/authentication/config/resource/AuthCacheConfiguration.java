@@ -17,9 +17,16 @@ import java.util.concurrent.TimeUnit;
 @EnableConfigurationProperties(AuthCacheProperties.class)
 public class AuthCacheConfiguration {
 
+    /** Cache that keeps pending registration requests until OTP verification completes. */
     public static final String REGISTER_CACHE_NAME = "register";
+
+    /** Cache that tracks failed login attempts while an account can be locked. */
     public static final String LOGIN_CACHE_NAME = "login";
 
+    /**
+     * Creates the authentication cache manager used by registration and login flows.
+     * Both caches share the same size limit and expiry window because their entries are short lived.
+     */
     @Primary
     @Bean({"authCacheManager"})
     public CacheManager authCacheManager(AuthCacheProperties properties) {

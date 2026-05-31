@@ -34,13 +34,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 /**
- * Service class for managing user authentications.
+ * Coordinates registration, login, refresh-token, and password-reset workflows.
  *
  * @author Roshan
  */
@@ -49,7 +48,7 @@ import java.util.UUID;
 public class AuthServiceImpl implements AuthService {
 
     /**
-     * Used for authentication
+     * Verifies submitted credentials against Spring Security's user details pipeline.
      */
     private final AuthenticationManager authenticationManager;
 
@@ -64,12 +63,12 @@ public class AuthServiceImpl implements AuthService {
     private final OtpSender sender;
 
     /**
-     * Responsible for tokens operations.
+     * Issues and reads JWTs used by the authentication API.
      */
     private final TokenService tokenService;
 
     /**
-     * Responsible for managing users
+     * Manages user lookup, creation, status changes, and password updates.
      */
     private final UserService userService;
 
@@ -89,9 +88,9 @@ public class AuthServiceImpl implements AuthService {
 
 
     /**
-     * Initiate the user registration with otp.
+     * Starts registration by generating an OTP and caching the request until verification.
      *
-     * @param request User information
+     * @param request user information captured before OTP verification
      */
     @Override
     public OtpResponse initiateRegistration(RegisterRequest request) {
@@ -104,10 +103,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     /**
-     * Register user after validating request body
+     * Creates a user after the cached registration request and submitted OTP are validated.
      *
-     * @param requestId otp request id
-     * @param otp plain ot[
+     * @param requestId OTP request identifier returned during registration initiation
+     * @param otp plain-text OTP provided by the user
      * @return email and tokens
      */
     @Transactional
@@ -127,7 +126,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     /**
-     * Login user after validating request body
+     * Authenticates a user, applies status-specific token rules, and tracks failed attempts.
      *
      * @param request user credentials
      * @return tokens
@@ -183,6 +182,9 @@ public class AuthServiceImpl implements AuthService {
         throw new LockedException("Account locked due to too many failed attempts");
     }
 
+    /**
+     * Reactivates eligible locked or deactivated users, otherwise blocks login.
+     */
     private String validateCustomerStatus(User user, CustomerStatus customerStatus) {
         if (customerStatus.isEqual(CustomerStatus.LOCKED)) {
             if (user.getLockedUntil().isBefore(Instant.now())) {
@@ -204,7 +206,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     /**
-     * Get new access token after validating refresh token.
+     * Issues a new access token after validating the supplied refresh token.
      *
      * @param request refresh token
      * @return access token
@@ -220,9 +222,9 @@ public class AuthServiceImpl implements AuthService {
 
 
     /**
-     * Reset the password for unauthenticated user
+     * Resets the password for an unauthenticated user.
      *
-     * @param loginRequest user login info
+     * @param loginRequest user email and replacement password
      */
     @Override
     public void forgotPassword(LoginRequest loginRequest) {
