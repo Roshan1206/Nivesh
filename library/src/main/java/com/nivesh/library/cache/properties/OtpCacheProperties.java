@@ -26,7 +26,7 @@ public class OtpCacheProperties {
     /**
      * Max otp can be stored in cache. default - 10,000
      */
-    private int maxCacheSize = 10_000;
+    private int maxCacheSize = 100;
 
     /**
      * otp length. default - 6

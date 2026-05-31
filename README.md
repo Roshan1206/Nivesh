@@ -45,34 +45,12 @@ Run the below script to generate and move it to correct location.
     mv public.pem  authentication/src/main/resources/keys/
 ```
 
-Customer taps Pay
-↓
-Transaction Service receives the request
-↓
-Transaction Service calls Fraud Detection
-— is this transaction safe?
-↓
-Fraud says OK
-↓
-Transaction Service calls Account Service
-POST /api/v1/internal/accounts/{accountId}/debit
-body: { amount: 5000, txnId: "txn_uuid", idempotencyKey: "key_123" }
-↓
-Account Service checks:
-— is account ACTIVE?
-— is balance >= 5000?
-— is daily limit not breached?
-↓
-All good → Account Service deducts 5000 from balance
-↓
-Account Service returns success to Transaction Service
-↓
-Transaction Service calls Account Service again
-POST /api/v1/internal/accounts/{accountId}/credit
-body: { amount: 5000, txnId: "txn_uuid", idempotencyKey: "key_124" }
-↓
-Account Service adds 5000 to recipient balance
-↓
-Transaction Service marks transaction as POSTED
-↓
-Publishes transaction.completed to Kafka
+### OTP
+OTP is sent via mail. Visit https://ethereal.email/ to generate mail and password to be sent via application.yml
+```yaml
+nivesh.otp:
+  ttl-seconds: 300  //5 min in cache
+  max-attempts: 3   // max 3 attempts
+  max-cache-size: 100 //max 100 otp in cache
+  otp-length: 6     // otp length ex - 356842
+```
