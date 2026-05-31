@@ -1,0 +1,21 @@
+info:
+  name: Refresh Access token
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{auth}}/auth/refresh"
+  body:
+    type: json
+    data: |-
+      {
+        "token" : "eyJraWQiOiJrZXktdjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJkMmM2MTY5MC1kN2ZmLTRjODAtYTA0MS01NmNhM2Q1ZTc0NTUiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODEiLCJleHAiOjE3ODA3NTQ3NTgsInRva2VuX3R5cGUiOiJSRUZSRVNIIiwiaWF0IjoxNzgwMTQ5OTU4LCJqdGkiOiIyMWJlYzlkZC00ZjBiLTRlZTctYTlmNS1lODYxNTRiZGQxYmYiLCJlbWFpbCI6InRlc3RAZ21haWwuY29tIn0.im30CSsJy2s_aWhLY77Yen-SBG3a2FwzdU_zBF6e_9JwmC_FwaRfgRSmwDcl4NAGBR-Vfpz1q2Aerp-gsIJDj8LZNHitBcX9iXX2Ukk-EJZEE9xlyaR88Hw6jQpvRJvqcZCsYrumTm-EoELPeuxYvdOsQ97ZDAv89o4gy9jCRTXLjzSSXg29zjkYRANp7kosZUd_KpHoyWmriM6HHidMfh3SOApnE3XuPzIgR13QVg-Lp50BjNVwl0p5VeCaxhvfvX1Jg6mCFbaYZrM8Wo3SgEOWstGNUxUWH3J6QCUC0RMC-lxYifu9d1geWkrj_8OFA_M7Wblx9h-4OtqDlLw1yw"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

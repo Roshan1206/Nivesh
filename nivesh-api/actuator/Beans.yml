@@ -1,0 +1,18 @@
+info:
+  name: Beans
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: http://localhost:8081/actuator/beans
+  auth:
+    type: basic
+    username: nivesh
+    password: password
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

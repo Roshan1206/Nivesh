@@ -1,0 +1,10 @@
+info:
+  name: customer
+  type: folder
+  seq: 3
+
+request:
+  headers:
+    - name: Authorization
+      value: "{{token}}"
+  auth: inherit

@@ -1,0 +1,23 @@
+info:
+  name: Register User
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{auth}}/auth/register"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "test1@gmail.com",
+        "mobileNumber": "9804500001",
+        "password": "Password@1234"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,25 @@
+info:
+  name: Customer Registration
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{customer}}/customer"
+  body:
+    type: json
+    data: |-
+      {
+        "firstName": "Nivesh",
+        "middleName": null,
+        "lastName": "Bank",
+        "dateOfBirth": "2026-05-30",
+        "gender": "male"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,18 @@
+info:
+  name: Register Verify otp
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{auth}}/auth/register/verify/82083232-862b-4686-8c08-3be45721ff41"
+  body:
+    type: text
+    data: "872704"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
