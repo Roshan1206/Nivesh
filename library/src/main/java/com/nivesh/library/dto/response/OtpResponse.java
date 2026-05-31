@@ -7,7 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class OtpResponse {
 
+    /** Response message about OTP delivery status */
     String message;
+    /** Unique identifier to track and verify the OTP */
     String requestId;
 
     public OtpResponse(String requestId){

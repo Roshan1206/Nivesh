@@ -12,22 +12,19 @@ import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
- * Base class for building communication using web client.
+ * Base client for building inter-service HTTP communication using WebClient.
+ * Automatically injects JWT tokens and internal service headers in all requests.
  *
  * @author Roshan
  */
 @Component
 public class BaseCommunicationClient {
 
-    /**
-     * Responsible for getting application name.
-     */
+    /** Application name from configuration */
     @Value("${spring.application.name}")
     private String name;
 
-    /**
-     * Responsible for building web client
-     */
+    /** WebClient builder for creating configured HTTP clients */
     private final WebClient.Builder builder;
 
 
@@ -39,11 +36,12 @@ public class BaseCommunicationClient {
     }
 
     /**
-     * Creates new request using the user's token.
-     * Add 2 internal headers in every request for validation.
+     * Constructs a new WebClient configured to:
+     * - Forward the current user's JWT token
+     * - Include internal service headers for microservice authentication
      *
-     * @param url service url
-     * @return WebClient client
+     * @param url the base URL for the target service
+     * @return configured WebClient instance
      */
     public WebClient create(String url) {
         return builder.baseUrl(url)

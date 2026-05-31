@@ -6,9 +6,8 @@ import org.springframework.context.annotation.Import;
 import java.lang.annotation.*;
 
 /**
- * Enables OTP services to be used by consuming applications.
- * Creates {@link com.nivesh.library.cache.OtpCacheService}, {@link com.nivesh.library.cache.OtpSender} beans
- * using {@link OtpCacheConfiguration}
+ * Meta-annotation to enable OTP generation and validation features.
+ * Imports {@link OtpCacheConfiguration} to register OTP beans in the application context.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

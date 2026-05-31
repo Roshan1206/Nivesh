@@ -29,10 +29,15 @@ import java.util.concurrent.TimeUnit;
 @EnableConfigurationProperties(OtpCacheProperties.class)
 public class OtpCacheConfiguration {
 
+    /** Name of the OTP cache */
     public static final String OTP_CACHE_NAME = "otpCache";
 
     /**
-     * Create CaffeineCacheManager specifically for OTP cache using cache properties
+     * Creates a Caffeine cache manager for OTP storage with TTL and size limits.
+     * Automatically evicts expired entries and maintains cache statistics.
+     *
+     * @param cacheProperties configuration properties for OTP cache
+     * @return configured CacheManager
      */
     @Bean
     @ConditionalOnMissingBean(name = "otpCacheManager")
@@ -49,7 +54,12 @@ public class OtpCacheConfiguration {
 
 
     /**
-     * Register Service class used for OTP
+     * Instantiates the OTP cache service for generating and validating OTPs.
+     * Conditionally registers only if not provided by a consuming application.
+     *
+     * @param cacheManager the OTP cache manager
+     * @param properties OTP configuration properties
+     * @return OtpCacheService instance
      */
     @Bean
     @ConditionalOnMissingBean(OtpCacheService.class)
@@ -60,7 +70,12 @@ public class OtpCacheConfiguration {
 
 
     /**
-     * Used for sending OTP via email
+     * Provides an email-based OTP sender implementation.
+     * Sends OTPs asynchronously with built-in retry mechanism.
+     * Only created if not provided by the consuming application.
+     *
+     * @param mailSender Spring mail sender configured for SMTP
+     * @return OtpSender implementation
      */
     @Bean
     @ConditionalOnMissingBean(EmailOtpSender.class)

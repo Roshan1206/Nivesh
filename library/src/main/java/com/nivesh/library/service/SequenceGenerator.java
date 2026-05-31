@@ -27,10 +27,11 @@ public class SequenceGenerator {
 
 
     /**
-     * Get next value from the sequence
+     * Retrieves the next sequence value from the database.
+     * Used for generating unique IDs.
      *
-     * @param seq sequence name
-     * @return next value
+     * @param seq the name of the database sequence
+     * @return the next value from the sequence
      */
     public long generateNextSeqValue(String seq) {
         String sequence = "SELECT nextVal('" + seq + "')";

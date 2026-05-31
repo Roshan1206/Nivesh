@@ -30,8 +30,12 @@ public class EmailOtpSender implements OtpSender {
 
 
     /**
-     * Creates a Async request using virtual thread to send OTP mail.
-     * If failed, it will retry for 3 more attempts within delay for 2 sec
+     * Sends OTP via email asynchronously with automatic retry on failure.
+     * Uses virtual threads for efficient async execution.
+     * Retries up to 3 times with exponential backoff on mail errors.
+     *
+     * @param email recipient email address
+     * @param otp the OTP code to send
      */
     @Async("emailTaskExecutor")
     @Retryable(
@@ -51,7 +55,11 @@ public class EmailOtpSender implements OtpSender {
 
 
     /**
-     * Recover method for Email failure
+     * Handles OTP email delivery failure after all retry attempts.
+     * Logs the final error for monitoring and troubleshooting.
+     *
+     * @param exception the mail exception that caused the failure
+     * @param email the email address where sending failed
      */
     @Recover
     public void onEmailFailure(MailException exception, String email) {

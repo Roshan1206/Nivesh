@@ -109,7 +109,12 @@ public class OtpCacheService {
 
 
     /**
-     * Build a unique key for otp cache per request
+     * Builds a composite cache key combining request ID and OTP purpose.
+     * Ensures unique keys for different OTP requests and purposes.
+     *
+     * @param requestId unique request identifier
+     * @param purpose the OTP use case
+     * @return combined cache key
      */
     private String buildKey(String requestId, OtpPurpose purpose) {
         return requestId + ":" + purpose.name();

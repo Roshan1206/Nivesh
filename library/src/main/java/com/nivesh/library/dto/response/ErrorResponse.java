@@ -16,8 +16,20 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ErrorResponse {
+
+    /**
+     * API endpoint path where the error occurred
+     */
     private String path;
+
+    /**
+     * Error message describing the failure
+     */
     private String message;
+
+    /**
+     * Timestamp when the error occurred
+     */
     private LocalDateTime time;
 
     public ErrorResponse(String message, WebRequest request) {

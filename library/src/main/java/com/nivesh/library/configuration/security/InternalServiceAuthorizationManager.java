@@ -10,8 +10,8 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 import java.util.function.Supplier;
 
 /**
- * Authorization manager for validating all the internal endpoints.
- * will be authorized if required headers are present in request.
+ * Authorization manager that validates requests from internal microservices.
+ * Verifies presence of required headers before granting access to internal endpoints.
  *
  * @author Roshan
  */
@@ -22,6 +22,7 @@ public class InternalServiceAuthorizationManager implements AuthorizationManager
         String internalRole = request.getHeader(Constants.INTERNAL_ROLE_HEADER_NAME);
         String sourceService = request.getHeader(Constants.SOURCE_SERVICE_HEADER_NAME);
 
+        // Both headers must be present and valid for access
         boolean isValid = Constants.INTERNAL_ROLE_HEADER_VALUE.equals(internalRole) &&
                 sourceService != null && !sourceService.isBlank();
         return new AuthorizationDecision(isValid);

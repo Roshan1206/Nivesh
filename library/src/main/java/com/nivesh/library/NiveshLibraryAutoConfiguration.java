@@ -5,7 +5,8 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
- * Configuration class for managing all configurations
+ * Spring Boot auto-configuration for the Nivesh Library.
+ * Automatically scans and registers library components including configurations and services.
  *
  * @author Roshan
  */
