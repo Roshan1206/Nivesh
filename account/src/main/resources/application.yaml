@@ -1,0 +1,29 @@
+server:
+  port: 8083
+  servlet:
+    context-path: /api
+
+nivesh:
+  config:
+    database:
+      schema: account
+
+spring:
+  application:
+    name: account
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nivesh?currentSchema=${nivesh.config.database.schema}
+    username: postgres
+    password: password
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${nivesh.config.database.schema}
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    schemas: ${nivesh.config.database.schema}
+    location: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true

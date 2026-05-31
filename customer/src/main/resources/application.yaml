@@ -1,0 +1,48 @@
+server:
+  port: 8082
+
+nivesh:
+  auth:
+    url: http://localhost:8081
+  customer:
+    database:
+      schema: customer
+#  otp:
+#    expiry-in-min: 5
+
+spring:
+  application:
+    name: customer
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nivesh?currentSchema=${nivesh.customer.database.schema}
+    username: postgres
+    password: password
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${nivesh.customer.database.schema}
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    schemas: ${nivesh.customer.database.schema}
+    location: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  mail:
+    host: smtp.ethereal.email
+    port: 587
+    username: ${MAIL_ID:bonnie33@ethereal.email}
+    password: ${MAIL_PWD:VdEK8XvVHqgYRS9CwG}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+logging:
+  level:
+    org.springframework.security: TRACE
+
