@@ -9,10 +9,8 @@ nivesh:
       access-expiry: 15
       refresh-expiry: 7
     cache:
-      ttl-seconds: 300
       max-attempt: 3
       max-cache-size: 500
-      otp-length: 6
       lock-duration-min: 60
     database:
       schema: auth
@@ -40,8 +38,8 @@ spring:
   mail:
     host: smtp.ethereal.email
     port: 587
-    username: ${MAIL_ID:mail-id@gmail.com}
-    password: ${MAIL_PWD:gmail-pwd}
+    username: ${MAIL_ID:bonnie33@ethereal.email}
+    password: ${MAIL_PWD:VdEK8XvVHqgYRS9CwG}
     properties:
       mail:
         smtp:
