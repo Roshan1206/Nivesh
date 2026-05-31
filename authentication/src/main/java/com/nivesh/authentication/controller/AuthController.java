@@ -14,8 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Handles endpoints which does not require authentication.
- * Excluded from filter chain
+ * Handles endpoints that are excluded from authentication filters.
  *
  * @author Roshan
  */
@@ -38,10 +37,10 @@ public class AuthController {
 
 
     /**
-     * Register new user. Validates all input
+     * Starts registration for a new user and returns the OTP request identifier.
      *
      * @param registerRequest info required for registration
-     * @return email with access and refresh token
+     * @return OTP request identifier used to verify registration
      */
     @PostMapping("/register")
     public ResponseEntity<OtpResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
@@ -49,6 +48,13 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Completes registration after validating the OTP sent during the initial request.
+     *
+     * @param requestId OTP request identifier returned by the registration initiation endpoint
+     * @param otp one-time password submitted as plain text
+     * @return registered user email with access and refresh tokens
+     */
     @PostMapping(value = "/register/verify/{requestId}", consumes = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<RegisterResponse> registerUser(@PathVariable String requestId, @RequestBody String otp) {
         RegisterResponse response = authService.registerUser(requestId, otp);
@@ -57,7 +63,7 @@ public class AuthController {
 
 
     /**
-     * Used for log in.
+     * Authenticates a user and returns issued tokens.
      *
      * @param request body containing email and password
      * @return access and refresh token
@@ -69,7 +75,7 @@ public class AuthController {
 
 
     /**
-     * Refresh access token.
+     * Issues a replacement access token from a refresh token.
      *
      * @param request refresh token
      * @return Access token
@@ -80,7 +86,13 @@ public class AuthController {
     }
 
 
-//    TODO: Add otp validation
+    // TODO: Add OTP validation before accepting password reset requests.
+    /**
+     * Resets a password for an unauthenticated user after receiving valid login details.
+     *
+     * @param loginRequest email and replacement password
+     * @return success message once the password is updated
+     */
     @PatchMapping("/forgot")
     public ResponseEntity<String> forgotPassword(@RequestBody LoginRequest loginRequest) {
         authService.forgotPassword(loginRequest);
