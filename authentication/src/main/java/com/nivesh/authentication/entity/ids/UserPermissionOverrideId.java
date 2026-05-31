@@ -1,4 +1,4 @@
-package com.nivesh.authentication.entity;
+package com.nivesh.authentication.entity.ids;
 
 import jakarta.persistence.Embeddable;
 import lombok.*;
@@ -7,7 +7,8 @@ import java.io.Serializable;
 import java.util.UUID;
 
 /**
- * Entity for managing id of UserRole
+ * Composite PK for UserPermissionOverride (user_id + permission_id).
+ * One override row per user per permission - enforced by PK
  */
 @Getter
 @Setter
@@ -15,11 +16,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Embeddable
-public class UserRoleId implements Serializable {
+public class UserPermissionOverrideId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private UUID userId;
 
-    private UUID roleId;
+    private UUID permissionId;
 }

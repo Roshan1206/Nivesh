@@ -52,7 +52,6 @@ public class UserServiceImpl implements UserService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .customerStatus(CustomerStatus.ONBOARDED)
-                .isKycVerified(false)
                 .build();
 
         user.getUserRoles().add(new UserRole(user, role));
@@ -81,17 +80,17 @@ public class UserServiceImpl implements UserService {
     public String updateStatus(String userId, String status) {
         User user = getUser(userId);
         CustomerStatus customerStatus = CustomerStatus.valueOf(status.toUpperCase());
+        String roleName = customerStatus.isEqual(CustomerStatus.REGISTERED) ? "CUSTOMER_REGISTERED" : "CUSTOMER_ACTIVE";
         updateStatus(user, customerStatus);
 
-        String tokenType = customerStatus.isEqual(CustomerStatus.REGISTERED) ? Constants.REGISTERED_TOKEN : Constants.ACCESS_TOKEN;
-        return tokenService.generateAccessToken(user, tokenType);
+        return tokenService.generateAccessToken(user, Constants.ACCESS_TOKEN);
     }
 
     @Transactional
     @Override
     public void updateStatus(User user, CustomerStatus customerStatus) {
         user.setCustomerStatus(customerStatus);
-        user = userRepository.save(user);
+        save(user);
     }
 
     @Transactional
@@ -99,6 +98,11 @@ public class UserServiceImpl implements UserService {
     public void forgotPassword(LoginRequest request) {
         User user = getUserByEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        save(user);
+    }
+
+    @Override
+    public void save(User user) {
         userRepository.save(user);
     }
 

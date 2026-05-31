@@ -1,5 +1,6 @@
 package com.nivesh.authentication.entity;
 
+import com.nivesh.authentication.entity.enums.OverrideType;
 import com.nivesh.library.entity.BaseAudit;
 import com.nivesh.library.entity.enums.CustomerStatus;
 import jakarta.persistence.*;
@@ -10,13 +11,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * User Entity
- *
- * @author Roshan
+ * Represents a registered user with auditing and roles
  */
 @Getter
 @Setter
@@ -45,31 +45,56 @@ public class User extends BaseAudit implements UserDetails {
     private int failedAttempt;
 
     @Column(name = "locked_until")
-    private LocalDateTime lockedUntil;
+    private Instant lockedUntil;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "customer_status", columnDefinition = "customer_status_enum", nullable = false)
     private CustomerStatus customerStatus;
 
-    @Column(name = "is_kyc_verified", nullable = false)
-    private boolean isKycVerified;
-
+    /**
+     * Predefined permissions for role
+     */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<UserRole> userRoles = new HashSet<>();
 
     /**
-     * @return User roles and permissions
+     * Permission on top of role based
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<UserPermissionOverride> permissionOverrides = new HashSet<>();
+
+    /**
+     * Builds the authority set for user using roles (base permissions) and
+     * extra permission if granted. Removes the expired or revoked roles from authorities.
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
+        Set<String> revokedCodes = new HashSet<>();
+        Instant now = Instant.now();
+
         for (UserRole ur : userRoles) {
             authorities.add(new SimpleGrantedAuthority(ur.getRole().getRoleName()));
             ur.getRole().getPermissions().forEach(p ->
                     authorities.add(new SimpleGrantedAuthority(p.getPermissionCode())));
         }
+
+        for (UserPermissionOverride override : permissionOverrides) {
+            if (override.getExpiresAt() != null && override.getExpiresAt().isBefore(now)) {
+                continue;
+            }
+            String code = override.getPermission().getPermissionCode();
+            if (override.getOverrideType() == OverrideType.GRANT) {
+                authorities.add(new SimpleGrantedAuthority(code));
+            } else {
+                revokedCodes.add(code);
+            }
+        }
+
+        authorities.removeIf(auth -> revokedCodes.contains(auth.getAuthority()));
         return authorities;
     }
 
@@ -83,5 +108,17 @@ public class User extends BaseAudit implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+
+    /**
+     * Indicates whether the user is locked or unlocked. A locked user cannot be
+     * authenticated.
+     *
+     * @return <code>true</code> if the user is not locked, <code>false</code> otherwise
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        return lockedUntil == null || Instant.now().isAfter(lockedUntil);
     }
 }

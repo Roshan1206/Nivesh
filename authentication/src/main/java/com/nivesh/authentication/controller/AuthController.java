@@ -3,11 +3,13 @@ package com.nivesh.authentication.controller;
 import com.nivesh.authentication.dto.RefreshReqRes;
 import com.nivesh.authentication.dto.request.LoginRequest;
 import com.nivesh.authentication.dto.request.RegisterRequest;
-import com.nivesh.authentication.dto.response.LoginResponse;
+import com.nivesh.authentication.dto.response.TokenResponse;
 import com.nivesh.authentication.dto.response.RegisterResponse;
 import com.nivesh.authentication.service.AuthService;
+import com.nivesh.library.dto.response.OtpResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,8 +44,14 @@ public class AuthController {
      * @return email with access and refresh token
      */
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        RegisterResponse response = authService.registerUser(registerRequest);
+    public ResponseEntity<OtpResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        OtpResponse response = authService.initiateRegistration(registerRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping(value = "/register/verify/{requestId}", consumes = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<RegisterResponse> registerUser(@PathVariable String requestId, @RequestBody String otp) {
+        RegisterResponse response = authService.registerUser(requestId, otp);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -55,7 +63,7 @@ public class AuthController {
      * @return access and refresh token
      */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.loginUser(request));
     }
 

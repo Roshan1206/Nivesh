@@ -57,7 +57,7 @@ public class AuthServerConfiguration {
     /**
      * URI of auth server
      */
-    @Value("${nivesh.config.auth.url}")
+    @Value("${nivesh.auth.url}")
     private String issuerUrl;
 
     /**

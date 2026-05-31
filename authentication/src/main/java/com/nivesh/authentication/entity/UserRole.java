@@ -1,5 +1,6 @@
 package com.nivesh.authentication.entity;
 
+import com.nivesh.authentication.entity.ids.UserRoleId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +10,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 /**
- * Contains the mapping of user and its roles
- *
- * @author Roshan
+ * Represents the user with all of its roles assigned.
  */
 @Getter
 @Setter
@@ -46,6 +45,14 @@ public class UserRole {
         this.user = user;
         this.role = role;
         this.assignedBy = user;
+        this.assignedAt = Instant.now();
+    }
+
+    public UserRole(User user, Role role, User assignedBy) {
+        this.id = new UserRoleId(user.getId(), role.getId());
+        this.user = user;
+        this.role = role;
+        this.assignedBy = assignedBy;
         this.assignedAt = Instant.now();
     }
 }

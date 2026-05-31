@@ -12,9 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Role entity for User's Roles
- *
- * @author Roshan
+ * Represents minimal pre-defined permissions for user.
  */
 @Getter
 @Setter
@@ -29,7 +27,7 @@ public class Role extends BaseAudit {
     @Column(name = "role_id")
     private UUID id;
 
-    @Column(name = "role_name", nullable = false, unique = true)
+    @Column(name = "role_name", nullable = false, unique = true, length = 30)
     private String roleName;
 
     @Column(name = "description", nullable = false)

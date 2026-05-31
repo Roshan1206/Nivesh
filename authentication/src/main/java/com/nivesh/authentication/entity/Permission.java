@@ -12,10 +12,7 @@ import org.hibernate.type.SqlTypes;
 import java.util.UUID;
 
 /**
- * Manages permission for User and Roles
- * Permission entity for RBAC
- *
- * @author Roshan
+ * Represents specific permission that a particular user/role needs
  */
 @Getter
 @Setter
@@ -30,7 +27,7 @@ public class Permission {
     @Column(name = "permission_id")
     private UUID id;
 
-    @Column(name = "permission_code", nullable = false, unique = true)
+    @Column(name = "permission_code", nullable = false, unique = true, length = 100)
     private String permissionCode;
 
     @Column(name = "resource", nullable = false)

@@ -5,6 +5,8 @@ import com.nivesh.authentication.dto.request.LoginRequest;
 import com.nivesh.authentication.dto.request.RegisterRequest;
 import com.nivesh.authentication.dto.response.LoginResponse;
 import com.nivesh.authentication.dto.response.RegisterResponse;
+import com.nivesh.authentication.dto.response.TokenResponse;
+import com.nivesh.library.dto.response.OtpResponse;
 
 /**
  * Interface for handling Authentications.
@@ -14,12 +16,17 @@ import com.nivesh.authentication.dto.response.RegisterResponse;
 public interface AuthService {
 
     /**
+     * Initiate the user registration with otp.
+     */
+    OtpResponse initiateRegistration(RegisterRequest request);
+
+    /**
      * Register user after validating request body
      *
      * @param request info for creating user
      * @return email and tokens
      */
-    RegisterResponse registerUser(RegisterRequest request);
+    RegisterResponse registerUser(String requestId, String otp);
 
 
     /**
@@ -28,7 +35,7 @@ public interface AuthService {
      * @param request user credentials
      * @return tokens
      */
-    LoginResponse loginUser(LoginRequest request);
+    TokenResponse loginUser(LoginRequest request);
 
 
     /**

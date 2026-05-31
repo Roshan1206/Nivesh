@@ -22,4 +22,5 @@ public interface UserService {
 
     void forgotPassword(LoginRequest request);
 
+    void save(User user);
 }

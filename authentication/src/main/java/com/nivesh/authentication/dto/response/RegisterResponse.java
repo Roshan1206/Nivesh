@@ -12,10 +12,9 @@ public class RegisterResponse {
 
     private String message;
     private String email;
-    private String accessToken;
-    private String refreshToken;
+    private TokenResponse tokens;
 
-    public RegisterResponse(String email, String accessToken, String refreshToken) {
-        this(WELCOME_MESSAGE, email, accessToken, refreshToken);
+    public RegisterResponse(String email, TokenResponse tokens) {
+        this(WELCOME_MESSAGE, email, tokens);
     }
 }

@@ -1,10 +1,12 @@
 package com.nivesh.authentication.service.impl;
 
+import com.nivesh.authentication.config.properties.TokenProperties;
 import com.nivesh.authentication.entity.User;
 import com.nivesh.authentication.service.TokenService;
 import com.nivesh.library.constant.Constants;
 import com.nivesh.library.service.JwtTokenService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -20,27 +22,22 @@ import java.util.*;
  * @author Roshan
  */
 @Service
+@EnableConfigurationProperties(TokenProperties.class)
 public class TokenServiceImpl implements TokenService {
 
-    @Value("${nivesh.config.auth.url}")
+    @Value("${nivesh.auth.url}")
     private String issuerUrl;
-
-    @Value("${nivesh.config.auth.onboarded-token.expiry:15}")
-    private String onboardedTokenExpiry;
-
-    @Value("${nivesh.config.auth.access-token.expiry:15}")
-    private String accessTokenExpiry;
-
-    @Value("${nivesh.config.auth.refresh-token.expiry:7}")
-    private String refreshTokenExpiry;
 
     private final JwtEncoder jwtEncoder;
 
     private final JwtTokenService jwtTokenService;
 
-    public TokenServiceImpl(JwtEncoder jwtEncoder, JwtTokenService jwtTokenService) {
+    private final TokenProperties tokenProperties;
+
+    public TokenServiceImpl(JwtEncoder jwtEncoder, JwtTokenService jwtTokenService, TokenProperties tokenProperties) {
         this.jwtEncoder = jwtEncoder;
         this.jwtTokenService = jwtTokenService;
+        this.tokenProperties = tokenProperties;
     }
 
 
@@ -55,8 +52,7 @@ public class TokenServiceImpl implements TokenService {
     public String generateAccessToken(User user, String tokenType) {
         String accessToken = switch (tokenType) {
             case Constants.ONBOARDED_TOKEN -> issueOnboardedToken(user);
-            case Constants.ACCESS_TOKEN -> issueAccessToken(user);
-            case Constants.REGISTERED_TOKEN -> issueRegisteredToken(user);
+            case Constants.ACCESS_TOKEN, Constants.REGISTERED_TOKEN -> issueAccessToken(user);
             default -> "";
         };
         return accessToken;
@@ -64,7 +60,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public String generateRefreshToken(String email, String userId) {
-        int expiry = Integer.parseInt(refreshTokenExpiry);
+        int expiry = Integer.parseInt(tokenProperties.refreshExpiry());
 
         Map<String, Object> claims = new HashMap<>();
         claims.put(Constants.EMAIL, email);
@@ -82,7 +78,7 @@ public class TokenServiceImpl implements TokenService {
      * Issues onboarded token. User is only allowed to perform customer registration
      */
     private String issueOnboardedToken(User user) {
-        int expiry = Integer.parseInt(onboardedTokenExpiry);
+        int expiry = Integer.parseInt(tokenProperties.onboardedExpiry());
         Map<String, Object> claims = addClaims(user);
         claims.put(Constants.TOKEN_TYPE, Constants.ONBOARDED_TOKEN);
         claims.put(Constants.MOBILE, user.getMobileNumber());
@@ -94,9 +90,9 @@ public class TokenServiceImpl implements TokenService {
      * Issues Registered token. User is only allowed to start the kyc process.
      */
     private String issueRegisteredToken(User user) {
-        int expiry = Integer.parseInt(accessTokenExpiry);
+        int expiry = Integer.parseInt(tokenProperties.accessExpiry());
         Map<String, Object> claims = addClaims(user);
-        claims.put(Constants.TOKEN_TYPE, Constants.REGISTERED_TOKEN);
+        claims.put(Constants.TOKEN_TYPE, Constants.ACCESS_TOKEN);
         return generateToken(claims, expiry, ChronoUnit.MINUTES, String.valueOf(user.getId()));
     }
 
@@ -105,7 +101,7 @@ public class TokenServiceImpl implements TokenService {
      * Issues access token. User is allowed to perform all action in his account.
      */
     private String issueAccessToken(User user) {
-        int expiry = Integer.parseInt(accessTokenExpiry);
+        int expiry = Integer.parseInt(tokenProperties.accessExpiry());
         Map<String, Object> claims = addClaims(user);
         claims.put(Constants.TOKEN_TYPE, Constants.ACCESS_TOKEN);
         return generateToken(claims, expiry, ChronoUnit.MINUTES, String.valueOf(user.getId()));
@@ -157,7 +153,6 @@ public class TokenServiceImpl implements TokenService {
         Map<String, Object> claims = new HashMap<>();
         claims.put(Constants.ROLES, roles);
         claims.put(Constants.PERMISSIONS, permissions);
-        claims.put(Constants.STATUS, user.getCustomerStatus());
         claims.put(Constants.EMAIL, user.getEmail());
         return claims;
     }
