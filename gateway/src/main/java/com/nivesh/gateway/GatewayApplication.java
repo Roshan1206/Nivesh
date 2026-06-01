@@ -1,9 +1,10 @@
 package com.nivesh.gateway;
 
+import com.nivesh.library.NiveshLibraryAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = NiveshLibraryAutoConfiguration.class)
 public class GatewayApplication {
 
 	public static void main(String[] args) {
