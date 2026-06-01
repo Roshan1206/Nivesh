@@ -13,8 +13,12 @@ import java.util.UUID;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, UUID> {
 
+    /** Finds an account by its customer-facing account number. */
     Optional<Account> findByAccountNumber(String accountNumber);
 
+    /**
+     * Checks whether a customer already has an account for the supplied product and status.
+     */
     @Query("""
             SELECT CASE WHEN EXISTS (
                 SELECT 1 FROM Account a

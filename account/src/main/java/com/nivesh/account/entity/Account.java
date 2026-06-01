@@ -78,10 +78,14 @@ public class Account extends BaseAccount {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<FixedDeposit> fixedDeposits = new HashSet<>();
 
+    /** Recurring deposits linked to this account. */
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<RecurringDeposit> recurringDeposits = new HashSet<>();
 
 
+    /**
+     * Creates an active account with product-driven interest and matching total and available balances.
+     */
     public Account(String accountNumber, String customerNumber, BigDecimal balance, Product product) {
         this.customerNumber = customerNumber;
         this.product = product;

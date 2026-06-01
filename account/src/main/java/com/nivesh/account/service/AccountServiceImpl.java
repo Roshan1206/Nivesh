@@ -38,6 +38,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
+    /**
+     * Loads an account by identifier or raises a not-found exception for the API layer.
+     */
     @Override
     public Account getAccount(UUID accountId) {
         return accountRepository.findById(accountId).orElseThrow(
@@ -45,6 +48,9 @@ public class AccountServiceImpl implements AccountService {
         );
     }
 
+    /**
+     * Creates a new active account after enforcing duplicate-account and minimum-balance rules.
+     */
     @Override
     public AccountResponse createAccount(AccountRequest accountRequest) {
         String customerNumber = accountRequest.getCustomerNumber();
@@ -69,17 +75,26 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
+    /**
+     * Retrieves account information and maps it to the external account response contract.
+     */
     @Override
     public AccountResponse getAccountInfo(UUID accountId) {
         return buildAccountResponse(getAccount(accountId));
     }
 
+    /**
+     * Fetches only the available balance for lightweight balance checks.
+     */
     @Override
     public BigDecimal getAvailableBalance(UUID accountId) {
         return getAccount(accountId).getAvailableBalance();
     }
 
 
+    /**
+     * Maps a persisted account entity into the API response payload.
+     */
     private static AccountResponse buildAccountResponse(Account account) {
         AccountResponse response = new AccountResponse();
         response.setAccountNumber(account.getAccountNumber());
@@ -91,6 +106,9 @@ public class AccountServiceImpl implements AccountService {
         return response;
     }
 
+    /**
+     * Generates a Luhn-protected account number from the product prefix and product sequence.
+     */
     private String generateAccountNumber(Product product) {
         String sequenceName = product.getSequenceName();
         long number = sequenceGenerator.generateNextSeqValue(sequenceName);

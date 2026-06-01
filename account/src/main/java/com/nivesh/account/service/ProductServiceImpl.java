@@ -15,6 +15,9 @@ public class ProductServiceImpl implements ProductService {
         this.productRepository = productRepository;
     }
 
+    /**
+     * Loads account product metadata or raises a not-found exception when the code is unknown.
+     */
     @Override
     public Product getProduct(String productCode) {
         return productRepository.findByProductCode(productCode).orElseThrow(
@@ -22,6 +25,7 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
+    /** Generates the next three-digit product code from the current maximum code. */
     private String generateId(){
         String lastCode = productRepository.findMaxProductCode().orElseThrow();
         int next = Integer.parseInt(lastCode) + 1;

@@ -44,9 +44,11 @@ public class Product extends BaseAudit {
     @Column(name = "product_name", nullable = false, unique = true)
     private String productName;
 
+    /** Prefix used while generating customer-facing account numbers. */
     @Column(name = "product_prefix", nullable = false, unique = true)
     private String productPrefix;
 
+    /** Database sequence used to allocate account numbers for this product. */
     @Column(name = "sequence_name", nullable = false, unique = true)
     private String sequenceName;
 
@@ -81,6 +83,7 @@ public class Product extends BaseAudit {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
+    /** Accounts opened under this product configuration. */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Account> accounts;
 }

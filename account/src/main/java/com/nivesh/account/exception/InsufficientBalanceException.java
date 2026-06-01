@@ -6,8 +6,12 @@ import org.springframework.http.HttpStatus;
 @Getter
 public class InsufficientBalanceException extends RuntimeException {
 
+    /** HTTP status that should be returned to the caller. */
     private final HttpStatus status;
 
+    /**
+     * Creates an exception when the requested balance is below the required threshold.
+     */
     public InsufficientBalanceException(HttpStatus status, String message) {
         super(message);
         this.status = status;

@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/**
+ * REST controller exposing customer registration and profile lookup endpoints.
+ */
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
@@ -20,12 +23,14 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
+    /** Registers the authenticated user as a customer. */
     @PostMapping
     public ResponseEntity<Map<String, Object>> registerCustomer(@Valid @RequestBody CustomerRegisterRequest request) {
         Map<String, Object> response = customerService.registerCustomer(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /** Returns profile information for the authenticated customer. */
     @GetMapping("/info")
     public ResponseEntity<CustomerInfoResponse> getCustomerInfo() {
         return ResponseEntity.status(HttpStatus.OK).body(customerService.getCustomerInfo());
