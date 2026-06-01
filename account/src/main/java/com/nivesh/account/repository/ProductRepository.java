@@ -10,8 +10,10 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
 
+    /** Finds a product configuration by its three-digit product code. */
     Optional<Product> findByProductCode(String productCode);
 
+    /** Returns the highest product code currently stored, if any. */
     @Query("SELECT MAX(a.productCode) FROM Product a")
     Optional<String> findMaxProductCode();
 }

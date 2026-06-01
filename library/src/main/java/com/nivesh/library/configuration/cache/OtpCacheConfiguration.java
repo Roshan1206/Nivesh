@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 @EnableConfigurationProperties(OtpCacheProperties.class)
 public class OtpCacheConfiguration {
 
-    /** Name of the OTP cache */
+    /** Name of the OTP cache shared by the cache manager and OTP service. */
     public static final String OTP_CACHE_NAME = "otpCache";
 
     /**

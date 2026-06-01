@@ -28,6 +28,7 @@ import java.util.UUID;
 @Table(name = "recurring_deposits")
 public class RecurringDeposit extends BaseAccount{
 
+    /** Unique identifier for the recurring deposit record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")

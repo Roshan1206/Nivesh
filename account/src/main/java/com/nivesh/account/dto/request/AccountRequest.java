@@ -14,11 +14,14 @@ import java.math.BigDecimal;
 @Data
 public class AccountRequest {
 
+    /** Customer number owning the new account. */
     @ValidateCustomerNumber
     private String customerNumber;
 
+    /** Opening balance to seed the account; defaults to zero when omitted. */
     private BigDecimal openingBalance = BigDecimal.ZERO;
 
+    /** Three-digit product code that determines account rules and number generation. */
     @Pattern(regexp = "^\\d{3}$", message = "Must be of length 3")
     private String productCode;
 }

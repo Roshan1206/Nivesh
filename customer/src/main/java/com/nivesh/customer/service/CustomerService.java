@@ -22,7 +22,11 @@ public interface CustomerService {
      */
     Customer getCustomer(String customerNumber);
 
+    /**
+     * Get profile data for the authenticated customer.
+     */
     CustomerInfoResponse getCustomerInfo();
+
     /**
      * Update customer kyc status
      */

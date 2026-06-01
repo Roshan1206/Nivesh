@@ -29,6 +29,7 @@ import java.util.UUID;
 @Table(name = "fixed_deposits")
 public class FixedDeposit extends BaseAccount {
 
+    /** Unique identifier for the fixed deposit record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")

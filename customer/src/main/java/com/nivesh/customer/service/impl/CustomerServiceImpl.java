@@ -96,6 +96,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
 
+    /**
+     * Retrieves a customer by the externally visible customer number.
+     */
     @Transactional(readOnly = true)
     @Override
     public Customer getCustomer(String customerNumber) {
@@ -103,6 +106,9 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseThrow(CustomerNotFoundException::new);
     }
 
+    /**
+     * Builds the profile response for the currently authenticated customer.
+     */
     @Override
     public CustomerInfoResponse getCustomerInfo() {
         UUID userId = UUID.fromString(jwtTokenService.getUserId());
@@ -111,6 +117,9 @@ public class CustomerServiceImpl implements CustomerService {
         return CustomerMapper.buildCustomerResponse(customer);
     }
 
+    /**
+     * Updates the stored KYC status for a customer after validation workflows complete.
+     */
     @Transactional
     @Override
     public void updateKycStaus(String customerNumber, KycStatus status) {
@@ -119,6 +128,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(customer);
     }
 
+    /** Generates the next zero-padded eight-digit customer number. */
     private String getNextCustomerNumber() {
         long value = sequenceGenerator.generateNextSeqValue(SEQUENCE);
         return String.format("%08d", value);

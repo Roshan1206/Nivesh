@@ -59,6 +59,7 @@ public class JwtSecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/auth/**", "/error").permitAll()
+                        // Internal endpoints require service-to-service authorization instead of user scopes.
                         .requestMatchers("/*/internal/**").access(new InternalServiceAuthorizationManager())
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
@@ -103,6 +104,7 @@ public class JwtSecurityConfiguration {
     @Bean
     @ConditionalOnMissingBean(JwtDecoder.class)
     public JwtDecoder jwtDecoder(){
+        // Resource servers validate signatures against the auth server's JWK set endpoint.
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(authUrl + "/oauth2/jwks").build();
         OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefaultWithIssuer(authUrl);
         decoder.setJwtValidator(validator);

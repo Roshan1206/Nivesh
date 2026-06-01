@@ -17,10 +17,16 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class AccountResponse {
 
+    /** Generated account number exposed to customers. */
     private String accountNumber;
+    /** Customer number associated with the account. */
     private String customerNumber;
+    /** Current lifecycle status of the account. */
     private Status status;
+    /** Product code used to open the account. */
     private String productCode;
+    /** Human-readable product name. */
     private String productName;
+    /** Balance currently available for withdrawal or transfer. */
     private BigDecimal availableBalance;
 }
