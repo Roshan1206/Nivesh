@@ -1,3 +1,15 @@
+server:
+  port: 8888
+
 spring:
   application:
     name: config
+  cloud:
+    config:
+      server:
+        git:
+          uri: "https://github.com/Roshan1206/nivesh-config.git"
+          default-label: main
+          timeout: 5
+          clone-on-start: true
+          force-pull: true
