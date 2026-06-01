@@ -1,7 +1,7 @@
-﻿info:
-  name: customer
+info:
+  name: account
   type: folder
-  seq: 3
+  seq: 4
 
 request:
   headers:
@@ -9,6 +9,5 @@ request:
       value: "{{bearer}}"
   auth: inherit
   variables:
-    - name: customerId
-      value: "00000301"
-
+    - name: accountId
+      value: ec7cde7b-699f-4cc3-b2a5-9f66f60d8041

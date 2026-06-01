@@ -1,4 +1,4 @@
-package com.nivesh.customer.repository;
+﻿package com.nivesh.customer.repository;
 
 import com.nivesh.customer.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +11,8 @@ import java.util.UUID;
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     boolean existsByUserId(UUID id);
+
+    Optional<Customer> findByUserId(UUID userId);
 
     Optional<Customer> findByCustomerNumber(String customerNumber);
 }

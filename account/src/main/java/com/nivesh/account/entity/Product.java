@@ -1,5 +1,6 @@
-package com.nivesh.account.entity;
+﻿package com.nivesh.account.entity;
 
+import com.nivesh.library.entity.BaseAudit;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +25,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "products")
-public class Product {
+public class Product extends BaseAudit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -34,7 +35,7 @@ public class Product {
     /**
      * Product code
      */
-    @Column(name = "product_code", columnDefinition = "CHAR(3)", nullable = false, unique = true)
+    @Column(name = "product_code", nullable = false, unique = true)
     private String productCode;
 
     /**
@@ -42,6 +43,12 @@ public class Product {
      */
     @Column(name = "product_name", nullable = false, unique = true)
     private String productName;
+
+    @Column(name = "product_prefix", nullable = false, unique = true)
+    private String productPrefix;
+
+    @Column(name = "sequence_name", nullable = false, unique = true)
+    private String sequenceName;
 
     /**
      * Minimum balance for the product

@@ -1,4 +1,4 @@
-package com.nivesh.customer.service.impl;
+﻿package com.nivesh.customer.service.impl;
 
 import com.nivesh.customer.dto.request.CustomerRegisterRequest;
 import com.nivesh.customer.dto.response.CustomerInfoResponse;
@@ -99,13 +99,16 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional(readOnly = true)
     @Override
     public Customer getCustomer(String customerNumber) {
-        return customerRepository.findByCustomerNumber(customerNumber).
-                orElseThrow(CustomerNotFoundException::new);
+        return customerRepository.findByCustomerNumber(customerNumber)
+                .orElseThrow(CustomerNotFoundException::new);
     }
 
     @Override
-    public CustomerInfoResponse getCustomerInfo(String customerNumber) {
-        return CustomerMapper.buildCustomerResponse(getCustomer(customerNumber));
+    public CustomerInfoResponse getCustomerInfo() {
+        UUID userId = UUID.fromString(jwtTokenService.getUserId());
+        Customer customer = customerRepository.findByUserId(userId)
+                .orElseThrow(CustomerNotFoundException::new);
+        return CustomerMapper.buildCustomerResponse(customer);
     }
 
     @Transactional

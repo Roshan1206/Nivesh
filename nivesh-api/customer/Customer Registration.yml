@@ -1,11 +1,11 @@
-info:
+﻿info:
   name: Customer Registration
   type: http
   seq: 1
 
 http:
   method: POST
-  url: "{{customer}}/customer"
+  url: "{{customer}}/customers"
   body:
     type: json
     data: |-

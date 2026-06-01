@@ -1,4 +1,4 @@
-package com.nivesh.account.entity;
+﻿package com.nivesh.account.entity;
 
 import com.nivesh.account.entity.enums.Status;
 import jakarta.persistence.*;
@@ -14,7 +14,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * Details of a Recurring Deposit — customer deposits a fixed amount every month. Missed instalments incur penalty. Maturity amount calculated at opening
+ * Details of a Recurring Deposit - customer deposits a fixed amount every month.
+ * Missed instalments incur penalty. Maturity amount calculated at opening
  * using compound interest.
  * 
  * @author Roshan 
@@ -36,13 +37,13 @@ public class RecurringDeposit extends BaseAccount{
      * Which customer account it belongs to.
      */
     @ManyToOne
-    @Column(name = "account", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     /**
      * Monthly installment amount for the deposit. Must be in multiple of 100
      */
-    @Column(name = "monthly_installment", nullable = false)
+    @Column(name = "installment", nullable = false)
     private BigDecimal installment;
 
     /**

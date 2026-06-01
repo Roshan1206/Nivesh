@@ -1,6 +1,9 @@
-package com.nivesh.account.dto.response;
+﻿package com.nivesh.account.dto.response;
 
+import com.nivesh.account.entity.enums.Status;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
@@ -10,16 +13,13 @@ import java.math.BigDecimal;
  * @author Roshan
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AccountResponse {
 
-    private String name;
     private String accountNumber;
     private String customerNumber;
-    private String address;
-    private String pinCode;
-    private String ifscCode;
-    private String branchCode;
-    private String branchAddress;
+    private Status status;
     private String productCode;
     private String productName;
     private BigDecimal availableBalance;

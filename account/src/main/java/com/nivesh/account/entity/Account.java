@@ -1,4 +1,4 @@
-package com.nivesh.account.entity;
+﻿package com.nivesh.account.entity;
 
 import com.nivesh.account.entity.enums.Status;
 import jakarta.persistence.*;
@@ -8,11 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -27,7 +26,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(name = "accounts")
-public class Account extends BaseAccount{
+public class Account extends BaseAccount {
 
     /**
      * UUID is used for account id. Unique and random
@@ -50,8 +49,6 @@ public class Account extends BaseAccount{
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-
-
     /**
      * Total balance - including hold amount
      */
@@ -65,6 +62,12 @@ public class Account extends BaseAccount{
     private BigDecimal availableBalance;
 
     /**
+     * Current hold balance
+     */
+    @Column(name = "hold_balance", precision = 20, scale = 2)
+    private BigDecimal holdBalance = BigDecimal.ZERO;
+
+    /**
      * Account status for transactions
      */
     @Enumerated(EnumType.STRING)
@@ -72,10 +75,20 @@ public class Account extends BaseAccount{
     @Column(name = "status", nullable = false, columnDefinition = "status_enum")
     private Status status;
 
-    /**
-     * Account last updated date. Cannot be insertable
-     */
-    @LastModifiedDate
-    @Column(name = "updated_at", insertable = false)
-    private LocalDateTime updatedAt;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<FixedDeposit> fixedDeposits = new HashSet<>();
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<RecurringDeposit> recurringDeposits = new HashSet<>();
+
+
+    public Account(String accountNumber, String customerNumber, BigDecimal balance, Product product) {
+        this.customerNumber = customerNumber;
+        this.product = product;
+        this.balance = balance;
+        this.availableBalance = balance;
+        this.status = Status.ACTIVE;
+        super.setAccountNumber(accountNumber);
+        super.setInterestRate(product.getInterestRate());
+    }
 }

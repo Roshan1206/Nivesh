@@ -1,10 +1,10 @@
-package com.nivesh.library.configuration.cache;
+﻿package com.nivesh.library.configuration.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.nivesh.library.cache.EmailOtpSender;
 import com.nivesh.library.cache.OtpCacheService;
 import com.nivesh.library.cache.OtpSender;
-import com.nivesh.library.cache.annotation.EnableOtpCache;
+import com.nivesh.library.annotation.EnableOtpCache;
 import com.nivesh.library.cache.properties.OtpCacheProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

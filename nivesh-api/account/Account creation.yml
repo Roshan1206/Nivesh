@@ -1,17 +1,18 @@
-﻿info:
-  name: Login
+info:
+  name: Account creation
   type: http
-  seq: 4
+  seq: 1
 
 http:
   method: POST
-  url: "{{auth}}/auth/login"
+  url: "{{account}}/accounts"
   body:
     type: json
     data: |-
       {
-        "email": "test@gmail.com",
-        "password": "Password@1234"
+        "customerNumber": "00000301",
+        "openingBalance": 2000,
+        "productCode": "001"
       }
   auth: inherit
 
@@ -20,4 +21,3 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
-

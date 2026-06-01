@@ -1,4 +1,4 @@
-package com.nivesh.account.entity;
+﻿package com.nivesh.account.entity;
 
 import com.nivesh.account.entity.enums.PayoutType;
 import com.nivesh.account.entity.enums.Status;
@@ -38,7 +38,7 @@ public class FixedDeposit extends BaseAccount {
      * Which customer account it belongs to.
      */
     @ManyToOne
-    @Column(name = "account", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     /**
@@ -82,7 +82,7 @@ public class FixedDeposit extends BaseAccount {
      */
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "product_type", nullable = false, updatable = false, columnDefinition = "payout_type_enum")
+    @Column(name = "payout_type", nullable = false, updatable = false, columnDefinition = "payout_type_enum")
     private PayoutType payoutType;
 
     /**

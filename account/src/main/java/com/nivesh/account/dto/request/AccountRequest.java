@@ -1,7 +1,6 @@
-package com.nivesh.account.dto.request;
+﻿package com.nivesh.account.dto.request;
 
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
+import com.nivesh.library.annotation.ValidateCustomerNumber;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
@@ -15,14 +14,10 @@ import java.math.BigDecimal;
 @Data
 public class AccountRequest {
 
-    @Pattern(regexp = "^\\d{8}$", message = "Customer Number can only be of 8 digits")
+    @ValidateCustomerNumber
     private String customerNumber;
 
-    @Pattern(regexp = "^[A-Z0-9]{11}$", message = "Invalid IFSC code")
-    private String ifscCode;
-
-    @DecimalMin(value = "100.00", message = "Must be greater than and multiple of 100")
-    private BigDecimal openingBalance;
+    private BigDecimal openingBalance = BigDecimal.ZERO;
 
     @Pattern(regexp = "^\\d{3}$", message = "Must be of length 3")
     private String productCode;

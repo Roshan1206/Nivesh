@@ -1,4 +1,4 @@
-package com.nivesh.library.configuration.security;
+﻿package com.nivesh.library.configuration.security;
 
 import com.nivesh.library.constant.Constants;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,18 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -31,7 +27,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -64,9 +59,7 @@ public class JwtSecurityConfiguration {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req
                         .requestMatchers("/auth/**", "/error").permitAll()
-                        .requestMatchers("/*/internal/**")
-//                        .permitAll()
-                        .access(new InternalServiceAuthorizationManager())
+                        .requestMatchers("/*/internal/**").access(new InternalServiceAuthorizationManager())
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter())))
@@ -110,7 +103,7 @@ public class JwtSecurityConfiguration {
     @Bean
     @ConditionalOnMissingBean(JwtDecoder.class)
     public JwtDecoder jwtDecoder(){
-        NimbusJwtDecoder decoder = NimbusJwtDecoder.withIssuerLocation(authUrl).build();
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(authUrl + "/oauth2/jwks").build();
         OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefaultWithIssuer(authUrl);
         decoder.setJwtValidator(validator);
         return decoder;
