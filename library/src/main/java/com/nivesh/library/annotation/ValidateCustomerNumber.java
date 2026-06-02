@@ -1,4 +1,4 @@
-﻿package com.nivesh.library.annotation;
+package com.nivesh.library.annotation;
 
 
 import jakarta.validation.Constraint;

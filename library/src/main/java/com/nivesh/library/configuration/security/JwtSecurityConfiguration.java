@@ -1,4 +1,4 @@
-﻿package com.nivesh.library.configuration.security;
+package com.nivesh.library.configuration.security;
 
 import com.nivesh.library.constant.Constants;
 import org.springframework.beans.factory.annotation.Value;

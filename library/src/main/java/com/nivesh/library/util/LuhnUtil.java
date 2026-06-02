@@ -1,4 +1,4 @@
-﻿package com.nivesh.library.util;
+package com.nivesh.library.util;
 
 /**
  * Utility methods for generating and validating Luhn check digits.
