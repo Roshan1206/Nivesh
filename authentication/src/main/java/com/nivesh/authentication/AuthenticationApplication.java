@@ -1,4 +1,4 @@
-﻿package com.nivesh.authentication;
+package com.nivesh.authentication;
 
 import com.nivesh.library.annotation.EnableOtpCache;
 import org.springframework.boot.SpringApplication;

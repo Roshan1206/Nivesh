@@ -1,4 +1,4 @@
-﻿package com.nivesh.customer;
+package com.nivesh.customer;
 
 import com.nivesh.library.annotation.EnableOtpCache;
 import org.springframework.boot.SpringApplication;

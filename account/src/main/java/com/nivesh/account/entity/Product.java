@@ -1,4 +1,4 @@
-﻿package com.nivesh.account.entity;
+package com.nivesh.account.entity;
 
 import com.nivesh.library.entity.BaseAudit;
 import jakarta.persistence.*;

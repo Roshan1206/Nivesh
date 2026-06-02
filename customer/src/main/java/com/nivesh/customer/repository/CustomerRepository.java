@@ -1,4 +1,4 @@
-﻿package com.nivesh.customer.repository;
+package com.nivesh.customer.repository;
 
 import com.nivesh.customer.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;

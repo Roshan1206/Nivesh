@@ -1,4 +1,4 @@
-﻿package com.nivesh.account.dto.response;
+package com.nivesh.account.dto.response;
 
 import com.nivesh.account.entity.enums.Status;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-﻿package com.nivesh.account.controller;
+package com.nivesh.account.controller;
 
 import com.nivesh.account.dto.request.AccountRequest;
 import com.nivesh.account.dto.response.AccountResponse;

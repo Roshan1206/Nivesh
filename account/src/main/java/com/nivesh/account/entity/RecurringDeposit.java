@@ -1,4 +1,4 @@
-﻿package com.nivesh.account.entity;
+package com.nivesh.account.entity;
 
 import com.nivesh.account.entity.enums.Status;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-﻿package com.nivesh.account.repository;
+package com.nivesh.account.repository;
 
 import com.nivesh.account.entity.Account;
 import com.nivesh.account.entity.enums.Status;
