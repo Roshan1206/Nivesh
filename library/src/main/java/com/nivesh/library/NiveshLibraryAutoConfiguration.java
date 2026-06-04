@@ -1,7 +1,9 @@
 package com.nivesh.library;
 
+import com.nivesh.library.cache.properties.OtpCacheProperties;
 import com.nivesh.library.exception.GlobalExceptionHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -17,5 +19,6 @@ import org.springframework.context.annotation.ComponentScan;
                 "com.nivesh.library.service"
         },
         basePackageClasses = {GlobalExceptionHandler.class})
+@EnableConfigurationProperties(OtpCacheProperties.class)
 public class NiveshLibraryAutoConfiguration {
 }

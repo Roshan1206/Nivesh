@@ -1,13 +1,13 @@
 package com.nivesh.library.cache;
 
 import com.nivesh.library.cache.properties.OtpCacheProperties;
-import com.nivesh.library.configuration.cache.OtpCacheConfiguration;
+import com.nivesh.library.constant.CacheConstants;
 import com.nivesh.library.dto.request.OtpEntry;
-import com.nivesh.library.dto.response.OtpStore;
 import com.nivesh.library.entity.enums.OtpPurpose;
 import com.nivesh.library.exception.OtpErrorCode;
 import com.nivesh.library.exception.OtpException;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.nivesh.library.service.JwtTokenService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +17,8 @@ import java.security.SecureRandom;
 /**
  * Service class for OTP generation and validation.
  */
+@Slf4j
+//@Service
 public class OtpCacheService {
 
     /**
@@ -29,10 +31,14 @@ public class OtpCacheService {
      */
     private final Cache otpCache;
 
+    private final JwtTokenService jwtTokenService;
+
     /**
      * Properties to be used for cache
      */
     private final OtpCacheProperties properties;
+
+    private final OtpSender sender;
 
     /**
      * Generated random OTP
@@ -42,12 +48,14 @@ public class OtpCacheService {
     /**
      * Injecting required dependency using CI
      */
-    public OtpCacheService(@Qualifier("otpCacheManager") CacheManager cacheManager,
-                           OtpCacheProperties properties) {
-        this.otpCache = cacheManager.getCache(OtpCacheConfiguration.OTP_CACHE_NAME);
+    public OtpCacheService(CacheManager cacheManager, JwtTokenService jwtTokenService,
+                           OtpCacheProperties properties, OtpSender sender) {
+        this.otpCache = cacheManager.getCache(CacheConstants.OTP_CACHE_NAME);
+        this.jwtTokenService = jwtTokenService;
         this.properties = properties;
         this.encoder = new BCryptPasswordEncoder();
         this.secureRandom = new SecureRandom();
+        this.sender = sender;
     }
 
     /**
@@ -55,9 +63,13 @@ public class OtpCacheService {
      *
      * @param requestId otp request id
      * @param otpPurpose purpose for which the otp is generated
-     * @return OtpStore containing requestId and OTP
      */
-    public OtpStore generateOtp(String requestId, OtpPurpose otpPurpose) {
+    public void generateOtp(String requestId, OtpPurpose otpPurpose) {
+        String email = jwtTokenService.extractEmail();
+        generateOtp(requestId, otpPurpose, email);
+    }
+
+    public void generateOtp(String requestId, OtpPurpose otpPurpose, String email) {
         int bound = (int) Math.pow(10, properties.getOtpLength());
         int min = (int) Math.pow(10, properties.getOtpLength() - 1);
         String plainOtp = String.format(
@@ -65,10 +77,11 @@ public class OtpCacheService {
                 secureRandom.nextInt(bound - min) + min
         );
 
+        log.info("OTP: {}", plainOtp);
         String otpHash = encoder.encode(plainOtp);
         OtpEntry entry = new OtpEntry(otpHash, requestId, otpPurpose, properties.getTtlSeconds(), properties.getMaxAttempts());
         otpCache.put(buildKey(requestId, otpPurpose), entry);
-        return new OtpStore(plainOtp, entry.getRequestId());
+        sender.send(email, plainOtp);
     }
 
 
@@ -116,7 +129,7 @@ public class OtpCacheService {
      * @param purpose the OTP use case
      * @return combined cache key
      */
-    private String buildKey(String requestId, OtpPurpose purpose) {
+    public static String buildKey(String requestId, OtpPurpose purpose) {
         return requestId + ":" + purpose.name();
     }
 }
