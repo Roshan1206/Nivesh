@@ -8,7 +8,6 @@ package com.nivesh.library.constant;
  */
 public final class Constants {
 
-    // ==================== JWT Claims - Token Type ====================
     /** JWT claim defining the token type */
     public static final String TOKEN_TYPE = "token_type";
 
@@ -32,7 +31,6 @@ public final class Constants {
     /** Super admin role with full permissions */
     public static final String ROLE_SUPER_ADMIN = "SUPER_ADMIN";
     
-    // ==================== JWT Claims - User Info ====================
     /** JWT claim for user status */
     public static final String STATUS = "status";
     /** JWT claim for user email */
@@ -42,7 +40,6 @@ public final class Constants {
     /** JWT claim for user ID */
     public static final String USER_ID = "userId";
     
-    // ==================== Internal Service Headers ====================
     /** Header name for identifying internal service requests */
     public static final String INTERNAL_ROLE_HEADER_NAME = "X-Internal-Role";
 
@@ -51,4 +48,6 @@ public final class Constants {
 
     /** Header name to identify source microservice */
     public static final String SOURCE_SERVICE_HEADER_NAME = "X-Source-Service";
+
+    public static final String IDEMPOTENCY_KEY = "idempotencyKey";
 }

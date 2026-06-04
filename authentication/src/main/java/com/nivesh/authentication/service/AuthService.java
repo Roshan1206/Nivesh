@@ -7,6 +7,8 @@ import com.nivesh.authentication.dto.response.RegisterResponse;
 import com.nivesh.authentication.dto.response.TokenResponse;
 import com.nivesh.library.dto.response.OtpResponse;
 
+import java.util.UUID;
+
 /**
  * Defines the public authentication workflows exposed by the authentication module.
  *

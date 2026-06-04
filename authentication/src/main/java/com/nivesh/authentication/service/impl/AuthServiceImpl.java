@@ -12,7 +12,6 @@ import com.nivesh.authentication.exception.InvalidUserStatusException;
 import com.nivesh.authentication.service.TokenService;
 import com.nivesh.library.cache.OtpCacheService;
 import com.nivesh.library.dto.response.OtpResponse;
-import com.nivesh.library.dto.response.OtpStore;
 import com.nivesh.library.entity.enums.CustomerStatus;
 import com.nivesh.authentication.service.AuthService;
 import com.nivesh.authentication.service.UserService;
@@ -95,11 +94,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public OtpResponse initiateRegistration(RegisterRequest request) {
         String requestId = UUID.randomUUID().toString();
-        OtpStore otpStore = otpCacheService.generateOtp(requestId, OtpPurpose.USER_REGISTRATION);
-        log.info("OTP: {}", otpStore.plainOtp());
-        sender.send(request.getEmail(), otpStore.plainOtp());
-        registerCache.put(buildKey(otpStore.otpRequestId(), OtpPurpose.USER_REGISTRATION.name()), request);
-        return new OtpResponse(otpStore.otpRequestId());
+        otpCacheService.generateOtp(requestId, OtpPurpose.USER_REGISTRATION, request.getEmail());
+        registerCache.put(OtpCacheService.buildKey(requestId, OtpPurpose.USER_REGISTRATION), request);
+        return new OtpResponse(requestId);
     }
 
     /**
@@ -112,8 +109,8 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public RegisterResponse registerUser(String requestId, String otp) {
-        RegisterRequest registerRequest = registerCache.get(
-                buildKey(requestId, OtpPurpose.USER_REGISTRATION.name()), RegisterRequest.class);
+        String key = OtpCacheService.buildKey(requestId, OtpPurpose.USER_REGISTRATION);
+        RegisterRequest registerRequest = registerCache.get(key, RegisterRequest.class);
         if (registerRequest == null) {
             throw new OtpException("Otp expired", OtpErrorCode.EXPIRED);
         }

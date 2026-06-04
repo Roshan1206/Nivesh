@@ -10,13 +10,10 @@ import com.nivesh.customer.service.KycService;
 import com.nivesh.customer.service.client.AuthServerClient;
 import com.nivesh.library.cache.OtpCacheService;
 import com.nivesh.library.dto.response.OtpResponse;
-import com.nivesh.library.dto.response.OtpStore;
 import com.nivesh.library.entity.enums.CustomerStatus;
 import com.nivesh.library.entity.enums.KycStatus;
 import com.nivesh.library.entity.enums.OtpPurpose;
 import com.nivesh.library.service.JwtTokenService;
-import com.nivesh.library.cache.OtpSender;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,19 +38,16 @@ public class KycServiceImpl implements KycService {
 
     private final JwtTokenService jwtTokenService;
 
-    private final OtpSender otpSender;
 
     public KycServiceImpl(AuthServerClient authServerClient, ContactService contactService,
                           CustomerService customerService, KycDocumentRepository repository,
-                          JwtTokenService jwtTokenService, OtpCacheService otpCacheService,
-                          @Qualifier("emailOtpSender") OtpSender otpSender) {
+                          JwtTokenService jwtTokenService, OtpCacheService otpCacheService) {
         this.authServerClient = authServerClient;
         this.contactService = contactService;
         this.customerService = customerService;
         this.repository = repository;
         this.jwtTokenService = jwtTokenService;
         this.otpCacheService = otpCacheService;
-        this.otpSender = otpSender;
     }
 
 //    TODO: create validation method for kyc using UIDAI/NSDL and service class for saving the file
@@ -68,10 +62,7 @@ public class KycServiceImpl implements KycService {
         KycDocument saved = repository.save(kycDocument);
 
         String requestId = saved.getId().toString();
-        String email = contactService.getCustomerEmail(customer.getId());
-        OtpStore otpStore = otpCacheService.generateOtp(requestId, OtpPurpose.KYC_VERIFICATION);
-        otpSender.send(email, otpStore.plainOtp());
-
+        otpCacheService.generateOtp(requestId, OtpPurpose.KYC_VERIFICATION);
         return new OtpResponse("KYC initiated. Verify with OTP to complete", requestId);
     }
 
@@ -84,7 +75,8 @@ public class KycServiceImpl implements KycService {
     }
 
     private void updateKycStatus(String requestId) {
-        KycDocument document = repository.findById(UUID.fromString(requestId)).orElseThrow(
+        UUID id = UUID.fromString(requestId);
+        KycDocument document = repository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Reinitiate Kyc")
         );
 

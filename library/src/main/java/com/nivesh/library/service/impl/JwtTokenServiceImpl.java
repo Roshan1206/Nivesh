@@ -68,6 +68,15 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         return jwtDecoder.decode(token).getClaimAsString(Constants.EMAIL);
     }
 
+    /**
+     * Extracts the email of current authenticated user
+     *
+     * @return User email
+     */
+    @Override
+    public String extractEmail() {
+        return extractEmail(getToken());
+    }
 
     /**
      * Extract token type from token

@@ -39,7 +39,8 @@ CREATE TABLE accounts (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_by VARCHAR(100) NOT NULL,
     updated_at TIMESTAMPTZ,
-    updated_by VARCHAR(100)
+    updated_by VARCHAR(100),
+    version BIGINT NOT NULL
 );
 
 CREATE TABLE fixed_deposits(
@@ -87,3 +88,21 @@ CREATE TABLE recurring_deposits(
 ALTER TABLE accounts ADD CONSTRAINT fk_account_product FOREIGN KEY (product_id) REFERENCES products(id);
 ALTER TABLE fixed_deposits ADD CONSTRAINT fk_fd_account FOREIGN KEY (account_id) REFERENCES accounts(id);
 ALTER TABLE recurring_deposits ADD CONSTRAINT fk_rd_account FOREIGN KEY (account_id) REFERENCES accounts(id);
+
+CREATE TYPE operation_type_enum AS ENUM ('DEBIT', 'CREDIT');
+CREATE TABLE idempotency_records (
+    id                   UUID           NOT NULL DEFAULT gen_random_uuid(),
+    idempotency_key      VARCHAR(255)   NOT NULL,
+    type            VARCHAR(10)    NOT NULL,
+    account_id           UUID           NOT NULL,
+    amount               DECIMAL(20, 4) NOT NULL,
+    running_balance      DECIMAL(20, 4) NOT NULL,
+    response_status_code INT            NOT NULL,
+    expires_at           TIMESTAMP      NOT NULL,
+    created_at           TIMESTAMP      NOT NULL DEFAULT now(),
+    created_by           VARCHAR(255),
+    updated_at          TIMESTAMP      NOT NULL DEFAULT now(),
+    updated_by          VARCHAR(255),
+    CONSTRAINT pk_idempotency_records PRIMARY KEY (id),
+    CONSTRAINT uq_idempotency_key UNIQUE (idempotency_key)
+)

@@ -1,4 +1,4 @@
-package com.nivesh.transaction.dto.request;
+package com.nivesh.library.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,4 +14,5 @@ public class TransactionRequest {
     private String sourceAccountNumber;
     private String destinationAccountNumber;
     private BigDecimal amount;
+    private String description;
 }

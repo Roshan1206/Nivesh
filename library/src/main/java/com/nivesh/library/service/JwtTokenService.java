@@ -17,6 +17,13 @@ public interface JwtTokenService {
     /**
      * Extracts the email of current authenticated user
      *
+     * @return User email
+     */
+    String extractEmail();
+
+    /**
+     * Extracts the email of current authenticated user
+     *
      * @param token authenticated token
      * @return User email
      */

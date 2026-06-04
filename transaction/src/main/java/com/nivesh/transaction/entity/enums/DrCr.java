@@ -1,7 +1,6 @@
 package com.nivesh.transaction.entity.enums;
 
-public enum TransactionFlow {
-
+public enum DrCr {
     DR,
     CR
 }

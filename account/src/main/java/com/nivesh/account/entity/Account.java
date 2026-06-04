@@ -82,6 +82,10 @@ public class Account extends BaseAccount {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<RecurringDeposit> recurringDeposits = new HashSet<>();
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
 
     /**
      * Creates an active account with product-driven interest and matching total and available balances.

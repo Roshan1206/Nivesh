@@ -4,6 +4,7 @@ import com.nivesh.library.entity.enums.OtpPurpose;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Represents an OTP entry stored in cache with expiration and attempt tracking.

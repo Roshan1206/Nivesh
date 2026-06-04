@@ -3,6 +3,10 @@ package com.nivesh.account.service;
 import com.nivesh.account.dto.request.AccountRequest;
 import com.nivesh.account.dto.response.AccountResponse;
 import com.nivesh.account.entity.Account;
+import com.nivesh.library.dto.request.AmountTransactionRequest;
+import com.nivesh.library.dto.request.TransactionRequest;
+import com.nivesh.library.dto.response.AccountTransactionResponse;
+import com.nivesh.library.dto.response.AccountValidationResponse;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -25,5 +29,11 @@ public interface AccountService {
 
     /** Returns the available balance for balance-only account lookups. */
     BigDecimal getAvailableBalance(UUID accountId);
+
+    AccountValidationResponse validateAccount(TransactionRequest request);
+
+    AccountTransactionResponse debit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request);
+
+    AccountTransactionResponse credit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request);
 
 }
