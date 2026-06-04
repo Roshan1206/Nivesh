@@ -1,0 +1,27 @@
+info:
+  name: Transaction initiate
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{transaction}}/transactions"
+  headers:
+    - name: idempotencyKey
+      value: 10cd68d3-e26e-44b4-b356-8de191c02247
+  body:
+    type: json
+    data: |-
+      {
+        "sourceAccountNumber": "10000000025",
+        "destinationAccountNumber": "10000000017",
+        "amount": 500.00,
+        "message": "first"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

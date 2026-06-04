@@ -1,0 +1,20 @@
+info:
+  name: Debit internal
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: "{{account}}/accounts/internal/{{accId}}/debit"
+  auth: inherit
+
+runtime:
+  variables:
+    - name: accId
+      value: bbf01d96-f781-450c-87fd-5d2e6e5ad3b9
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
