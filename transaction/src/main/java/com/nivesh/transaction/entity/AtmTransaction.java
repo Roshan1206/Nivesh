@@ -26,6 +26,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Persistence entity that models ATM transaction data in the transaction domain.
+ */
 @Entity
 @Table(name = "atm_transactions")
 @Getter
@@ -34,57 +37,67 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 class AtmTransaction {
- 
+
+    /** Unique identifier for the ATM transaction record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "atm_txn_id", updatable = false, nullable = false)
     private UUID atmTxnId;
- 
+
+    /** Transaction associated with this detail record. */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "txn_id", nullable = false, unique = true,
                 updatable = false,
                 foreignKey = @ForeignKey(name = "fk_atm_txn_transaction"))
     private Transaction transaction;
- 
+
+    /** Identifier of the ATM terminal. */
     // Which physical ATM terminal processed this.
     // UUID from Branch & ATM Service (port 8093).
     @Column(name = "atm_id", nullable = false, updatable = false)
     private UUID atmId;
- 
+
+    /** Identifier of the card used at the ATM. */
     // Which debit card was used.
     // UUID from Cards Service (port 8087).
     @Column(name = "card_id", nullable = false, updatable = false)
     private UUID cardId;
- 
+
+    /** Indicates whether the card PIN was verified. */
     // False = customer did not enter correct PIN.
     // Triggers automatic fraud review flag.
     // After 3 false PINs in a session → card blocked.
     @Column(name = "pin_verified", nullable = false, updatable = false)
     private boolean pinVerified;
- 
+
+    /** Amount requested by the ATM customer. */
     // What the customer requested.
     // May differ from dispensed_amount if ATM ran low on cash.
     @Column(name = "requested_amount", nullable = false,
             precision = 20, scale = 4, updatable = false)
     private BigDecimal requestedAmount;
- 
+
+    /** Amount actually dispensed by the ATM. */
     // Actual cash physically dispensed.
     // Stored for dispute resolution: "I asked for ₹5000 but got ₹4800"
     @Column(name = "dispensed_amount", nullable = false,
             precision = 20, scale = 4)
     private BigDecimal dispensedAmount;
- 
+
+    /** Reason the ATM transaction was rejected. */
     // Null on success. Reason code if ATM declined.
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "reject_reason", length = 30, columnDefinition = "atm_reject_reason")
     private AtmRejectReason rejectReason;
- 
+
+    /** ATM-provided sequence number for reconciliation. */
     // ISO 8583 sequence number from the ATM switch.
     // Used for inter-system reconciliation with the ATM vendor.
     @Column(name = "atm_sequence_number", length = 20, updatable = false)
     private String atmSequenceNumber;
- 
+
+    /** Timestamp when this record was created. */
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

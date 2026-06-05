@@ -17,8 +17,8 @@ import java.util.UUID;
  * Details of a Recurring Deposit - customer deposits a fixed amount every month.
  * Missed instalments incur penalty. Maturity amount calculated at opening
  * using compound interest.
- * 
- * @author Roshan 
+ *
+ * @author Roshan
  */
 @Getter
 @Setter

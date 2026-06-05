@@ -24,6 +24,7 @@ import java.util.UUID;
 @Table(name = "user_role_history")
 public class UserRoleHistory {
 
+    /** Unique identifier for this record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
@@ -66,6 +67,7 @@ public class UserRoleHistory {
     @JoinColumn(name = "changed_by", nullable = false)
     private User changedBy;
 
+    /** Timestamp when the role change was recorded. */
     @Column(name = "changed_at", nullable = false)
     private Instant changedAt;
 

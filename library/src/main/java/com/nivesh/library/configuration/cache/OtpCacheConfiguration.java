@@ -41,7 +41,6 @@ public class OtpCacheConfiguration {
         return new OtpCacheService(cacheManager, jwtTokenService, properties, sender);
     }
 
-
     /**
      * Provides an email-based OTP sender implementation.
      * Sends OTPs asynchronously with built-in retry mechanism.

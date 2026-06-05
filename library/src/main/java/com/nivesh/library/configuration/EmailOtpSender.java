@@ -23,14 +23,12 @@ public class EmailOtpSender implements OtpSender {
      */
     private final JavaMailSender mailSender;
 
-
     /**
      * Injecting dependency using CI
      */
     public EmailOtpSender(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
-
 
     /**
      * Sends OTP via email asynchronously with automatic retry on failure.
@@ -55,7 +53,6 @@ public class EmailOtpSender implements OtpSender {
         mailSender.send(message);
         log.debug("OTP sent to {}", email);
     }
-
 
     /**
      * Handles OTP email delivery failure after all retry attempts.

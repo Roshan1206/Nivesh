@@ -8,6 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying contact records.
+ */
 @Repository
 public interface ContactRepository extends JpaRepository<Contact, UUID> {
 

@@ -30,7 +30,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
      */
     private final JwtDecoder jwtDecoder;
 
-
     /**
      * Injecting required dependency via Constructor Injection
      */
@@ -38,7 +37,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         this.servletRequest = servletRequest;
         this.jwtDecoder = jwtDecoder;
     }
-
 
     /**
      * Extract the user details from jwt token which are required to create customer account.
@@ -55,7 +53,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         info.put(Constants.MOBILE, (String) claims.get(Constants.MOBILE));
         return info;
     }
-
 
     /**
      * Extracts the email of current authenticated user after token validation.
@@ -93,7 +90,6 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         Instant expiry = jwtDecoder.decode(refreshToken).getExpiresAt();
         return expiry != null && expiry.isBefore(Instant.now());
     }
-
 
     /**
      * Extract current authenticated user id.

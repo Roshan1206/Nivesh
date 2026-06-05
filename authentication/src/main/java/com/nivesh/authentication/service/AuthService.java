@@ -30,7 +30,6 @@ public interface AuthService {
      */
     RegisterResponse registerUser(String requestId, String otp);
 
-
     /**
      * Authenticates user credentials and returns a token pair.
      *
@@ -38,7 +37,6 @@ public interface AuthService {
      * @return tokens
      */
     TokenResponse loginUser(LoginRequest request);
-
 
     /**
      * Refreshes an access token using a valid refresh token.

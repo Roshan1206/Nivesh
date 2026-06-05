@@ -13,6 +13,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Mapper component for converting between customer domain objects and transfer objects.
+ */
 public class CustomerMapper {
 
     public static Customer buildCustomer(CustomerRegisterRequest request, UUID userId, String customerNumber) {

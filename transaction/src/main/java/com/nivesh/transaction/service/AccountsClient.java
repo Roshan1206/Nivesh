@@ -6,6 +6,9 @@ import com.nivesh.library.dto.response.AccountValidationResponse;
 
 import java.util.UUID;
 
+/**
+ * Client abstraction for communicating with dependent services from the transaction module.
+ */
 public interface AccountsClient {
 
     AccountValidationResponse validateAccount(TransactionRequest request);

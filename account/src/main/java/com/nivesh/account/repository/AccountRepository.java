@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying account records.
+ */
 @Repository
 public interface AccountRepository extends JpaRepository<Account, UUID> {
 

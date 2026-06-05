@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying address records.
+ */
 @Repository
 public interface AddressRepository extends JpaRepository<Address, UUID> {
 }

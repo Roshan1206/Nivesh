@@ -26,14 +26,21 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
+    /** Encoder used to hash and verify passwords. */
     private final PasswordEncoder passwordEncoder;
 
+    /** Service used to manage user roles. */
     private final RoleService roleService;
 
+    /** Service used to issue and refresh tokens. */
     private final TokenService tokenService;
 
+    /** Repository used to persist and query users. */
     private final UserRepository userRepository;
 
+    /**
+     * Injects dependencies used to register, load, and update users.
+     */
     public UserServiceImpl(PasswordEncoder passwordEncoder, RoleService roleService,
                            TokenService tokenService, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
@@ -65,7 +72,6 @@ public class UserServiceImpl implements UserService {
                 () -> new UsernameNotFoundException(email + " not found.")
         );
     }
-
 
     /**
      * Updates the user status. Should only be used by other services.

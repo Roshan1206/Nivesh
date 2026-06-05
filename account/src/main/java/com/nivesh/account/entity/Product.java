@@ -27,6 +27,7 @@ import java.util.UUID;
 @Table(name = "products")
 public class Product extends BaseAudit {
 
+    /** Unique identifier for this record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")

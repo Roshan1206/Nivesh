@@ -25,21 +25,27 @@ import java.util.*;
 @EnableConfigurationProperties(TokenProperties.class)
 public class TokenServiceImpl implements TokenService {
 
+    /** Configured issuer URL used in generated tokens. */
     @Value("${nivesh.auth.url}")
     private String issuerUrl;
 
+    /** Encoder used to sign JWT values. */
     private final JwtEncoder jwtEncoder;
 
+    /** Service used to create or inspect JWT values. */
     private final JwtTokenService jwtTokenService;
 
+    /** Token configuration values. */
     private final TokenProperties tokenProperties;
 
+    /**
+     * Injects token services and properties required to issue JWTs.
+     */
     public TokenServiceImpl(JwtEncoder jwtEncoder, JwtTokenService jwtTokenService, TokenProperties tokenProperties) {
         this.jwtEncoder = jwtEncoder;
         this.jwtTokenService = jwtTokenService;
         this.tokenProperties = tokenProperties;
     }
-
 
     /**
      * Generate access token with different claims based on user status.
@@ -85,7 +91,6 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(claims, expiry, ChronoUnit.MINUTES, String.valueOf(user.getId()));
     }
 
-
     /**
      * Issues Registered token. User is only allowed to start the kyc process.
      */
@@ -96,7 +101,6 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(claims, expiry, ChronoUnit.MINUTES, String.valueOf(user.getId()));
     }
 
-
     /**
      * Issues access token. User is allowed to perform all action in his account.
      */
@@ -106,7 +110,6 @@ public class TokenServiceImpl implements TokenService {
         claims.put(Constants.TOKEN_TYPE, Constants.ACCESS_TOKEN);
         return generateToken(claims, expiry, ChronoUnit.MINUTES, String.valueOf(user.getId()));
     }
-
 
     /**
      * Generates different kind of jwt token.
@@ -130,7 +133,6 @@ public class TokenServiceImpl implements TokenService {
         JwtClaimsSet token = tokenBuilder.build();
         return jwtEncoder.encode(JwtEncoderParameters.from(token)).getTokenValue();
     }
-
 
     /**
      * Add common claims in the token. Token related claims should be added separately.

@@ -13,8 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class RoleServiceImpl implements RoleService {
 
+    /** Repository used to persist and query roles. */
     private final RoleRepository roleRepository;
 
+    /**
+     * Injects the role repository used to manage roles.
+     */
     public RoleServiceImpl(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }

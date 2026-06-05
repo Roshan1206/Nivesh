@@ -30,20 +30,31 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Service implementation that coordinates transaction business logic for transaction operations.
+ */
 @Slf4j
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
+    /** Client used to debit, credit, and validate accounts. */
     private final AccountsClient accountsClient;
 
+    /** Cache value used by this component. */
     private final Cache cache;
 
+    /** Service used to create and validate OTP cache entries. */
     private final OtpCacheService otpCacheService;
 
+    /** Repository used to persist transaction records. */
     private final TransactionRepository transactionRepository;
 
+    /** Service used to resolve transaction configuration. */
     private final TransactionConfigServiceImpl transactionConfigService;
 
+    /**
+     * Injects repositories and clients required to process transactions.
+     */
     public TransactionServiceImpl(AccountsClient accountsClient, CacheManager cacheManager,
                                   OtpCacheService otpCacheService, TransactionRepository transactionRepository,
                                   TransactionConfigServiceImpl transactionConfigService) {
@@ -68,7 +79,6 @@ public class TransactionServiceImpl implements TransactionService {
         cache.put(key, savedTxn.getId());
         return new OtpResponse(requestId);
     }
-
 
     @Override
     public TransactionResponse startTransaction(String requestId, String otp) {

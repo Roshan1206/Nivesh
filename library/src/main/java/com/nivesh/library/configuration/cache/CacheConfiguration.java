@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Configuration class that wires cache configuration settings for the library module.
+ */
 @EnableCaching
 @Configuration
 public class CacheConfiguration {

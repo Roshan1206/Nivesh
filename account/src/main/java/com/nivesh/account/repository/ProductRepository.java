@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Spring Data repository for persisting and querying product records.
+ */
 @Repository
 public interface ProductRepository extends JpaRepository<Product, String> {
 

@@ -75,6 +75,7 @@ public class Account extends BaseAccount {
     @Column(name = "status", nullable = false, columnDefinition = "status_enum")
     private Status status;
 
+    /** Fixed deposits linked to this account. */
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<FixedDeposit> fixedDeposits = new HashSet<>();
 
@@ -82,10 +83,10 @@ public class Account extends BaseAccount {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<RecurringDeposit> recurringDeposits = new HashSet<>();
 
+    /** Optimistic-lock version used to protect concurrent account updates. */
     @Version
     @Column(name = "version", nullable = false)
     private Long version;
-
 
     /**
      * Creates an active account with product-driven interest and matching total and available balances.

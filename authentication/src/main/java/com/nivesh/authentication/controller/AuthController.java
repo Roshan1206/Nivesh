@@ -29,14 +29,12 @@ public class AuthController {
      */
     private final AuthService authService;
 
-
     /**
      * Injecting required dependency using CI.
      */
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
-
 
     /**
      * Starts registration for a new user and returns the OTP request identifier.
@@ -63,7 +61,6 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-
     /**
      * Authenticates a user and returns issued tokens.
      *
@@ -75,7 +72,6 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(authService.loginUser(request));
     }
 
-
     /**
      * Issues a replacement access token from a refresh token.
      *
@@ -86,7 +82,6 @@ public class AuthController {
     public ResponseEntity<RefreshReqRes> refreshToken(@RequestBody RefreshReqRes request) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.refreshAccessToken(request));
     }
-
 
     // TODO: Add OTP validation before accepting password reset requests.
     /**
@@ -100,6 +95,5 @@ public class AuthController {
         authService.forgotPassword(loginRequest);
         return ResponseEntity.status(HttpStatus.OK).body("Password updated successfully");
     }
-
 
 }

@@ -11,12 +11,19 @@ import reactor.util.retry.Retry;
 
 import java.time.Duration;
 
+/**
+ * Client abstraction for communicating with dependent services from the customer module.
+ */
 @Slf4j
 @Component
 public class AuthServerClient {
 
+    /** WebClient configured for authentication-service calls. */
     private final WebClient webClient;
 
+    /**
+     * Creates an auth-server client for the configured base URL.
+     */
     public AuthServerClient(@Qualifier("authClient") WebClient webClient) {
         this.webClient = webClient;
     }

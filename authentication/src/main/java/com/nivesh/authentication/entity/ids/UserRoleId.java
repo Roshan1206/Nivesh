@@ -19,7 +19,9 @@ public class UserRoleId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /** Identifier of the user portion of the composite key. */
     private UUID userId;
 
+    /** Identifier of the role portion of the composite key. */
     private UUID roleId;
 }

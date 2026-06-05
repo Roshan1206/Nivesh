@@ -1,5 +1,8 @@
 package com.nivesh.library.constant;
 
+/**
+ * Constants shared across library components for cache constants usage.
+ */
 public class CacheConstants {
 
     /** Name of the OTP cache shared by the cache manager and OTP service. */

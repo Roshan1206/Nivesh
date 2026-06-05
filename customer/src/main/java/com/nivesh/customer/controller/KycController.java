@@ -12,12 +12,19 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+/**
+ * REST controller that exposes customer API endpoints for KYC operations.
+ */
 @RestController
 @RequestMapping("/kyc")
 public class KycController {
 
+    /** Service that coordinates KYC initiation and verification. */
     private final KycService kycService;
 
+    /**
+     * Injects the KYC service used by KYC endpoints.
+     */
     public KycController(KycService kycService) {
         this.kycService = kycService;
     }

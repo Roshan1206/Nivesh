@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-
 /**
  * Implementation of {@link CustomerService} for handling {@link Customer} related operations
  */
@@ -67,7 +66,6 @@ public class CustomerServiceImpl implements CustomerService {
         this.sequenceGenerator = sequenceGenerator;
     }
 
-
     /**
      * Register a new Customer by getting basic details from {@link CustomerRegisterRequest}.
      *
@@ -94,7 +92,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         return CustomerMapper.createResponse(customer, token);
     }
-
 
     /**
      * Retrieves a customer by the externally visible customer number.

@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying user records.
+ */
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
@@ -28,7 +31,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     WHERE u.email = :email
     """)
     Optional<User> findByEmailWithRolesAndPermissions(@Param("email") String email);
-
 
     /**
      * Fetches user by Id with full authority data

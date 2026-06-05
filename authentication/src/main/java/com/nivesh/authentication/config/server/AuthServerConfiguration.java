@@ -84,7 +84,6 @@ public class AuthServerConfiguration {
         return new JdbcRegisteredClientRepository(jdbcTemplate);
     }
 
-
     /**
      * Creates a JDBC-based service for managing authorizations.
      * Stores and retrieves authorization related data like tokens.
@@ -98,7 +97,6 @@ public class AuthServerConfiguration {
                                                                  RegisteredClientRepository registeredClientRepository) {
         return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
     }
-
 
     /**
      * Service for managing authorization consents.
@@ -114,7 +112,6 @@ public class AuthServerConfiguration {
         return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
     }
 
-
     /**
      * Configures authorization server settings.
      *
@@ -124,7 +121,6 @@ public class AuthServerConfiguration {
     public AuthorizationServerSettings authorizationServerSettings() {
         return AuthorizationServerSettings.builder().issuer(issuerUrl).build();
     }
-
 
     /**
      * Configures the filter chain for authorization server.
@@ -157,7 +153,6 @@ public class AuthServerConfiguration {
         return httpSecurity.build();
     }
 
-
     /**
      * Provides User details for authentication and authorization.
      *
@@ -179,7 +174,6 @@ public class AuthServerConfiguration {
         };
     }
 
-
     /**
      * Using BcryptPasswordEncoder for encoding passwords.
      */
@@ -187,7 +181,6 @@ public class AuthServerConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
     /**
      * Configures the RSAKey. Responsible for Signing and validating token.
@@ -207,7 +200,6 @@ public class AuthServerConfiguration {
         return new ImmutableJWKSet<>(jwkSet);
     }
 
-
     /**
      * Configures Jwt encoder for signing jwt tokens.
      *
@@ -218,7 +210,6 @@ public class AuthServerConfiguration {
     public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource){
         return new NimbusJwtEncoder(jwkSource);
     }
-
 
     /**
      * Configures Public Key for validating token.
@@ -233,7 +224,6 @@ public class AuthServerConfiguration {
         X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
         return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(spec);
     }
-
 
     /**
      * Load the private key from pem file

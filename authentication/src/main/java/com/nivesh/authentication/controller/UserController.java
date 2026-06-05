@@ -27,7 +27,6 @@ public class UserController {
         this.userService = userService;
     }
 
-
     /**
      * internal endpoint for changing user status.
      */

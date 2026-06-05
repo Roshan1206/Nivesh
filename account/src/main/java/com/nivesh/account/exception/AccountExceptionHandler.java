@@ -6,9 +6,15 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+/**
+ * Centralized exception handler for translating account errors into HTTP responses.
+ */
 @ControllerAdvice
 public class AccountExceptionHandler {
 
+    /**
+     * Handles duplicate-account creation requests.
+     */
     @ExceptionHandler(AccountAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleAccountAlreadyExistsException(AccountAlreadyExistsException exception,
                                                                              WebRequest request) {
@@ -16,7 +22,9 @@ public class AccountExceptionHandler {
         return ResponseEntity.status(exception.getStatus()).body(response);
     }
 
-
+    /**
+     * Handles account lookup failures.
+     */
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleAccountNotFoundException(AccountNotFoundException exception,
                                                                         WebRequest request) {
@@ -24,7 +32,9 @@ public class AccountExceptionHandler {
         return ResponseEntity.status(exception.getStatus()).body(response);
     }
 
-
+    /**
+     * Handles account operations rejected for insufficient balance.
+     */
     @ExceptionHandler(InsufficientBalanceException.class)
     public ResponseEntity<ErrorResponse> handleInsufficientBalanceException(InsufficientBalanceException exception,
                                                                             WebRequest request) {
@@ -32,7 +42,9 @@ public class AccountExceptionHandler {
         return ResponseEntity.status(exception.getStatus()).body(response);
     }
 
-
+    /**
+     * Handles product lookup failures.
+     */
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException exception,
                                                                         WebRequest request) {

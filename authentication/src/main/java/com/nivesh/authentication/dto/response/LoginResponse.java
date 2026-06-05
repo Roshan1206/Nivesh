@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Response payload returned by the authentication API for login response operations.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 
+/**
+ * Exception raised when service unavailable conditions occur.
+ */
 @Slf4j
 public class ServiceUnavailableException extends RuntimeException {
 

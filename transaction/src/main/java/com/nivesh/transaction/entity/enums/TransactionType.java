@@ -1,5 +1,8 @@
 package com.nivesh.transaction.entity.enums;
 
+/**
+ * Enumerates supported transaction type values used by the transaction domain model.
+ */
 public enum TransactionType {
 
     /**
@@ -47,5 +50,6 @@ public enum TransactionType {
      */
     RD_MATURITY,
 
+    /** Funds move between customer or internal accounts. */
     TRANSFER
 }

@@ -12,8 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class PermissionServiceImpl implements PermissionService {
 
+    /** Repository used to persist and query permissions. */
     private final PermissionRepository permissionRepository;
 
+    /**
+     * Injects the permission repository used to manage permissions.
+     */
     public PermissionServiceImpl(PermissionRepository permissionRepository) {
         this.permissionRepository = permissionRepository;
     }

@@ -18,8 +18,12 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    /** Request context used to populate error response metadata. */
     private final WebRequest request;
 
+    /**
+     * Creates a handler with the current web request context.
+     */
     public GlobalExceptionHandler(WebRequest request) {
         this.request = request;
     }
@@ -33,6 +37,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
     }
 
+    /**
+     * Handles OTP validation and verification failures.
+     */
     @ExceptionHandler(OtpException.class)
     public ResponseEntity<ErrorResponse> handleOtpException(OtpException exception) {
         ErrorResponse response = new ErrorResponse(exception.getMessage(), request);

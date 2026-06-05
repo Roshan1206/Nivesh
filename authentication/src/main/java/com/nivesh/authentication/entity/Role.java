@@ -22,20 +22,25 @@ import java.util.UUID;
 @Table(name = "roles")
 public class Role extends BaseAudit {
 
+    /** Unique identifier for this record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "role_id")
     private UUID id;
 
+    /** Unique role name assigned to users. */
     @Column(name = "role_name", nullable = false, unique = true, length = 30)
     private String roleName;
 
+    /** Human-readable description for this record. */
     @Column(name = "description", nullable = false)
     private String description;
 
+    /** Indicates whether the role is managed by the system. */
     @Column(name = "is_system_role", nullable = false)
     private boolean isSystemRole;
 
+    /** User-role assignments associated with this role. */
     @OneToMany(
             mappedBy = "role",
             cascade = CascadeType.ALL,
@@ -43,6 +48,7 @@ public class Role extends BaseAudit {
     )
     private Set<UserRole> userRoles = new HashSet<>();
 
+    /** Permissions granted to this role. */
     @ManyToMany
     @JoinTable(
             name = "role_permissions",
