@@ -6,6 +6,9 @@ import com.nivesh.transaction.dto.response.TransactionResponse;
 
 import java.util.UUID;
 
+/**
+ * Service contract for transaction business logic related to transaction operations.
+ */
 public interface TransactionService {
 
     OtpResponse initiateTransaction(String idempotencyKey, TransactionRequest transactionRequest);

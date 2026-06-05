@@ -58,7 +58,6 @@ public class ActuatorSecurityConfiguration {
         return httpSecurity.build();
     }
 
-
     /**
      * Build in-memory user for actuator endpoints.
      * Should only be used for {@code actuatorSecurityFilterChain}

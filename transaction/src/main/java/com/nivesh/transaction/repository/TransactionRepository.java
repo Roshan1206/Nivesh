@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying transaction records.
+ */
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 }

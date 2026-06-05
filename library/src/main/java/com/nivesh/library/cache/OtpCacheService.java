@@ -31,6 +31,7 @@ public class OtpCacheService {
      */
     private final Cache otpCache;
 
+    /** Service used to create or inspect JWT values. */
     private final JwtTokenService jwtTokenService;
 
     /**
@@ -38,6 +39,7 @@ public class OtpCacheService {
      */
     private final OtpCacheProperties properties;
 
+    /** Sender used to deliver OTP values. */
     private final OtpSender sender;
 
     /**
@@ -84,7 +86,6 @@ public class OtpCacheService {
         sender.send(email, plainOtp);
     }
 
-
     /**
      * Validates and evict the otp from cache.
      *
@@ -119,7 +120,6 @@ public class OtpCacheService {
         }
         otpCache.evict(key);
     }
-
 
     /**
      * Builds a composite cache key combining request ID and OTP purpose.

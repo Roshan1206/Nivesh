@@ -4,9 +4,13 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+/**
+ * Exception raised when account not found conditions occur.
+ */
 @Getter
 public class AccountNotFoundException extends RuntimeException {
 
+    /** HTTP status returned for this exception or response. */
     private final HttpStatus status;
 
     /**
@@ -16,6 +20,5 @@ public class AccountNotFoundException extends RuntimeException {
         super(message);
         this.status = HttpStatus.NOT_FOUND;
     }
-
 
 }

@@ -68,7 +68,6 @@ public class JwtSecurityConfiguration {
         return httpSecurity.build();
     }
 
-
     /**
      * Converts claims into roles and scopes for authorization purpose.
      * Used for jwt token
@@ -96,7 +95,6 @@ public class JwtSecurityConfiguration {
         };
     }
 
-
     /**
      * Create JWT decoder. Fetches public key from auth server.
      * Will be created only if the upstream server doesn't have its own decoder.
@@ -110,7 +108,6 @@ public class JwtSecurityConfiguration {
         decoder.setJwtValidator(validator);
         return decoder;
     }
-
 
     /**
      * Creates AuthenticationManager for token authentication.

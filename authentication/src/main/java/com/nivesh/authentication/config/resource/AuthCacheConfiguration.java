@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Primary;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Configuration class that wires auth cache configuration settings for the authentication module.
+ */
 @Configuration
 @EnableCaching
 @EnableConfigurationProperties(AuthCacheProperties.class)

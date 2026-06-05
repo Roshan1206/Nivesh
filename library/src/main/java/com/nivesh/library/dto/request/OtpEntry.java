@@ -35,6 +35,9 @@ public class OtpEntry {
     @Getter
     private final String requestId;
 
+    /**
+     * Creates an OTP cache entry with the generated code and attempt metadata.
+     */
     public OtpEntry(String otpHash, String requestId, OtpPurpose purpose, int ttlSecond, int maxAttempt) {
         this.otpHash = otpHash;
         this.purpose = purpose;

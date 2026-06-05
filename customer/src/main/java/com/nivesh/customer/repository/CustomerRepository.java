@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying customer records.
+ */
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 

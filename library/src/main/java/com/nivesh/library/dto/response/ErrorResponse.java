@@ -32,6 +32,9 @@ public class ErrorResponse {
      */
     private LocalDateTime time;
 
+    /**
+     * Creates a error response instance.
+     */
     public ErrorResponse(String message, WebRequest request) {
         this.path = request.getDescription(false);
         this.message = message;

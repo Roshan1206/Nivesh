@@ -6,11 +6,18 @@ import com.nivesh.account.repository.ProductRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service implementation that coordinates account business logic for product operations.
+ */
 @Service
 public class ProductServiceImpl implements ProductService {
 
+    /** Repository used to load product definitions. */
     private final ProductRepository productRepository;
 
+    /**
+     * Injects the product repository used to query banking products.
+     */
     public ProductServiceImpl(ProductRepository productRepository){
         this.productRepository = productRepository;
     }

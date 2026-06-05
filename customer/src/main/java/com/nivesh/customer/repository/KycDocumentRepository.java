@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying KYC document records.
+ */
 @Repository
 public interface KycDocumentRepository extends JpaRepository<KycDocument, UUID> {
 }

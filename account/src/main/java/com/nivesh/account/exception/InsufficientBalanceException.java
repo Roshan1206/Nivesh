@@ -3,6 +3,9 @@ package com.nivesh.account.exception;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Exception raised when insufficient balance conditions occur.
+ */
 @Getter
 public class InsufficientBalanceException extends RuntimeException {
 

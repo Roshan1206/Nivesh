@@ -27,8 +27,12 @@ import static com.nivesh.library.constant.Constants.IDEMPOTENCY_KEY;
 @RequestMapping("/accounts")
 public class AccountController {
 
+    /** Service used to process account API requests. */
     private final AccountService accountService;
 
+    /**
+     * Injects the account service used by account endpoints.
+     */
     public AccountController(AccountService accountService){
         this.accountService = accountService;
     }

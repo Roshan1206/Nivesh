@@ -17,8 +17,12 @@ import java.util.Map;
 @RequestMapping("/customers")
 public class CustomerController {
 
+    /** Service that coordinates customer registration and lookup. */
     private final CustomerService customerService;
 
+    /**
+     * Injects the customer service used by customer endpoints.
+     */
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }

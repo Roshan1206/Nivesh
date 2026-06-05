@@ -6,6 +6,9 @@ import com.nivesh.library.constant.Constants;
 
 import java.util.Map;
 
+/**
+ * Mapper component for converting between customer domain objects and transfer objects.
+ */
 public class ContactMapper {
 
     public static Contact buildContact(Map<String, String> userInfo, Customer customer) {

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying journal entry records.
+ */
 @Repository
 public interface JournalEntryRepository extends JpaRepository<JournalEntry, UUID> {
 }

@@ -18,14 +18,21 @@ import reactor.util.retry.RetryBackoffSpec;
 import java.time.Duration;
 import java.util.UUID;
 
+/**
+ * Class that supports account client impl behavior in the transaction module.
+ */
 @Slf4j
 @Service
 public class AccountClientImpl implements AccountsClient {
 
     private static final String ACCOUNTS = "/accounts/internal";
 
+    /** Web client value used by this component. */
     private final WebClient webClient;
 
+    /**
+     * Injects the account communication client used to call the account service.
+     */
     public AccountClientImpl(@Qualifier("accountClient") WebClient client) {
         this.webClient = client;
     }
@@ -40,7 +47,6 @@ public class AccountClientImpl implements AccountsClient {
                 .retryWhen(doRetry())
                 .block();
     }
-
 
     @Override
     public void debit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {

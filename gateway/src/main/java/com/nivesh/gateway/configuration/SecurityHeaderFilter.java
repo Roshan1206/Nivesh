@@ -11,6 +11,9 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+/**
+ * Web filter that applies security header behavior to gateway requests and responses.
+ */
 @Component
 public class SecurityHeaderFilter implements GlobalFilter, Ordered {
 

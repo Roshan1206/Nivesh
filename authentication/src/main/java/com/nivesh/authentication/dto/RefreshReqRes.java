@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data transfer object that carries refresh-token request and response details between layers.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -7,11 +7,18 @@ import com.nivesh.transaction.repository.TransactionTypeConfigRepository;
 import com.nivesh.transaction.service.TransactionConfigService;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service implementation that coordinates transaction business logic for transaction config operations.
+ */
 @Service
 public class TransactionConfigServiceImpl implements TransactionConfigService {
 
+    /** Repository value used by this component. */
     private final TransactionTypeConfigRepository repository;
 
+    /**
+     * Injects repositories used to manage transaction configuration.
+     */
     public TransactionConfigServiceImpl(TransactionTypeConfigRepository repository) {
         this.repository = repository;
     }

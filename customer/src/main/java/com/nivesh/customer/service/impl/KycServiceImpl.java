@@ -22,23 +22,33 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
-
+/**
+ * Service implementation that coordinates customer business logic for KYC operations.
+ */
 @Service
 public class KycServiceImpl implements KycService {
 
+    /** Client used to notify the authentication service about KYC status changes. */
     private final AuthServerClient authServerClient;
 
+    /** Service used to retrieve verified contact information for OTP delivery. */
     private final ContactService contactService;
 
+    /** Service used to load customer records during KYC processing. */
     private final CustomerService customerService;
 
+    /** Service used to generate and verify OTP values for KYC. */
     private final OtpCacheService otpCacheService;
 
+    /** Repository used to persist KYC documents. */
     private final KycDocumentRepository repository;
 
+    /** Service used to read claims from KYC verification tokens. */
     private final JwtTokenService jwtTokenService;
 
-
+    /**
+     * Injects dependencies required to initiate and verify KYC workflows.
+     */
     public KycServiceImpl(AuthServerClient authServerClient, ContactService contactService,
                           CustomerService customerService, KycDocumentRepository repository,
                           JwtTokenService jwtTokenService, OtpCacheService otpCacheService) {
@@ -50,7 +60,7 @@ public class KycServiceImpl implements KycService {
         this.otpCacheService = otpCacheService;
     }
 
-//    TODO: create validation method for kyc using UIDAI/NSDL and service class for saving the file
+//    TODO: create validation method for KYC using UIDAI/NSDL and service class for saving the file
     @Override
     public OtpResponse initiateKyc(KycInitiationRequest request, MultipartFile file) {
         Customer customer = customerService.getCustomer(request.getCustomerNumber());
@@ -65,7 +75,6 @@ public class KycServiceImpl implements KycService {
         otpCacheService.generateOtp(requestId, OtpPurpose.KYC_VERIFICATION);
         return new OtpResponse("KYC initiated. Verify with OTP to complete", requestId);
     }
-
 
     @Transactional
     @Override

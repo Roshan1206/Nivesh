@@ -17,6 +17,9 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class ExceptionalHandler {
 
+    /**
+     * Handles missing role errors.
+     */
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleRoleNotFoundException(RoleNotFoundException exception,
                                                                      WebRequest request) {
@@ -24,7 +27,9 @@ public class ExceptionalHandler {
                 .body(new ErrorResponse(exception.getMessage(), request));
     }
 
-
+    /**
+     * Handles invalid authentication credentials.
+     */
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentialException(BadCredentialsException exception,
                                                                       WebRequest request) {
@@ -32,7 +37,9 @@ public class ExceptionalHandler {
                 .body(new ErrorResponse(exception.getMessage(), request));
     }
 
-
+    /**
+     * Handles login attempts for locked accounts.
+     */
     @ExceptionHandler(LockedException.class)
     public ResponseEntity<ErrorResponse> handleLockedException(LockedException exception,
                                                                WebRequest request) {

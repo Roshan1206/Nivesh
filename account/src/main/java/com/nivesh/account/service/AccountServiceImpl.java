@@ -41,14 +41,21 @@ import java.util.UUID;
 @Service
 public class AccountServiceImpl implements AccountService {
 
+    /** Repository used to persist and query accounts. */
     private final AccountRepository accountRepository;
 
+    /** Repository used to store idempotent account operation responses. */
     private final IdempotencyRepository idempotencyRepository;
 
+    /** Generator used to allocate account-number sequences. */
     private final SequenceGenerator sequenceGenerator;
 
+    /** Service used to resolve product configuration for accounts. */
     private final ProductService productService;
 
+    /**
+     * Injects repositories and services required to manage accounts.
+     */
     public AccountServiceImpl(AccountRepository accountRepository, IdempotencyRepository idempotencyRepository,
                               SequenceGenerator sequenceGenerator, ProductService productService) {
         this.accountRepository = accountRepository;
@@ -56,7 +63,6 @@ public class AccountServiceImpl implements AccountService {
         this.sequenceGenerator = sequenceGenerator;
         this.productService = productService;
     }
-
 
     /**
      * Loads an account by identifier or raises a not-found exception for the API layer.
@@ -94,7 +100,6 @@ public class AccountServiceImpl implements AccountService {
         return buildAccountResponse(account);
     }
 
-
     /**
      * Retrieves account information and maps it to the external account response contract.
      */
@@ -110,7 +115,6 @@ public class AccountServiceImpl implements AccountService {
     public BigDecimal getAvailableBalance(UUID accountId) {
         return getAccount(accountId).getAvailableBalance();
     }
-
 
     @Override
     public AccountValidationResponse validateAccount(TransactionRequest request) {
@@ -131,7 +135,6 @@ public class AccountServiceImpl implements AccountService {
         }
         return response;
     }
-
 
     @Transactional
     @Override

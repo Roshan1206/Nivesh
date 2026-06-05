@@ -51,14 +51,19 @@ public class AuthServiceImpl implements AuthService {
      */
     private final AuthenticationManager authenticationManager;
 
+    /** Cache settings used by authentication flows. */
     private final AuthCacheProperties cacheProperties;
 
+    /** Cache used to store login OTP state. */
     private final Cache loginCache;
 
+    /** Cache used to store registration OTP state. */
     private final Cache registerCache;
 
+    /** Service used to create and validate OTP cache entries. */
     private final OtpCacheService otpCacheService;
 
+    /** Sender used to deliver OTP values. */
     private final OtpSender sender;
 
     /**
@@ -71,6 +76,9 @@ public class AuthServiceImpl implements AuthService {
      */
     private final UserService userService;
 
+    /**
+     * Injects authentication dependencies required for login, registration, and token refresh flows.
+     */
     public AuthServiceImpl(AuthenticationManager authenticationManager, AuthCacheProperties cacheProperties,
                            @Qualifier("authCacheManager") CacheManager cacheManager, OtpCacheService otpCacheService,
                            @Qualifier("emailOtpSender") OtpSender sender, TokenService tokenService,
@@ -84,7 +92,6 @@ public class AuthServiceImpl implements AuthService {
         this.tokenService = tokenService;
         this.userService = userService;
     }
-
 
     /**
      * Starts registration by generating an OTP and caching the request until verification.
@@ -120,7 +127,6 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = tokenService.generateRefreshToken(registerRequest.getEmail(), String.valueOf(savedUser.getId()));
         return new RegisterResponse(registerRequest.getEmail(), new TokenResponse(accessToken, refreshToken));
     }
-
 
     /**
      * Authenticates a user, applies status-specific token rules, and tracks failed attempts.
@@ -201,7 +207,6 @@ public class AuthServiceImpl implements AuthService {
         return Constants.ACCESS_TOKEN;
     }
 
-
     /**
      * Issues a new access token after validating the supplied refresh token.
      *
@@ -216,7 +221,6 @@ public class AuthServiceImpl implements AuthService {
         String token = tokenService.generateAccessToken(user, Constants.ACCESS_TOKEN);
         return new RefreshReqRes(token);
     }
-
 
     /**
      * Resets the password for an unauthenticated user.

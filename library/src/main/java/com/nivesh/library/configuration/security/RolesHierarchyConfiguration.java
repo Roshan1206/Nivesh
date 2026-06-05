@@ -28,7 +28,6 @@ public class RolesHierarchyConfiguration {
                 .build();
     }
 
-
     /**
      * Inject hierarchy into expression handler {@code @PreAuthorize},
      * {@code hasAuthority()}. Without this, spring will ignore the hierarchy.

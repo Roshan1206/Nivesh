@@ -16,12 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * REST controller that exposes transaction API endpoints for transaction operations.
+ */
 @RestController
 @RequestMapping("/transactions")
 public class TransactionController {
 
+    /** Service that processes transaction requests. */
     private final TransactionService transactionService;
 
+    /**
+     * Injects the transaction service used by transaction endpoints.
+     */
     public TransactionController(TransactionService transactionService){
         this.transactionService = transactionService;
     }

@@ -5,6 +5,9 @@ package com.nivesh.authentication.exception;
  */
 public class RoleNotFoundException extends RuntimeException {
 
+    /**
+     * Creates a role-not-found exception with the provided status and message.
+     */
     public RoleNotFoundException(String message) {
         super(message);
     }

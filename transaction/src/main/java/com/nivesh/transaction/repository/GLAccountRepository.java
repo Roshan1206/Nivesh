@@ -6,6 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Spring Data repository for persisting and querying g l account records.
+ */
 @Repository
 public interface GLAccountRepository extends JpaRepository<GLAccount, UUID> {
 }

@@ -25,7 +25,6 @@ public class SequenceGenerator {
         this.entityManager = entityManager;
     }
 
-
     /**
      * Retrieves the next sequence value from the database.
      * Used for generating unique IDs.

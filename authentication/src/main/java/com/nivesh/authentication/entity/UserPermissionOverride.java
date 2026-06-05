@@ -53,13 +53,16 @@ public class UserPermissionOverride {
     @Column(name = "override_type", nullable = false, columnDefinition = "override_type_enum")
     private OverrideType overrideType;
 
+    /** Business reason recorded for this change. */
     @Column(name = "reason", nullable = false, length = 200)
     private String reason;
 
+    /** User who granted the permission override. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "granted_by", nullable = false)
     private User grantedBy;
 
+    /** Timestamp when the permission override was granted. */
     @Column(name = "granted_At", nullable = false)
     private Instant grantedAt;
 

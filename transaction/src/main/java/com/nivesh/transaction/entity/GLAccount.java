@@ -21,6 +21,9 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
+/**
+ * Persistence entity that models g l account data in the transaction domain.
+ */
 @Builder
 @Getter
 @Setter
@@ -30,32 +33,39 @@ import java.util.UUID;
 @Entity
 public class GLAccount {
 
+    /** Unique identifier for this record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "gl_account_id", updatable = false, nullable = false)
     private UUID id;
 
+    /** Unique code for the general ledger account. */
     @Column(name = "gl_code", nullable = false, unique = true, length = 30)
     private String glCode;
 
+    /** Name captured for this record. */
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    /** Category of the general ledger account. */
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "category", nullable = false, columnDefinition = "gl_category")
     private GlCategory category;
 
+    /** Accounting type of the general ledger account. */
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "account_type", nullable = false, columnDefinition = "gl_account_type")
     private GlAccountType accountType;
 
+    /** Normal debit or credit balance for the ledger account. */
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "normal_balance", nullable = false, columnDefinition = "dr_cr")
     private DrCr normalBalance;
 
+    /** Indicates whether this configuration is active. */
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private boolean isActive = true;

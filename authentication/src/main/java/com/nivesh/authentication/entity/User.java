@@ -27,26 +27,33 @@ import java.util.*;
 @Table(name = "users")
 public class User extends BaseAudit implements UserDetails {
 
+    /** Unique identifier for this record. */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id")
     private UUID id;
 
+    /** Registered mobile number for the user. */
     @Column(name = "mobile_number", nullable = false, unique = true)
     private String mobileNumber;
 
+    /** Registered email address for the user. */
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    /** Encoded password used for authentication. */
     @Column(name = "password", nullable = false)
     private String password;
 
+    /** Number of consecutive failed login attempts. */
     @Column(name = "failed_attempt")
     private int failedAttempt;
 
+    /** Time until which the user account remains locked. */
     @Column(name = "locked_until")
     private Instant lockedUntil;
 
+    /** Current lifecycle status of the customer account. */
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "customer_status", columnDefinition = "customer_status_enum", nullable = false)
@@ -98,18 +105,15 @@ public class User extends BaseAudit implements UserDetails {
         return authorities;
     }
 
-
     @Override
     public String getPassword() {
         return password;
     }
 
-
     @Override
     public String getUsername() {
         return email;
     }
-
 
     /**
      * Indicates whether the user is locked or unlocked. A locked user cannot be

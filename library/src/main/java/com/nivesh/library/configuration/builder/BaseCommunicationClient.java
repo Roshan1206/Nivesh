@@ -32,7 +32,6 @@ public class BaseCommunicationClient {
     /** WebClient builder for creating configured HTTP clients */
     private final WebClient.Builder builder;
 
-
     /**
      * Injecting required dependency via constructor injection.
      */

@@ -31,7 +31,6 @@ public class SecurityConfiguration {
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
 
-
     /**
      * Creates AuthenticationManager for token authentication.
      * {@code DaoAuthenticationProvider} for login while {@code JwtAuthenticationProvider} used for validating JWT tokens
