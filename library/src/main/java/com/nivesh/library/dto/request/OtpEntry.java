@@ -1,5 +1,8 @@
 package com.nivesh.library.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nivesh.library.entity.enums.OtpPurpose;
 import lombok.Getter;
 
@@ -9,66 +12,48 @@ import java.util.UUID;
 /**
  * Represents an OTP entry stored in cache with expiration and attempt tracking.
  */
+@Getter
 public class OtpEntry {
 
     /** Bcrypt-encoded OTP hash */
-    @Getter
-    private final String otpHash;
-
-    /** Purpose for which OTP was generated */
-    private final OtpPurpose purpose;
-
-    /** Timestamp when OTP was created */
-    private final Instant createdAt;
-
-    /** Timestamp when OTP expires */
-    private final Instant expiresAt;
+    private final String otp;
 
     /** Current validation attempt count */
-    @Getter
     private int attemptCount;
 
     /** Maximum allowed validation attempts */
-    private final int maxAttempt;
+    private final int maxAttempt = 3;
 
-    /** Unique identifier for the OTP request */
-    @Getter
-    private final String requestId;
 
     /**
      * Creates an OTP cache entry with the generated code and attempt metadata.
      */
-    public OtpEntry(String otpHash, String requestId, OtpPurpose purpose, int ttlSecond, int maxAttempt) {
-        this.otpHash = otpHash;
-        this.purpose = purpose;
-        this.createdAt = Instant.now();
-        this.expiresAt = Instant.now().plusSeconds(ttlSecond);
+    public OtpEntry(String otp) {
+        this.otp = otp;
         this.attemptCount = 0;
-        this.maxAttempt = maxAttempt;
-        this.requestId = requestId;
+    }
+
+    @JsonCreator
+    public OtpEntry(@JsonProperty("otp") String otp, @JsonProperty("attemptCount") int attemptCount) {
+        this.otp = otp;
+        this.attemptCount = attemptCount;
     }
 
     /**
      * Increments the failed validation attempt count.
      */
+    @JsonIgnore
     public void incrementCount() {
         this.attemptCount++;
     }
 
-    /**
-     * Checks if the OTP has expired.
-     *
-     * @return true if current time is after expiration time
-     */
-    public boolean isExpired() {
-        return Instant.now().isAfter(expiresAt);
-    }
 
     /**
      * Checks if maximum validation attempts have been exceeded.
      *
      * @return true if attempt count meets or exceeds max limit
      */
+    @JsonIgnore
     public boolean isMaxAttemptReached() {
         return attemptCount >= maxAttempt;
     }
@@ -78,6 +63,7 @@ public class OtpEntry {
      *
      * @return number of attempts still available
      */
+    @JsonIgnore
     public int getRemainingAttempts() {
         return maxAttempt - attemptCount;
     }

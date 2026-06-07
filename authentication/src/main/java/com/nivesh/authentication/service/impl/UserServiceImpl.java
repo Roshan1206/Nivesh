@@ -88,7 +88,6 @@ public class UserServiceImpl implements UserService {
         CustomerStatus customerStatus = CustomerStatus.valueOf(status.toUpperCase());
         String roleName = customerStatus.isEqual(CustomerStatus.REGISTERED) ? "CUSTOMER_REGISTERED" : "CUSTOMER_ACTIVE";
         updateStatus(user, customerStatus);
-
         return tokenService.generateAccessToken(user, Constants.ACCESS_TOKEN);
     }
 
@@ -112,7 +111,15 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    private User getUser(String id) {
+
+    @Override
+    public void incrementTokenVersion(String userId) {
+        User user = getUser(userId);
+        user.setTokenVersion(user.getTokenVersion() + 1);
+    }
+
+    @Override
+    public User getUser(String id) {
         UUID userId = UUID.fromString(id);
         return userRepository.findById(userId).orElseThrow(
                 () -> new UsernameNotFoundException("User not found")

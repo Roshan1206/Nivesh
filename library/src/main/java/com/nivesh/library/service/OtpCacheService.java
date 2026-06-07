@@ -1,12 +1,10 @@
-package com.nivesh.library.cache;
+package com.nivesh.library.service;
 
-import com.nivesh.library.cache.properties.OtpCacheProperties;
-import com.nivesh.library.constant.CacheConstants;
 import com.nivesh.library.dto.request.OtpEntry;
 import com.nivesh.library.entity.enums.OtpPurpose;
+import com.nivesh.library.exception.CacheNotFoundException;
 import com.nivesh.library.exception.OtpErrorCode;
 import com.nivesh.library.exception.OtpException;
-import com.nivesh.library.service.JwtTokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -18,26 +16,17 @@ import java.security.SecureRandom;
  * Service class for OTP generation and validation.
  */
 @Slf4j
-//@Service
 public class OtpCacheService {
 
-    /**
-     * Encoder for encoding OTPs.
-     */
-    private final BCryptPasswordEncoder encoder;
+    private static final String OTP_CACHE = "otp";
 
     /**
      * OTP cache
      */
-    private final Cache otpCache;
+    private final CacheManager cacheManager;
 
     /** Service used to create or inspect JWT values. */
     private final JwtTokenService jwtTokenService;
-
-    /**
-     * Properties to be used for cache
-     */
-    private final OtpCacheProperties properties;
 
     /** Sender used to deliver OTP values. */
     private final OtpSender sender;
@@ -51,11 +40,9 @@ public class OtpCacheService {
      * Injecting required dependency using CI
      */
     public OtpCacheService(CacheManager cacheManager, JwtTokenService jwtTokenService,
-                           OtpCacheProperties properties, OtpSender sender) {
-        this.otpCache = cacheManager.getCache(CacheConstants.OTP_CACHE_NAME);
+                           OtpSender sender) {
+        this.cacheManager = cacheManager;
         this.jwtTokenService = jwtTokenService;
-        this.properties = properties;
-        this.encoder = new BCryptPasswordEncoder();
         this.secureRandom = new SecureRandom();
         this.sender = sender;
     }
@@ -64,25 +51,23 @@ public class OtpCacheService {
      * Generate and put otp in cache with unique key
      *
      * @param requestId otp request id
-     * @param otpPurpose purpose for which the otp is generated
      */
-    public void generateOtp(String requestId, OtpPurpose otpPurpose) {
+    public void generateAndSendOtp(String requestId) {
         String email = jwtTokenService.extractEmail();
-        generateOtp(requestId, otpPurpose, email);
+        generateAndSendOtp(requestId, email);
     }
 
-    public void generateOtp(String requestId, OtpPurpose otpPurpose, String email) {
-        int bound = (int) Math.pow(10, properties.getOtpLength());
-        int min = (int) Math.pow(10, properties.getOtpLength() - 1);
+    public void generateAndSendOtp(String requestId, String email) {
+        int bound = (int) Math.pow(10, 6);
+        int min = (int) Math.pow(10, 5);
         String plainOtp = String.format(
-                "%0" + properties.getOtpLength() + "d",
+                "%0" + 6 + "d",
                 secureRandom.nextInt(bound - min) + min
         );
 
+        OtpEntry entry = new OtpEntry(plainOtp);
         log.info("OTP: {}", plainOtp);
-        String otpHash = encoder.encode(plainOtp);
-        OtpEntry entry = new OtpEntry(otpHash, requestId, otpPurpose, properties.getTtlSeconds(), properties.getMaxAttempts());
-        otpCache.put(buildKey(requestId, otpPurpose), entry);
+        getCache().put(requestId, entry);
         sender.send(email, plainOtp);
     }
 
@@ -90,35 +75,37 @@ public class OtpCacheService {
      * Validates and evict the otp from cache.
      *
      * @param requestId for which otp needs validation
-     * @param otpPurpose purpose for otp validation
      * @param submittedOtp user submitted otp
      * @throws OtpException for invalid otp
      */
-    public void validateOtp(String requestId, OtpPurpose otpPurpose, String submittedOtp) {
-        String key = buildKey(requestId, otpPurpose);
-        OtpEntry entry = otpCache.get(key, OtpEntry.class);
+    public void validateOtp(String requestId, String submittedOtp) {
+//        Cache.ValueWrapper cache = getCache().get(requestId);
+        OtpEntry entry = getCache().get(requestId, OtpEntry.class);
 
         if (entry == null) {
             throw new OtpException("OTP Expired", OtpErrorCode.EXPIRED);
         }
 
-        if (entry.isExpired()) {
-            otpCache.evict(key);
-            throw new OtpException("OTP Expired. Request new one.", OtpErrorCode.EXPIRED);
-        }
 
-        if (entry.isMaxAttemptReached()) {
-            otpCache.evict(key);
-            throw new OtpException("Max attempts reached. Request new OTP", OtpErrorCode.MAX_ATTEMPTS_EXCEEDED);
-        }
-
-        if (!encoder.matches(submittedOtp, entry.getOtpHash())) {
+        if (!submittedOtp.equals(entry.getOtp())) {
             entry.incrementCount();
-            otpCache.put(key, entry);
+            if (entry.isMaxAttemptReached()) {
+                getCache().evict(requestId);
+                throw new OtpException("Max attempts reached. Request new OTP", OtpErrorCode.MAX_ATTEMPTS_EXCEEDED);
+            }
+            getCache().put(requestId, entry);
             int remaining = entry.getRemainingAttempts();
             throw new OtpException("Invalid OTP. " + remaining + " attempts remaining", OtpErrorCode.INVALID);
         }
-        otpCache.evict(key);
+        getCache().evict(requestId);
+    }
+
+    private Cache getCache() {
+        Cache cache = cacheManager.getCache(OtpCacheService.OTP_CACHE);
+        if (cache == null) {
+            throw new CacheNotFoundException(OTP_CACHE);
+        }
+        return cache;
     }
 
     /**

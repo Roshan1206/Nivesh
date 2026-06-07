@@ -5,7 +5,20 @@ info:
 
 http:
   method: POST
-  url: "{{account}}/accounts/internal/{{accId}}/debit"
+  url: "{{account}}/accounts/internal/{{accId}}/credit"
+  headers:
+    - name: idempotencyKey
+      value: bbf01d96-f781-450c-87fd-5d2e6e5ad3b9
+    - name: X-Internal-Role
+      value: INTERNAL_SERVICE
+    - name: X-Source-Service
+      value: transaction
+  body:
+    type: json
+    data: |-
+      {
+        "amount": 500.00
+      }
   auth: inherit
 
 runtime:

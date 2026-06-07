@@ -4,4 +4,7 @@ info:
   seq: 5
 
 request:
+  headers:
+    - name: Authorization
+      value: "{{bearer}}"
   auth: inherit

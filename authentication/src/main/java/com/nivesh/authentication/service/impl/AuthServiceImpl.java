@@ -1,7 +1,5 @@
 package com.nivesh.authentication.service.impl;
 
-import com.nivesh.authentication.config.properties.AuthCacheProperties;
-import com.nivesh.authentication.config.resource.AuthCacheConfiguration;
 import com.nivesh.authentication.dto.RefreshReqRes;
 import com.nivesh.authentication.dto.request.LoginRequest;
 import com.nivesh.authentication.dto.request.RegisterRequest;
@@ -9,19 +7,20 @@ import com.nivesh.authentication.dto.response.RegisterResponse;
 import com.nivesh.authentication.dto.response.TokenResponse;
 import com.nivesh.authentication.entity.User;
 import com.nivesh.authentication.exception.InvalidUserStatusException;
+import com.nivesh.authentication.service.RefreshTokenService;
 import com.nivesh.authentication.service.TokenService;
-import com.nivesh.library.cache.OtpCacheService;
 import com.nivesh.library.dto.response.OtpResponse;
 import com.nivesh.library.entity.enums.CustomerStatus;
 import com.nivesh.authentication.service.AuthService;
 import com.nivesh.authentication.service.UserService;
 import com.nivesh.library.constant.Constants;
 import com.nivesh.library.entity.enums.OtpPurpose;
+import com.nivesh.library.exception.CacheNotFoundException;
 import com.nivesh.library.exception.OtpErrorCode;
 import com.nivesh.library.exception.OtpException;
-import com.nivesh.library.cache.OtpSender;
+import com.nivesh.library.service.OtpCacheService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,25 +45,31 @@ import java.util.UUID;
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    private static final String LOGIN_CACHE_NAME = "login";
+
+    private static final String REGISTER_CACHE_NAME = "register";
+
+    @Value("${nivesh.auth.user.locked-duration}")
+    private Long lockedDuration;
+
     /**
      * Verifies submitted credentials against Spring Security's user details pipeline.
      */
     private final AuthenticationManager authenticationManager;
 
     /** Cache settings used by authentication flows. */
-    private final AuthCacheProperties cacheProperties;
+//    private final AuthCacheProperties cacheProperties;
 
     /** Cache used to store login OTP state. */
-    private final Cache loginCache;
+    private final CacheManager cacheManager;
 
     /** Cache used to store registration OTP state. */
-    private final Cache registerCache;
+//    private final Cache registerCache;
 
     /** Service used to create and validate OTP cache entries. */
     private final OtpCacheService otpCacheService;
 
-    /** Sender used to deliver OTP values. */
-    private final OtpSender sender;
+    private final RefreshTokenService refreshTokenService;
 
     /**
      * Issues and reads JWTs used by the authentication API.
@@ -79,16 +84,14 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Injects authentication dependencies required for login, registration, and token refresh flows.
      */
-    public AuthServiceImpl(AuthenticationManager authenticationManager, AuthCacheProperties cacheProperties,
-                           @Qualifier("authCacheManager") CacheManager cacheManager, OtpCacheService otpCacheService,
-                           @Qualifier("emailOtpSender") OtpSender sender, TokenService tokenService,
+    public AuthServiceImpl(AuthenticationManager authenticationManager,
+                           CacheManager cacheManager, OtpCacheService otpCacheService,
+                           TokenService tokenService, RefreshTokenService refreshTokenService,
                            UserService userService) {
         this.authenticationManager = authenticationManager;
-        this.cacheProperties = cacheProperties;
-        this.loginCache = cacheManager.getCache(AuthCacheConfiguration.LOGIN_CACHE_NAME);
-        this.registerCache = cacheManager.getCache(AuthCacheConfiguration.REGISTER_CACHE_NAME);
+        this.cacheManager = cacheManager;
         this.otpCacheService = otpCacheService;
-        this.sender = sender;
+        this.refreshTokenService = refreshTokenService;
         this.tokenService = tokenService;
         this.userService = userService;
     }
@@ -101,8 +104,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public OtpResponse initiateRegistration(RegisterRequest request) {
         String requestId = UUID.randomUUID().toString();
-        otpCacheService.generateOtp(requestId, OtpPurpose.USER_REGISTRATION, request.getEmail());
-        registerCache.put(OtpCacheService.buildKey(requestId, OtpPurpose.USER_REGISTRATION), request);
+        otpCacheService.generateAndSendOtp(requestId, request.getEmail());
+        getCache(REGISTER_CACHE_NAME).put(requestId, request);
         return new OtpResponse(requestId);
     }
 
@@ -116,15 +119,14 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public RegisterResponse registerUser(String requestId, String otp) {
-        String key = OtpCacheService.buildKey(requestId, OtpPurpose.USER_REGISTRATION);
-        RegisterRequest registerRequest = registerCache.get(key, RegisterRequest.class);
+        RegisterRequest registerRequest = getCache(REGISTER_CACHE_NAME).get(requestId, RegisterRequest.class);
         if (registerRequest == null) {
             throw new OtpException("Otp expired", OtpErrorCode.EXPIRED);
         }
-        otpCacheService.validateOtp(requestId, OtpPurpose.USER_REGISTRATION, otp);
+        otpCacheService.validateOtp(requestId, otp);
         User savedUser = userService.createNewUser(registerRequest);
         String accessToken = tokenService.generateAccessToken(savedUser, Constants.ONBOARDED_TOKEN);
-        String refreshToken = tokenService.generateRefreshToken(registerRequest.getEmail(), String.valueOf(savedUser.getId()));
+        String refreshToken = refreshTokenService.issueRefreshToken(savedUser);
         return new RegisterResponse(registerRequest.getEmail(), new TokenResponse(accessToken, refreshToken));
     }
 
@@ -140,8 +142,8 @@ public class AuthServiceImpl implements AuthService {
         String email = request.getEmail();
         User user = userService.getUserByEmail(email);
         CustomerStatus customerStatus = user.getCustomerStatus();
-        String key = buildKey(user.getId().toString(), "LOGIN");
-        Integer loginAttempts = loginCache.get(key, Integer.class);
+        String key = OtpCacheService.buildKey(user.getId().toString(), OtpPurpose.LOGIN);
+        Integer loginAttempts = getCache(LOGIN_CACHE_NAME).get(key, Integer.class);
 
         tokenType = switch (customerStatus) {
             case ONBOARDED -> Constants.ONBOARDED_TOKEN;
@@ -150,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
             case REGISTERED -> Constants.REGISTERED_TOKEN;
         };
 
-        int maxAttempts = cacheProperties.getMaxAttempts();
+        int maxAttempts = 3;
         if (loginAttempts != null && loginAttempts >= maxAttempts) {
             lockUser(user);
         }
@@ -158,9 +160,9 @@ public class AuthServiceImpl implements AuthService {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
         } catch (AuthenticationException e) {
-            Integer failedAttempt = loginCache.get(key, Integer.class);
+            Integer failedAttempt = getCache(LOGIN_CACHE_NAME).get(key, Integer.class);
             failedAttempt = failedAttempt == null ? 1 : failedAttempt + 1;
-            loginCache.put(key, failedAttempt);
+            getCache(LOGIN_CACHE_NAME).put(key, failedAttempt);
             if (failedAttempt >= maxAttempts) {
                 lockUser(user);
             }
@@ -171,16 +173,16 @@ public class AuthServiceImpl implements AuthService {
             }
             throw e;
         }
-        loginCache.evict(key);
+        getCache(LOGIN_CACHE_NAME).evict(key);
 
         String accessToken = tokenService.generateAccessToken(user, tokenType);
-        String refreshToken = tokenService.generateRefreshToken(email, String.valueOf(user.getId()));
+        String refreshToken = refreshTokenService.issueRefreshToken(user);
         return new TokenResponse(accessToken, refreshToken);
     }
 
     private void lockUser(User user) {
         user.setCustomerStatus(CustomerStatus.LOCKED);
-        user.setLockedUntil(Instant.now().plus(cacheProperties.getLockDurationMin(), ChronoUnit.MINUTES));
+        user.setLockedUntil(Instant.now().plus(lockedDuration, ChronoUnit.HOURS));
         userService.save(user);
         throw new LockedException("Account locked due to too many failed attempts");
     }
@@ -232,7 +234,12 @@ public class AuthServiceImpl implements AuthService {
         userService.forgotPassword(loginRequest);
     }
 
-    private String buildKey(String requestId, String purpose) {
-        return requestId + ":" + purpose;
+    private Cache getCache(String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache == null) {
+            throw new CacheNotFoundException(cacheName);
+        }
+        return cache;
     }
+
 }

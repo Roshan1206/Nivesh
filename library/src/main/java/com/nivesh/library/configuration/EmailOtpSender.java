@@ -1,6 +1,6 @@
 package com.nivesh.library.configuration;
 
-import com.nivesh.library.cache.OtpSender;
+import com.nivesh.library.service.OtpSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -9,7 +9,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 
 /**
  * Implementation of {@link OtpSender} to send OTP via email

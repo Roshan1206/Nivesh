@@ -1,16 +1,16 @@
-﻿info:
+info:
   name: Login
   type: http
   seq: 4
 
 http:
   method: POST
-  url: "{{auth}}/auth/login"
+  url: "{{gateway}}/auth/login"
   body:
     type: json
     data: |-
       {
-        "email": "test@gmail.com",
+        "email": "Roshan@gmail.com",
         "password": "Password@1234"
       }
   auth: inherit
@@ -20,4 +20,3 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
-

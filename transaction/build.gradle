@@ -31,7 +31,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
     implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'com.nivesh:library:0.0.1-SNAPSHOT'
+    implementation 'com.nivesh:nivesh-lib:0.0.1-SNAPSHOT'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'

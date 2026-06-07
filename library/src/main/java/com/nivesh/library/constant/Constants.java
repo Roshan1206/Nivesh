@@ -26,8 +26,10 @@ public final class Constants {
     // ==================== JWT Claims - Permissions ====================
     /** JWT claim containing user roles */
     public static final String ROLES = "roles";
+
     /** JWT claim containing user permissions */
     public static final String PERMISSIONS = "permissions";
+
     /** Super admin role with full permissions */
     public static final String ROLE_SUPER_ADMIN = "SUPER_ADMIN";
     

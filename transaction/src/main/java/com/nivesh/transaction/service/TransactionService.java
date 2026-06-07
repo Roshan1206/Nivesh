@@ -11,7 +11,22 @@ import java.util.UUID;
  */
 public interface TransactionService {
 
+    /**
+     * Initiate transaction for account
+     *
+     * @param idempotencyKey unique key per transaction
+     * @param transactionRequest transaction details
+     * @return OTP request id
+     */
     OtpResponse initiateTransaction(String idempotencyKey, TransactionRequest transactionRequest);
 
+
+    /**
+     * Start transaction
+     *
+     * @param requestId otp request id
+     * @param otp submitted otp
+     * @return reference number and status for future use
+     */
     TransactionResponse startTransaction(String requestId, String otp);
 }

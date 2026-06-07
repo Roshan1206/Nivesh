@@ -1,6 +1,6 @@
-package com.nivesh.gateway.configuration;
+package com.nivesh.gateway.configuration.security;
 
-import com.nivesh.library.constant.Constants;
+//import com.nivesh.library.constant.Constants;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -17,7 +17,7 @@ import java.util.List;
 @Component
 public class SecurityHeaderFilter implements GlobalFilter, Ordered {
 
-    private static final List<String> RESTRICTED_HEADERS = List.of(Constants.INTERNAL_ROLE_HEADER_NAME, Constants.SOURCE_SERVICE_HEADER_NAME);
+    private static final List<String> RESTRICTED_HEADERS = List.of("X-Internal-Role", "X-Source-Service");
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {

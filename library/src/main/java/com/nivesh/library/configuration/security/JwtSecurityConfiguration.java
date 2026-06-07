@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -95,16 +97,24 @@ public class JwtSecurityConfiguration {
         };
     }
 
+    @Bean
+    public NiveshJwtTokenValidator niveshJwtTokenValidator(RedisTemplate<String, String> redisTemplate) {
+        return new NiveshJwtTokenValidator(redisTemplate);
+    }
+
     /**
      * Create JWT decoder. Fetches public key from auth server.
      * Will be created only if the upstream server doesn't have its own decoder.
      */
     @Bean
     @ConditionalOnMissingBean(JwtDecoder.class)
-    public JwtDecoder jwtDecoder(){
+    public JwtDecoder jwtDecoder(NiveshJwtTokenValidator niveshJwtTokenValidator){
         // Resource servers validate signatures against the auth server's JWK set endpoint.
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(authUrl + "/oauth2/jwks").build();
-        OAuth2TokenValidator<Jwt> validator = JwtValidators.createDefaultWithIssuer(authUrl);
+
+        OAuth2TokenValidator<Jwt> defaultValidator = JwtValidators.createDefaultWithIssuer(authUrl);
+        OAuth2TokenValidator<Jwt> validator =
+                new DelegatingOAuth2TokenValidator<>(defaultValidator, niveshJwtTokenValidator);
         decoder.setJwtValidator(validator);
         return decoder;
     }

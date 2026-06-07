@@ -1,6 +1,7 @@
 package com.nivesh.authentication.service.impl;
 
 import com.nivesh.authentication.config.properties.TokenProperties;
+import com.nivesh.authentication.entity.RefreshToken;
 import com.nivesh.authentication.entity.User;
 import com.nivesh.authentication.service.TokenService;
 import com.nivesh.library.constant.Constants;
@@ -65,14 +66,14 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public String generateRefreshToken(String email, String userId) {
+    public String generateRefreshToken(RefreshToken refreshToken) {
         int expiry = Integer.parseInt(tokenProperties.refreshExpiry());
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put(Constants.EMAIL, email);
+        claims.put("token_id", refreshToken.getTokenId());
         claims.put(Constants.TOKEN_TYPE, Constants.REFRESH_TOKEN);
 
-        return generateToken(claims, expiry, ChronoUnit.DAYS, userId);
+        return generateToken(claims, expiry, ChronoUnit.DAYS, refreshToken.getUser().getId().toString());
     }
 
     @Override
@@ -156,6 +157,7 @@ public class TokenServiceImpl implements TokenService {
         claims.put(Constants.ROLES, roles);
         claims.put(Constants.PERMISSIONS, permissions);
         claims.put(Constants.EMAIL, user.getEmail());
+        claims.put("jti", UUID.randomUUID());
         return claims;
     }
 }

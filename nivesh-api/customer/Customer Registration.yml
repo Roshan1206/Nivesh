@@ -1,4 +1,4 @@
-﻿info:
+info:
   name: Customer Registration
   type: http
   seq: 1
@@ -10,9 +10,9 @@ http:
     type: json
     data: |-
       {
-        "firstName": "Nivesh",
+        "firstName": "Roshan 2",
         "middleName": null,
-        "lastName": "Bank",
+        "lastName": "Sahu",
         "dateOfBirth": "2026-05-30",
         "gender": "male"
       }

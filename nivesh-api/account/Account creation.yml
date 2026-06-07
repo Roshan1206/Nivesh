@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-        "customerNumber": "00000301",
-        "openingBalance": 2000,
+        "customerNumber": "00000002",
+        "openingBalance": 20000,
         "productCode": "001"
       }
   auth: inherit

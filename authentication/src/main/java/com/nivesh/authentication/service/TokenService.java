@@ -1,5 +1,6 @@
 package com.nivesh.authentication.service;
 
+import com.nivesh.authentication.entity.RefreshToken;
 import com.nivesh.authentication.entity.User;
 
 /**
@@ -18,7 +19,7 @@ public interface TokenService {
      */
     String generateAccessToken(User user, String tokenType);
 
-    String generateRefreshToken(String email, String userId);
+    String generateRefreshToken(RefreshToken refreshToken);
 
     String getUserEmail(String token);
 }

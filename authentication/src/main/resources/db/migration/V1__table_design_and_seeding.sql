@@ -138,6 +138,7 @@ CREATE TABLE users (
     failed_attempt  INTEGER              NOT NULL DEFAULT 0,
     locked_until    TIMESTAMPTZ          DEFAULT NULL,
     customer_status customer_status_enum NOT NULL,
+    token_version   INTEGER              NOT NULL,
     created_at      TIMESTAMPTZ          NOT NULL,
     created_by      VARCHAR(50)          NOT NULL,
     updated_at      TIMESTAMPTZ          NOT NULL DEFAULT NOW(),

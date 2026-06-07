@@ -59,6 +59,10 @@ public class User extends BaseAudit implements UserDetails {
     @Column(name = "customer_status", columnDefinition = "customer_status_enum", nullable = false)
     private CustomerStatus customerStatus;
 
+    /** Current token version. Incremented in case of blacklisted/revoked */
+    @Column(name = "token_version", nullable = false)
+    private int tokenVersion;
+
     /**
      * Predefined permissions for role
      */

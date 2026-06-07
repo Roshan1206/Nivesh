@@ -12,5 +12,7 @@ public enum OtpPurpose {
     KYC_VERIFICATION,
 
     /** OTP for high-value transaction authorization */
-    TRANSACTION
+    TRANSACTION,
+
+    LOGIN
 }

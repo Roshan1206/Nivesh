@@ -1,4 +1,4 @@
-package com.nivesh.library.cache;
+package com.nivesh.library.service;
 
 /**
  * Interface for sending OTP

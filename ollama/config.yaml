@@ -1,0 +1,62 @@
+name: Local Ollama Stack
+version: 1.0.0
+schema: v1
+
+models:
+  # Chat model — for documentation, explanations, code review
+  - name: Gemma 3 4B
+    provider: ollama
+    model: gemma3:4b
+    apiBase: http://localhost:11434
+    roles:
+      - chat
+      - edit
+      - apply
+    defaultCompletionOptions:
+      temperature: 0.7
+      contextLength: 4096
+
+  # Autocomplete — fast and lightweight for tab completion
+  - name: Qwen Coder 1.5B
+    provider: ollama
+    model: qwen2.5-coder:1.5b
+    apiBase: http://localhost:11434
+    roles:
+      - autocomplete
+    autocompleteOptions:
+      debounceDelay: 300
+      maxPromptTokens: 512
+      multilineCompletions: auto
+
+  # Embeddings — for @codebase semantic search
+  - name: Nomic Embed
+    provider: ollama
+    model: nomic-embed-text
+    apiBase: http://localhost:11434
+    roles:
+      - embed
+
+context:
+  - provider: code
+  - provider: diff
+  - provider: terminal
+  - provider: folder
+  - provider: codebase
+
+rules:
+  - Give concise, focused responses
+  - Follow existing code style and conventions
+  - Prefer Java 21 idioms and Spring Boot 3.x patterns
+  - When writing documentation, be clear and developer-friendly
+  - |
+    Java Code Quality Rules — apply strictly to all .java files:
+    1. All comments must use block-level Javadoc style: /** ... */. Never use // or /* */ comments.
+    2. Comments are only for .java files. Do not add comments in .yml, .properties, .xml, or any other file type.
+    3. Never add any comments (not even Javadoc) to main application class (the one annotated with @SpringBootApplication) in both src/main and src/test packages.
+    4. After writing or editing any module, update that module's own README.md to reflect its purpose, endpoints, dependencies, configuration, and any important design decisions.
+    5. After any structural change (new service, new module, new dependency), update the root-level README.md to reflect the current project structure and module relationships.
+    6. Spacing rules inside every Java class:
+       - Leave exactly 1 blank line between consecutive field (variable) declarations.
+       - Leave exactly 2 blank lines between the last field declaration and the first method.
+       - Leave exactly 2 blank lines between consecutive methods.
+    7. Comment placement rule: after a method ends on line N, lines N+1 and N+2 must be left blank, the Javadoc comment /** ... */ starts on line N+3, and the next method signature starts immediately after the closing */ with no extra blank line between the comment and the method.

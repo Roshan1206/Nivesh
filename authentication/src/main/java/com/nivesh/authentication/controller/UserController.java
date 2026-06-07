@@ -1,9 +1,14 @@
 package com.nivesh.authentication.controller;
 
+import com.nivesh.authentication.dto.request.LogoutRequest;
+import com.nivesh.authentication.service.RefreshTokenService;
 import com.nivesh.authentication.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 /**
  * Rest controller for user.
@@ -15,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class UserController {
 
+    private final RefreshTokenService refreshTokenService;
+
     /**
      * Responsible for managing user
      */
@@ -23,8 +30,16 @@ public class UserController {
     /**
      * Injecting required dependency via CI
      */
-    public UserController(UserService userService) {
+    public UserController(RefreshTokenService refreshTokenService, UserService userService) {
+        this.refreshTokenService = refreshTokenService;
         this.userService = userService;
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestBody LogoutRequest request) {
+        refreshTokenService.revokeRefreshToken(request);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -33,6 +48,6 @@ public class UserController {
     @PostMapping("/internal/{userId}/{status}")
     public ResponseEntity<String> updateUserStatus(@PathVariable String userId, @PathVariable String status) {
         String token = userService.updateStatus(userId, status);
-        return ResponseEntity.status(HttpStatus.OK).body(token);
+        return ResponseEntity.ok(token);
     }
 }

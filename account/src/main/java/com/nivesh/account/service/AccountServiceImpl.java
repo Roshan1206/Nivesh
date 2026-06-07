@@ -160,6 +160,7 @@ public class AccountServiceImpl implements AccountService {
         return getAccountTransactionResponse(accountId, newIdempotencyKey, request, type, account, newAvailableBalance, newBalance);
     }
 
+    @Transactional
     @Override
     public AccountTransactionResponse credit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request) {
         OperationType type = OperationType.CREDIT;

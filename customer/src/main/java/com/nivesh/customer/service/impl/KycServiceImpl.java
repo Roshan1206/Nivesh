@@ -8,11 +8,10 @@ import com.nivesh.customer.service.ContactService;
 import com.nivesh.customer.service.CustomerService;
 import com.nivesh.customer.service.KycService;
 import com.nivesh.customer.service.client.AuthServerClient;
-import com.nivesh.library.cache.OtpCacheService;
+import com.nivesh.library.service.OtpCacheService;
 import com.nivesh.library.dto.response.OtpResponse;
 import com.nivesh.library.entity.enums.CustomerStatus;
 import com.nivesh.library.entity.enums.KycStatus;
-import com.nivesh.library.entity.enums.OtpPurpose;
 import com.nivesh.library.service.JwtTokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -72,14 +71,14 @@ public class KycServiceImpl implements KycService {
         KycDocument saved = repository.save(kycDocument);
 
         String requestId = saved.getId().toString();
-        otpCacheService.generateOtp(requestId, OtpPurpose.KYC_VERIFICATION);
+        otpCacheService.generateAndSendOtp(requestId);
         return new OtpResponse("KYC initiated. Verify with OTP to complete", requestId);
     }
 
     @Transactional
     @Override
     public void verifyKyc(String requestId, String otp) {
-        otpCacheService.validateOtp(requestId, OtpPurpose.KYC_VERIFICATION, otp);
+        otpCacheService.validateOtp(requestId, otp);
         updateKycStatus(requestId);
     }
 

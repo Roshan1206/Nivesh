@@ -1,4 +1,4 @@
-﻿opencollection: 1.0.0
+opencollection: 1.0.0
 
 info:
   name: nivesh
@@ -25,13 +25,16 @@ request:
     - name: account
       value: http://localhost:8083
     - name: token
-      value: eyJraWQiOiJrZXktdjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJkMmM2MTY5MC1kN2ZmLTRjODAtYTA0MS01NmNhM2Q1ZTc0NTUiLCJwZXJtaXNzaW9ucyI6WyJDVVNUT01FUl9TVkM6UFJPRklMRTpSRUFEOk9XTiIsIkNVU1RPTUVSX1NWQzpQUk9GSUxFOldSSVRFOk9XTiJdLCJyb2xlcyI6WyJDVVNUT01FUiJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODEiLCJleHAiOjE3ODAyOTc2NzcsInRva2VuX3R5cGUiOiJBQ0NFU1MiLCJpYXQiOjE3ODAyOTQwNzcsImp0aSI6IjM4N2M1MzNmLTlkYjUtNDE1Ni05ZDZiLTUxNTQ0YWZmZDJiYiIsImVtYWlsIjoidGVzdEBnbWFpbC5jb20ifQ.a7dhEJEP123djI3pf_IbziujCXlE2btl_oT4x0M1xvQxEZFqEER17kOaIUujlaXxawY0fVfmIBjh7Uw9e9eOZgldRAkxPLT1l-EO13UYoNxEa6pv1-NX9DWceRr-6VDq9zOXZ1Sj5lP1kLTV6UrO8Oy5w5gQDgiD6lv62i240bKIdGxEggmM6dNt_Jxi15AK8ROcPeLasfRCcTYbvPLRYZqhXJf4XhB-2CLVxIZ_lMc131_XZ0NbpBKJtbLS8ZvmsB3EMoahSWzHDPwb9FafzCp0VICtPKdU72T48nwjwzQ6K4Sp8mgES5EUeMNiibAZEnIixnnLjI5RdwK2FIUXSQ
+      value: eyJraWQiOiJrZXktdjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIzMTE1ZDg0MS02YmJiLTQzNjUtYTkyMi0zMmUxMTc3MWIyODEiLCJwZXJtaXNzaW9ucyI6WyJDVVNUT01FUl9TVkM6UFJPRklMRTpSRUFEOk9XTiIsIkNVU1RPTUVSX1NWQzpQUk9GSUxFOldSSVRFOk9XTiJdLCJyb2xlcyI6WyJDVVNUT01FUiJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODEiLCJleHAiOjE3ODA1Nzc0OTAsInRva2VuX3R5cGUiOiJBQ0NFU1MiLCJpYXQiOjE3ODA1NzY1OTAsImp0aSI6IjU0NTJiZjZkLWM0NDAtNGY2OS1hZDhmLTIyYTdkZTcwMzA1YSIsImVtYWlsIjoiUm9zaGFuMUBnbWFpbC5jb20ifQ.KDmM__alQZ80zMB4UuVdDXS8ekdRUTJJZcvbICE0cLjM7PSTbSLjF5xzxpNE7Yf3eUfjBKJ36AkRjiAxEpUpbcjUtmYVo9_aGTHTWR2Bjp4quNwylzZba4z9zLQjlebA6pGQdWRmkrYJRU4xn7wHA7hHugeQf9lKbviq5YGu9WROmCoczbo3vBFoNahIRMOPfsUGCCN1tV_qVHdfCOWJsrOp0RhKychAgmuRikwxLqP71fJUgOFYLjQ_-HxqiLeRHBQmVTwow_Q2XS34JyovMCDRNKMDxzGT6FIuyh-w9PtIbNGGOuwJQtEJ1ile-3OutsUeYvzL2ywlxI2I7bJQxQ
     - name: bearer
       value: Bearer {{token}}
+    - name: transaction
+      value: http://localhost:8084
+    - name: gateway
+      value: http://localhost:8080/nivesh
 bundled: false
 extensions:
   bruno:
     ignore:
       - node_modules
       - .git
-

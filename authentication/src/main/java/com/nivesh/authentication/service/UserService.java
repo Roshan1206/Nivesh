@@ -7,8 +7,6 @@ import com.nivesh.library.entity.enums.CustomerStatus;
 
 /**
  * Interface for managing users.
- *
- * @author Roshan
  */
 public interface UserService {
 
@@ -23,4 +21,8 @@ public interface UserService {
     void forgotPassword(LoginRequest request);
 
     void save(User user);
+
+    User getUser(String userId);
+
+    void incrementTokenVersion(String userId);
 }

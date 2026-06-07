@@ -1,13 +1,13 @@
 package com.nivesh.authentication;
 
-import com.nivesh.library.annotation.EnableOtpCache;
+import com.nivesh.library.annotation.EnableNiveshCache;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@SpringBootApplication
 @EnableJpaAuditing(auditorAwareRef = "auditConfig")
-@EnableOtpCache
+@EnableNiveshCache
+@SpringBootApplication
 public class AuthenticationApplication {
 
 	public static void main(String[] args) {
