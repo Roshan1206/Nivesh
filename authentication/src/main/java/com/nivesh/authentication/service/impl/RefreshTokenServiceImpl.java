@@ -59,6 +59,13 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         this.redisTemplate = redisTemplate;
     }
 
+
+    /**
+     * Issues a new refresh token for the given user.
+     *
+     * @param user The user for whom to issue a refresh token.
+     * @return The newly issued refresh token.
+     */
     @Override
     public String issueRefreshToken(User user) {
         String tokenId = UUID.randomUUID().toString();
@@ -71,6 +78,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         return tokenService.generateRefreshToken(saved);
     }
 
+
+    /**
+     * Revokes a refresh token associated with the provided logout request.
+     *
+     * @param request The LogoutRequest containing the refresh token to revoke.
+     */
     @Override
     public void revokeRefreshToken(LogoutRequest request) {
         String userId = getUserId();
@@ -80,6 +93,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
 
+    /**
+     * Revokes all refresh tokens associated with a given user ID.
+     *
+     * @param request LogoutRequest object containing the user ID to revoke tokens for.
+     */
     @Override
     public void revokeUserAllRefreshToken(LogoutRequest request) {
         String userId = getUserId();

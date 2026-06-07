@@ -23,6 +23,13 @@ public class RoleServiceImpl implements RoleService {
         this.roleRepository = roleRepository;
     }
 
+
+    /**
+     * Retrieves a Role object based on its role name.
+     *
+     * @param roleName The name of the role to retrieve.
+     * @return The Role object with the specified role name, or null if no such role exists.
+     */
     @Transactional(readOnly = true)
     @Override
     public Role getRole(String roleName) {

@@ -16,6 +16,12 @@ public class OtpException extends RuntimeException {
         this.errorCode = errorCode;
     }
 
+
+    /**
+     * Returns the error code associated with this exception.
+     *
+     * @return The OTP error code.
+     */
     public OtpErrorCode getErrorCode() {
         return errorCode;
     }

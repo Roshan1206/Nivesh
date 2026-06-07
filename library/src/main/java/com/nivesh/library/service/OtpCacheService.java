@@ -57,6 +57,13 @@ public class OtpCacheService {
         generateAndSendOtp(requestId, email);
     }
 
+
+    /**
+     * Generates and sends an OTP to the specified email address based on the provided request ID.
+     *
+     * @param requestId The unique identifier for the request.
+     * @param email The recipient's email address.
+     */
     public void generateAndSendOtp(String requestId, String email) {
         int bound = (int) Math.pow(10, 6);
         int min = (int) Math.pow(10, 5);
@@ -100,6 +107,12 @@ public class OtpCacheService {
         getCache().evict(requestId);
     }
 
+
+    /**
+     * Retrieves the application cache instance.
+     *
+     * @return Cache
+     */
     private Cache getCache() {
         Cache cache = cacheManager.getCache(OtpCacheService.OTP_CACHE);
         if (cache == null) {

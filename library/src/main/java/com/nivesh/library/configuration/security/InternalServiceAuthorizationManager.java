@@ -18,6 +18,15 @@ import java.util.function.Supplier;
  */
 @Slf4j
 public class InternalServiceAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
+
+
+    /**
+     * Checks if a request for access to an internal service is authorized based on the provided authentication and context.
+     *
+     * @param authentication The current user's authentication information.
+     * @param object The RequestAuthorizationContext containing details about the authorization decision process.
+     * @return An AuthorizationDecision indicating whether the request is permitted or denied.
+     */
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext object) {
         HttpServletRequest request = object.getRequest();

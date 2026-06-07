@@ -85,6 +85,13 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         return jwtDecoder.decode(getToken()).getClaimAsString(Constants.TOKEN_TYPE);
     }
 
+
+    /**
+     * Checks if a refresh token is expired.
+     *
+     * @param refreshToken The refresh token to check.
+     * @return True if the refresh token is expired, false otherwise.
+     */
     @Override
     public boolean isTokenExpired(String refreshToken) {
         Instant expiry = jwtDecoder.decode(refreshToken).getExpiresAt();

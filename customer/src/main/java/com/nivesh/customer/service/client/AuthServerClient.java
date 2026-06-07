@@ -28,6 +28,14 @@ public class AuthServerClient {
         this.webClient = webClient;
     }
 
+
+    /**
+     * Updates the user's status based on the provided user ID and status.
+     *
+     * @param userId The ID of the user to update.
+     * @param status The new status for the user.
+     * @return A success message upon successful update, or an error message if the update fails.
+     */
     public String updateUserStatus(String userId, String status) {
         return webClient.post()
                 .uri(uriBuilder -> uriBuilder

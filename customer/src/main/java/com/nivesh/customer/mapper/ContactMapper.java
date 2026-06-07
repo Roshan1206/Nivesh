@@ -11,6 +11,14 @@ import java.util.Map;
  */
 public class ContactMapper {
 
+
+    /**
+     * Builds a Contact object from user information and customer details.
+     *
+     * @param userInfo A map containing user information, such as name and email.
+     * @param customer The associated Customer object.
+     * @return A Contact object populated with the provided data.
+     */
     public static Contact buildContact(Map<String, String> userInfo, Customer customer) {
         String email = userInfo.get(Constants.EMAIL);
         String mobileNo = userInfo.get(Constants.MOBILE);

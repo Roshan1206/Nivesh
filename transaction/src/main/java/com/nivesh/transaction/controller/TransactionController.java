@@ -33,12 +33,28 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+
+    /**
+     * Initiates a new transaction with an OTP response.
+     *
+     * @param idempotencyKey The idempotency key for the transaction.
+     * @param request The transaction request containing the details of the transaction.
+     * @return A ResponseEntity containing the OTP response for the initiated transaction.
+     */
     @PostMapping
     public ResponseEntity<OtpResponse> initiateTransaction(@RequestHeader String idempotencyKey, @RequestBody TransactionRequest request) {
         OtpResponse otpResponse = transactionService.initiateTransaction(idempotencyKey, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(otpResponse);
     }
 
+
+    /**
+     * Starts a new transaction with the provided request ID and OTP.
+     *
+     * @param requestId The unique identifier for the transaction request.
+     * @param otp The one-time password used to authenticate the transaction.
+     * @return A ResponseEntity containing the TransactionResponse object upon successful transaction start.
+     */
     @PostMapping(value = "/{requestId}/verify", consumes = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<TransactionResponse> startTransaction(@PathVariable String requestId,  @RequestBody String otp) {
         TransactionResponse response = transactionService.startTransaction(requestId, otp);

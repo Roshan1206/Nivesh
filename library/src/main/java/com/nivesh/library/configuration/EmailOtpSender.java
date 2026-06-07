@@ -43,6 +43,14 @@ public class EmailOtpSender implements OtpSender {
             maxAttempts = 3,
             backoff = @Backoff(delay = 2000, multiplier = 2)
     )
+
+
+    /**
+     * Sends a one-time password (OTP) to the specified email address.
+     *
+     * @param email The recipient's email address.
+     * @param otp The OTP to send.
+     */
     @Override
     public void send(String email, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();

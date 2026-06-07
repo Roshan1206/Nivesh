@@ -97,6 +97,13 @@ public class JwtSecurityConfiguration {
         };
     }
 
+
+    /**
+     * Creates a NiveshJwtTokenValidator instance using the provided RedisTemplate for token verification.
+     *
+     * @param redisTemplate The RedisTemplate used to retrieve and validate JWT tokens.
+     * @return A NiveshJwtTokenValidator instance.
+     */
     @Bean
     public NiveshJwtTokenValidator niveshJwtTokenValidator(RedisTemplate<String, String> redisTemplate) {
         return new NiveshJwtTokenValidator(redisTemplate);

@@ -65,6 +65,13 @@ public class TokenServiceImpl implements TokenService {
         return accessToken;
     }
 
+
+    /**
+     * Generates a new refresh token based on the provided refresh token.
+     *
+     * @param refreshToken The existing refresh token.
+     * @return A newly generated refresh token.
+     */
     @Override
     public String generateRefreshToken(RefreshToken refreshToken) {
         int expiry = Integer.parseInt(tokenProperties.refreshExpiry());
@@ -76,6 +83,13 @@ public class TokenServiceImpl implements TokenService {
         return generateToken(claims, expiry, ChronoUnit.DAYS, refreshToken.getUser().getId().toString());
     }
 
+
+    /**
+     * Retrieves the user's email address based on a refresh token.
+     *
+     * @param refreshToken The refresh token to use for authentication.
+     * @return The user's email address, or null if not found.
+     */
     @Override
     public String getUserEmail(String refreshToken) {
         return jwtTokenService.extractEmail(refreshToken);

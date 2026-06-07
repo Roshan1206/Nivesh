@@ -3,12 +3,8 @@ package com.nivesh.authentication.controller;
 import com.nivesh.authentication.dto.request.LogoutRequest;
 import com.nivesh.authentication.service.RefreshTokenService;
 import com.nivesh.authentication.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 /**
  * Rest controller for user.
@@ -36,10 +32,29 @@ public class UserController {
     }
 
 
+    /**
+     * Logs out the currently authenticated user and returns a no-content response.
+     *
+     * @param request The LogoutRequest containing the user identifier to log out.
+     * @return ResponseEntity<Void> A no-content response indicating successful logout.
+     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestBody LogoutRequest request) {
         refreshTokenService.revokeRefreshToken(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
+    }
+
+
+    /**
+     * Logs out the currently authenticated user from all sessions and returns a no-content response.
+     *
+     * @param request The LogoutRequest containing the user identifier to log out.
+     * @return ResponseEntity<Void> A no-content response indicating successful logout.
+     */
+    @PostMapping("/logout/all")
+    public ResponseEntity<Void> logoutUserFromAllSession(@RequestBody LogoutRequest request) {
+        refreshTokenService.revokeUserAllRefreshToken(request);
+        return ResponseEntity.noContent().build();
     }
 
     /**

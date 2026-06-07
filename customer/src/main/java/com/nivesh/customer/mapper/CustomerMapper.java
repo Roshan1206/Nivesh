@@ -18,6 +18,15 @@ import java.util.stream.Stream;
  */
 public class CustomerMapper {
 
+
+    /**
+     * Builds a Customer object from a request and provides necessary identifiers.
+     *
+     * @param request The CustomerRegisterRequest containing customer details.
+     * @param userId The unique identifier for the customer.
+     * @param customerNumber The customer's number.
+     * @return A newly created Customer object.
+     */
     public static Customer buildCustomer(CustomerRegisterRequest request, UUID userId, String customerNumber) {
         Gender gender = Gender.valueOf(request.getGender().toUpperCase());
 
@@ -33,6 +42,14 @@ public class CustomerMapper {
                 .build();
     }
 
+
+    /**
+     * Creates a response map containing customer data and a token.
+     *
+     * @param customer The customer object.
+     * @param token The authentication token.
+     * @return A Map<String, Object> containing the customer's data and the token.
+     */
     public static Map<String, Object> createResponse(Customer customer, String token) {
         CustomerInfoResponse customerResponse = buildCustomerResponse(customer);
         Map<String, Object> response = new HashMap<>();
@@ -41,12 +58,26 @@ public class CustomerMapper {
         return response;
     }
 
+
+    /**
+     * Builds a full name string from a Customer object's first and last names.
+     *
+     * @param customer The Customer object containing the first and last names.
+     * @return A string representing the full name, combining the first and last names.
+     */
     public static String buildFullName(Customer customer) {
         return Stream.of(customer.getFirstName(), customer.getMiddleName(), customer.getLastName())
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(" "));
     }
 
+
+    /**
+     * Builds a CustomerInfoResponse object from a given Customer object.
+     *
+     * @param customer The Customer object to map.
+     * @return A CustomerInfoResponse object containing the customer's information.
+     */
     public static CustomerInfoResponse buildCustomerResponse(Customer customer) {
         Set<ContactResponse> contacts = customer.getContacts().stream()
                 .map(contact -> new ContactResponse(

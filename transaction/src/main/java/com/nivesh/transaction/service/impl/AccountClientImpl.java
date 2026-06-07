@@ -37,6 +37,13 @@ public class AccountClientImpl implements AccountsClient {
         this.webClient = client;
     }
 
+
+    /**
+     * Validates an account based on the provided transaction request.
+     *
+     * @param request The transaction request containing account details.
+     * @return An AccountValidationResponse object indicating the validation result.
+     */
     @Override
     public AccountValidationResponse validateAccount(TransactionRequest request) {
         return webClient.post()
@@ -48,6 +55,14 @@ public class AccountClientImpl implements AccountsClient {
                 .block();
     }
 
+
+    /**
+     * Processes a debit transaction for the specified account.
+     *
+     * @param accountId The unique identifier of the account to debit.
+     * @param idempotencyKey A key used to prevent duplicate transactions.
+     * @param request The transaction request containing the amount and other details.
+     */
     @Override
     public void debit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {
         webClient.post()
@@ -62,6 +77,14 @@ public class AccountClientImpl implements AccountsClient {
                 .block();
     }
 
+
+    /**
+     * Credits money to an account based on the provided transaction request.
+     *
+     * @param accountId The unique identifier of the account to credit.
+     * @param idempotencyKey A key used to prevent duplicate transactions.
+     * @param request The transaction request containing the amount and other details.
+     */
     @Override
     public void credit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {
         webClient.post()
@@ -76,6 +99,12 @@ public class AccountClientImpl implements AccountsClient {
                 .block();
     }
 
+
+    /**
+     * Creates a RetryBackoffSpec with an initial delay of 1 second and exponential backoff.
+     *
+     * @return RetryBackoffSpec
+     */
     @NonNull
     private static RetryBackoffSpec doRetry() {
         return Retry.backoff(3, Duration.ofSeconds(2))

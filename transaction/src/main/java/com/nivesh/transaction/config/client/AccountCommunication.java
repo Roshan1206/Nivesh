@@ -16,6 +16,13 @@ public class AccountCommunication {
     @Value("${nivesh.account.url}")
     private String accountsUrl;
 
+
+    /**
+     * Creates a new WebClient instance for account-related communication.
+     *
+     * @param client A BaseCommunicationClient to use as the underlying web client.
+     * @return A WebClient instance configured for account operations.
+     */
     @Bean
     public WebClient accountClient(BaseCommunicationClient client) {
         return client.create(accountsUrl);

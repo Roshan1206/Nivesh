@@ -109,11 +109,23 @@ public class User extends BaseAudit implements UserDetails {
         return authorities;
     }
 
+
+    /**
+     * Returns the user's password.
+     *
+     * @return The user's password as a string.
+     */
     @Override
     public String getPassword() {
         return password;
     }
 
+
+    /**
+     * Returns the username associated with the user account.
+     *
+     * @return The username as a String.
+     */
     @Override
     public String getUsername() {
         return email;

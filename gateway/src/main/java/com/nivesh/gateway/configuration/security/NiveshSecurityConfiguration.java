@@ -22,6 +22,13 @@ public class NiveshSecurityConfiguration {
     @Value("${nivesh.auth.url}")
     private String authUrl;
 
+
+    /**
+     * Configures the security web filter chain for the application.
+     *
+     * @param httpSecurity The HttpSecurity object to configure the filter chain with.
+     * @return The SecurityWebFilterChain instance configured by this method.
+     */
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity httpSecurity){
         httpSecurity
@@ -35,6 +42,11 @@ public class NiveshSecurityConfiguration {
     }
 
 
+    /**
+     * Creates a ReactiveJwtDecoder for decoding JWT tokens.
+     *
+     * @return reactiveJwtDecoder
+     */
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
         NimbusReactiveJwtDecoder decoder = ReactiveJwtDecoders.fromIssuerLocation(authUrl);

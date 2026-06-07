@@ -60,6 +60,14 @@ public class KycServiceImpl implements KycService {
     }
 
 //    TODO: create validation method for KYC using UIDAI/NSDL and service class for saving the file
+
+
+    /**
+     * Initiates a KYC process by sending an OTP to the user's registered mobile number and accepting the uploaded document.
+     *
+     * @param request The KycInitiationRequest object containing the user details and OTP preferences.
+     * @param file The MultipartFile representing the user-uploaded document for KYC verification.
+     */
     @Override
     public OtpResponse initiateKyc(KycInitiationRequest request, MultipartFile file) {
         Customer customer = customerService.getCustomer(request.getCustomerNumber());
@@ -75,6 +83,14 @@ public class KycServiceImpl implements KycService {
         return new OtpResponse("KYC initiated. Verify with OTP to complete", requestId);
     }
 
+
+    /**
+     * Verifies KYC details for a given request ID and OTP.
+     *
+     * @param requestId The unique identifier of the KYC request.
+     * @param otp The one-time password provided by the user.
+     * @return void
+     */
     @Transactional
     @Override
     public void verifyKyc(String requestId, String otp) {
@@ -82,6 +98,12 @@ public class KycServiceImpl implements KycService {
         updateKycStatus(requestId);
     }
 
+
+    /**
+     * Updates the KYC status for a given request ID.
+     *
+     * @param requestId The unique identifier of the KYC request to update.
+     */
     private void updateKycStatus(String requestId) {
         UUID id = UUID.fromString(requestId);
         KycDocument document = repository.findById(id).orElseThrow(

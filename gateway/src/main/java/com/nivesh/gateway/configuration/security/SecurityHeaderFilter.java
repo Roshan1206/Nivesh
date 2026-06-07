@@ -19,6 +19,13 @@ public class SecurityHeaderFilter implements GlobalFilter, Ordered {
 
     private static final List<String> RESTRICTED_HEADERS = List.of("X-Internal-Role", "X-Source-Service");
 
+
+    /**
+     * Adds security headers to the outgoing request.
+     *
+     * @param exchange The current ServerWebExchange.
+     * @param chain The GatewayFilterChain to continue processing the request.
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest sanitizeRequest = exchange.getRequest()
@@ -28,6 +35,12 @@ public class SecurityHeaderFilter implements GlobalFilter, Ordered {
         return chain.filter(exchange.mutate().request(sanitizeRequest).build());
     }
 
+
+    /**
+     * Returns the order in which this filter should be applied.
+     *
+     * @return The order of this filter.
+     */
     @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE;

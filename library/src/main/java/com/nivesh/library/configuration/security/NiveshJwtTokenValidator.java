@@ -44,6 +44,13 @@ public class NiveshJwtTokenValidator implements OAuth2TokenValidator<Jwt> {
         return OAuth2TokenValidatorResult.success();
     }
 
+
+    /**
+     * Retrieves the current version associated with a given user ID from the token data.
+     *
+     * @param userId The user ID to retrieve the version for.
+     * @return The current version integer, or null if not found.
+     */
     private Integer getTokenCurrentVersion(String userId) {
         String val = redisTemplate.opsForValue().get("tok_ver:" + userId);
         if (val == null) return null;
@@ -54,6 +61,13 @@ public class NiveshJwtTokenValidator implements OAuth2TokenValidator<Jwt> {
         }
     }
 
+
+    /**
+     * Checks if a JWT token ID is present in the blacklisted set of tokens.
+     *
+     * @param jti The JWT token ID to check.
+     * @return True if the token ID is found in the blacklist, false otherwise.
+     */
     private boolean isBlackListed(String jti) {
         return redisTemplate.hasKey("blacklist:jti:" + jti);
     }

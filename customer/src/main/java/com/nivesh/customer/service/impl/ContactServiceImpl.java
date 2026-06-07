@@ -23,6 +23,13 @@ public class ContactServiceImpl implements ContactService {
         this.repository = repository;
     }
 
+
+    /**
+     * Retrieves the email address associated with a given customer ID.
+     *
+     * @param customerId The unique identifier of the customer.
+     * @return The customer's email address as a String, or null if not found.
+     */
     @Override
     public String getCustomerEmail(UUID customerId) {
         return repository.getCustomerPrimaryEmail(customerId, Contact.ContactType.PRIMARY);

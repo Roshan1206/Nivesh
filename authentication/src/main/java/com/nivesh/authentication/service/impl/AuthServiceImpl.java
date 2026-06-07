@@ -180,6 +180,12 @@ public class AuthServiceImpl implements AuthService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
+
+    /**
+     * Locks a user account by setting the 'locked' flag to true.
+     *
+     * @param user The User object to lock.
+     */
     private void lockUser(User user) {
         user.setCustomerStatus(CustomerStatus.LOCKED);
         user.setLockedUntil(Instant.now().plus(lockedDuration, ChronoUnit.HOURS));
@@ -234,6 +240,13 @@ public class AuthServiceImpl implements AuthService {
         userService.forgotPassword(loginRequest);
     }
 
+
+    /**
+     * Retrieves a cache instance based on the provided cache name.
+     *
+     * @param cacheName The name of the cache to retrieve.
+     * @return A Cache object representing the retrieved cache.
+     */
     private Cache getCache(String cacheName) {
         Cache cache = cacheManager.getCache(cacheName);
         if (cache == null) {

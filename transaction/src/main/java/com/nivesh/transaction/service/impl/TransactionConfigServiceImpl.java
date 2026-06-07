@@ -23,6 +23,13 @@ public class TransactionConfigServiceImpl implements TransactionConfigService {
         this.repository = repository;
     }
 
+
+    /**
+     * Retrieves the configuration for a specific transaction type.
+     *
+     * @param type The transaction type to retrieve the configuration for.
+     * @return The TransactionTypeConfig object corresponding to the given transaction type.
+     */
     @Override
     public TransactionTypeConfig getTransactionType(TransactionType type) {
         return repository.findById(type.name()).orElseThrow(

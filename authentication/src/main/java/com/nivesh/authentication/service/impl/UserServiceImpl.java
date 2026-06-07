@@ -49,6 +49,13 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
+
+    /**
+     * Creates a new user account based on the provided registration details.
+     *
+     * @param request A RegisterRequest object containing the user's information.
+     * @return The newly created User object.
+     */
     @Transactional
     @Override
     public User createNewUser(RegisterRequest request) {
@@ -65,6 +72,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+
+    /**
+     * Retrieves a User object from the database based on the provided email address.
+     *
+     * @param email The email address to search for.
+     * @return A User object if found, or null if no user with that email exists.
+     */
     @Transactional(readOnly = true)
     @Override
     public User getUserByEmail(String email) {
@@ -91,6 +105,13 @@ public class UserServiceImpl implements UserService {
         return tokenService.generateAccessToken(user, Constants.ACCESS_TOKEN);
     }
 
+
+    /**
+     * Updates the status of a customer.
+     *
+     * @param user The user making the update.
+     * @param customerStatus The new status to apply to the customer.
+     */
     @Transactional
     @Override
     public void updateStatus(User user, CustomerStatus customerStatus) {
@@ -98,6 +119,12 @@ public class UserServiceImpl implements UserService {
         save(user);
     }
 
+
+    /**
+     * Initiates the password reset process by sending a password reset link to the user's registered email address.
+     *
+     * @param request The LoginRequest object containing the user's email address.
+     */
     @Transactional
     @Override
     public void forgotPassword(LoginRequest request) {
@@ -106,18 +133,36 @@ public class UserServiceImpl implements UserService {
         save(user);
     }
 
+
+    /**
+     * Saves a User object to the database.
+     *
+     * @param user The User object to save.
+     */
     @Override
     public void save(User user) {
         userRepository.save(user);
     }
 
 
+    /**
+     * Increments the token version for a given user ID.
+     *
+     * @param userId The ID of the user whose token version should be incremented.
+     */
     @Override
     public void incrementTokenVersion(String userId) {
         User user = getUser(userId);
         user.setTokenVersion(user.getTokenVersion() + 1);
     }
 
+
+    /**
+     * Retrieves a user from the database based on the provided ID.
+     *
+     * @param id The unique identifier of the user to retrieve.
+     * @return A User object if found, or null if no user with that ID exists.
+     */
     @Override
     public User getUser(String id) {
         UUID userId = UUID.fromString(id);

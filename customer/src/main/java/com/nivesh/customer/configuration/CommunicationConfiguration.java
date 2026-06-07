@@ -16,6 +16,13 @@ public class CommunicationConfiguration {
     @Value("${nivesh.auth.url}")
     private String authUrl;
 
+
+    /**
+     * Creates a WebClient with authentication configured using the provided BaseCommunicationClient builder.
+     *
+     * @param builder The BaseCommunicationClient builder to use for configuring the WebClient.
+     * @return A WebClient instance with authentication enabled.
+     */
     @Bean(name = "authClient")
     public WebClient createAuthClient(BaseCommunicationClient builder) {
         return builder.create(authUrl);
