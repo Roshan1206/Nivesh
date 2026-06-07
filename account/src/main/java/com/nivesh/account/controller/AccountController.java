@@ -61,12 +61,28 @@ public class AccountController {
         return ResponseEntity.status(HttpStatus.OK).body(accountService.getAvailableBalance(accountId));
     }
 
+
+    /**
+     * Validates an account based on the provided transaction request and returns a response indicating success or failure.
+     *
+     * @param request The TransactionRequest object containing the details of the transaction to validate.
+     * @return A ResponseEntity containing an AccountValidationResponse object, which will contain validation results.
+     */
     @PostMapping("/internal/validate")
     public ResponseEntity<AccountValidationResponse> validateAccount(@RequestBody TransactionRequest request) {
         AccountValidationResponse response = accountService.validateAccount(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+
+    /**
+     * Debits the specified account and returns the transaction response.
+     *
+     * @param idempotencyKey The idempotency key for the request.
+     * @param accountId The ID of the account to debit.
+     * @param request The amount transaction request containing the debit amount.
+     * @return A ResponseEntity containing the AccountTransactionResponse representing the debit operation.
+     */
     @PostMapping("/internal/{accountId}/debit")
     public ResponseEntity<AccountTransactionResponse> debitAccount(@RequestHeader String idempotencyKey,
                                                                    @PathVariable UUID accountId,
@@ -75,6 +91,15 @@ public class AccountController {
         return ResponseEntity.status(debit.getStatus()).body(debit);
     }
 
+
+    /**
+     * Credits the specified account with the transaction details provided in the request.
+     *
+     * @param idempotencyKey The idempotency key for this request.
+     * @param accountId The ID of the account to credit.
+     * @param request The AmountTransactionRequest containing the transaction details.
+     * @return A ResponseEntity containing the AccountTransactionResponse representing the successful credit operation.
+     */
     @PostMapping("/internal/{accountId}/credit")
     public ResponseEntity<AccountTransactionResponse> creditAccount(@RequestHeader String idempotencyKey,
                                                                     @PathVariable UUID accountId,

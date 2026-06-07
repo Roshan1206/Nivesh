@@ -116,6 +116,13 @@ public class AccountServiceImpl implements AccountService {
         return getAccount(accountId).getAvailableBalance();
     }
 
+
+    /**
+     * Validates an account based on the provided transaction request.
+     *
+     * @param request The transaction request containing account details.
+     * @return An AccountValidationResponse object indicating the validation result.
+     */
     @Override
     public AccountValidationResponse validateAccount(TransactionRequest request) {
         AccountValidationResponse response = new AccountValidationResponse();
@@ -136,6 +143,15 @@ public class AccountServiceImpl implements AccountService {
         return response;
     }
 
+
+    /**
+     * Initiates a debit transaction for the specified account.
+     *
+     * @param accountId The unique identifier of the account to debit.
+     * @param idempotencyKey A unique key used to prevent duplicate transactions.
+     * @param request The AmountTransactionRequest object containing the debit details.
+     * @return An AccountTransactionResponse object representing the result of the debit transaction.
+     */
     @Transactional
     @Override
     public AccountTransactionResponse debit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request) {
@@ -160,6 +176,15 @@ public class AccountServiceImpl implements AccountService {
         return getAccountTransactionResponse(accountId, newIdempotencyKey, request, type, account, newAvailableBalance, newBalance);
     }
 
+
+    /**
+     * Credits funds to an account based on the provided transaction request.
+     *
+     * @param accountId The ID of the account to credit.
+     * @param idempotencyKey A unique key for this transaction, used to prevent duplicate processing.
+     * @param request The transaction request containing the amount and other details.
+     * @return An AccountTransactionResponse object representing the successful credit operation.
+     */
     @Transactional
     @Override
     public AccountTransactionResponse credit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request) {
@@ -178,6 +203,19 @@ public class AccountServiceImpl implements AccountService {
         return getAccountTransactionResponse(accountId, newIdempotencyKey, request, type, account, newAvailableBalance, newBalance);
     }
 
+
+    /**
+     * Retrieves an AccountTransactionResponse object based on the provided account details and transaction request.
+     *
+     * @param accountId The unique identifier of the account.
+     * @param idempotencyKey A key used to ensure that a transaction is only processed once.
+     * @param request The AmountTransactionRequest detailing the transaction parameters.
+     * @param type The type of operation being performed (e.g., debit, credit).
+     * @param account The Account object representing the target account.
+     * @param newAvailableBalance The new available balance after the transaction.
+     * @param newBalance The new total balance after the transaction.
+     * @return An AccountTransactionResponse object containing the transaction details.
+     */
     @NonNull
     private AccountTransactionResponse getAccountTransactionResponse(UUID accountId, String idempotencyKey, AmountTransactionRequest request, OperationType type, Account account, BigDecimal newAvailableBalance, BigDecimal newBalance) {
         account.setAvailableBalance(newAvailableBalance);
@@ -194,6 +232,16 @@ public class AccountServiceImpl implements AccountService {
         return response;
     }
 
+
+    /**
+     * Saves an account transaction response with idempotency key for future processing.
+     *
+     * @param request The original AmountTransactionRequest object.
+     * @param accountId The ID of the account associated with the transaction.
+     * @param idempotencyKey The unique identifier for this idempotent operation.
+     * @param response The AccountTransactionResponse representing the successful transaction.
+     * @param type The type of operation performed (e.g., CREATE, UPDATE).
+     */
     private void saveIdempotency(AmountTransactionRequest request, UUID accountId,
                                  String idempotencyKey, AccountTransactionResponse response, OperationType type) {
         IdempotencyRecord record = IdempotencyRecord.builder()
