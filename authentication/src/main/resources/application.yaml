@@ -8,10 +8,12 @@ nivesh:
       onboarded-expiry: 10
       access-expiry: 15
       refresh-expiry: 7
-    user:
-      locked-duration: 2
     database:
       schema: auth
+    cache:
+      lock-duration-in-hour: 5
+      max-attempts: 3
+      max-cache-size: 10000
 
 spring:
   application:

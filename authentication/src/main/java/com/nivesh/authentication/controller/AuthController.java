@@ -3,6 +3,7 @@ package com.nivesh.authentication.controller;
 import com.nivesh.authentication.dto.RefreshReqRes;
 import com.nivesh.authentication.dto.request.LoginRequest;
 import com.nivesh.authentication.dto.request.RegisterRequest;
+import com.nivesh.authentication.dto.request.ResetPasswordRequest;
 import com.nivesh.authentication.dto.response.TokenResponse;
 import com.nivesh.authentication.dto.response.RegisterResponse;
 import com.nivesh.authentication.service.AuthService;
@@ -83,17 +84,29 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(authService.refreshAccessToken(request));
     }
 
-    // TODO: Add OTP validation before accepting password reset requests.
+
     /**
      * Resets a password for an unauthenticated user after receiving valid login details.
      *
      * @param loginRequest email and replacement password
      * @return success message once the password is updated
      */
-    @PatchMapping("/forgot")
+    @PostMapping("/forgot/initiate")
     public ResponseEntity<String> forgotPassword(@RequestBody LoginRequest loginRequest) {
-        authService.forgotPassword(loginRequest);
-        return ResponseEntity.status(HttpStatus.OK).body("Password updated successfully");
+        String requestId = authService.forgotPassword(loginRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(requestId);
+    }
+
+    @PostMapping(value = "/forgot/verify/{requestId}", consumes = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> validateOtp(@PathVariable String requestId, @RequestBody String otp) {
+        String newRequestId = authService.validateForgotPassword(requestId, otp);
+        return ResponseEntity.status(HttpStatus.OK).body(newRequestId);
+    }
+
+    @PatchMapping("/forgot/reset/{requestId}")
+    public ResponseEntity<TokenResponse> resetPassword(@PathVariable String requestId, @RequestBody ResetPasswordRequest request) {
+        TokenResponse response = authService.resetPassword(requestId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

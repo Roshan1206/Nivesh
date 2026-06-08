@@ -7,8 +7,9 @@ import com.nivesh.authentication.entity.User;
 import com.nivesh.authentication.repository.RefreshTokenRepository;
 import com.nivesh.authentication.service.RefreshTokenService;
 import com.nivesh.authentication.service.TokenService;
-import com.nivesh.authentication.service.UserService;
+import com.nivesh.library.exception.SessionExpiredException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -42,20 +43,16 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     /** Issues tokens */
     private final TokenService tokenService;
 
-    /** Manages user*/
-    private final UserService userService;
-
 
     /**
      * Injecting required dependency
      */
     public RefreshTokenServiceImpl(RefreshTokenRepository repository, JwtDecoder jwtDecoder,
-                                   TokenProperties tokenProperties, UserService userService,
+                                   TokenProperties tokenProperties,
                                    TokenService tokenService, RedisTemplate<String, String> redisTemplate) {
         this.repository = repository;
         this.tokenProperties = tokenProperties;
         this.tokenService = tokenService;
-        this.userService = userService;
         this.jwtDecoder = jwtDecoder;
         this.redisTemplate = redisTemplate;
     }
@@ -103,12 +100,24 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
      */
     @Transactional
     @Override
-    public void revokeUserAllRefreshToken(LogoutRequest request) {
+    public String revokeUserAllRefreshToken(LogoutRequest request) {
         String userId = getUserId();
         repository.revokeAllByUser(UUID.fromString(userId), "Logout");
-        userService.incrementTokenVersion(userId);
+        return userId;
     }
 
+
+    @Override
+    public String validateRefreshToken(String refreshToken) {
+        String tokenId = jwtDecoder.decode(refreshToken).getClaimAsString("token_id");
+        RefreshToken token = repository.findByTokenId(UUID.fromString(tokenId)).orElseThrow(
+                () -> new SessionExpiredException(HttpStatus.NOT_FOUND, "Refresh token not found")
+        );
+        if (token.isRevoked()) {
+            throw new SessionExpiredException(HttpStatus.BAD_REQUEST, "Session has been expired. Please login again");
+        }
+        return token.getUser().getId().toString();
+    }
 
     /** Get user id of current authenticated user */
     private String getUserId() {

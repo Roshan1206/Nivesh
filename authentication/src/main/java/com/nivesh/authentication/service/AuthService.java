@@ -3,6 +3,7 @@ package com.nivesh.authentication.service;
 import com.nivesh.authentication.dto.RefreshReqRes;
 import com.nivesh.authentication.dto.request.LoginRequest;
 import com.nivesh.authentication.dto.request.RegisterRequest;
+import com.nivesh.authentication.dto.request.ResetPasswordRequest;
 import com.nivesh.authentication.dto.response.RegisterResponse;
 import com.nivesh.authentication.dto.response.TokenResponse;
 import com.nivesh.library.dto.response.OtpResponse;
@@ -51,5 +52,9 @@ public interface AuthService {
      *
      * @param loginRequest user email and replacement password
      */
-    void forgotPassword(LoginRequest loginRequest);
+    String forgotPassword(LoginRequest loginRequest);
+
+    String validateForgotPassword(String requestId, String otp);
+
+    TokenResponse resetPassword(String requestId, ResetPasswordRequest passwordRequest);
 }

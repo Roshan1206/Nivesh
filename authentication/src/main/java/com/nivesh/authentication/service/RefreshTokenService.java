@@ -27,5 +27,8 @@ public interface RefreshTokenService {
     /**
      * Revoke all refresh token for a user
      */
-    void revokeUserAllRefreshToken(LogoutRequest request);
+    String revokeUserAllRefreshToken(LogoutRequest request);
+
+
+    String validateRefreshToken(String refreshToken);
 }

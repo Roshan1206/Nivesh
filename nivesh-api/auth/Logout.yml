@@ -6,6 +6,16 @@ info:
 http:
   method: POST
   url: "{{auth}}/user/logout"
+  headers:
+    - name: Authorization
+      value: "{{bearer}}"
+  body:
+    type: json
+    data: |-
+      {
+        "reason" : "Logout",
+        "refreshToken": "eyJraWQiOiJrZXktdjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyYTk5ZWY5Yy1lMmUwLTQ1MTctYTliNy00OWFmMTUwZjE3ZTMiLCJ0b2tlbl9pZCI6ImEzMTUyNDNjLWFmNTktNGRlMC1iNWQzLTBkMzljNWE1NzI2NCIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MSIsImV4cCI6MTc4MTUwMjI4NSwidG9rZW5fdHlwZSI6IlJFRlJFU0giLCJpYXQiOjE3ODA4OTc0ODUsImp0aSI6IjVmMDgyNDlhLTAzMTQtNDM2Yy1hZGMxLTgzZjQ2ZmUyOTUxMyJ9.BHeia7FEHcg2yj_ynDANIyG3E7JjXlixQcVSnJSn2pgNClH60qOkiHaPy3wh1vK9socCFsHhtkcNGhcVYlvTYMRc0CFYKus3bRzpI9Vw1WnLZw9T5NddN_ht9-oM9vCBmfiQcMndwqnboUBF8yCx1APvm49zY7GKbvgyiHasGXNJLJ7OjLyFBBRsrtsrn00h9aR_pNQc2vNp89-hP1d0IzjxQTW343pFVa8F8uGMB4QWJ4xqmEtpwcLi4XZlZsRv-dZuJrYtrlqRZTlp88itQshe96lUBxxdvrnubcPomM-uTy3Sq7lkLg4DDk3-W240QneYjMIDYxBhE6dBsAlLig"
+      }
   auth: inherit
 
 settings:

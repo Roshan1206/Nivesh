@@ -1,7 +1,7 @@
 package com.nivesh.authentication.service;
 
-import com.nivesh.authentication.dto.request.LoginRequest;
 import com.nivesh.authentication.dto.request.RegisterRequest;
+import com.nivesh.authentication.dto.request.ResetPasswordRequest;
 import com.nivesh.authentication.entity.User;
 import com.nivesh.library.entity.enums.CustomerStatus;
 
@@ -18,7 +18,7 @@ public interface UserService {
 
     void updateStatus(User user, CustomerStatus customerStatus);
 
-    void forgotPassword(LoginRequest request);
+    void resetPassword(ResetPasswordRequest request);
 
     void save(User user);
 

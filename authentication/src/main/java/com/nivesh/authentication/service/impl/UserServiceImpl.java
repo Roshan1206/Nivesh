@@ -1,7 +1,7 @@
 package com.nivesh.authentication.service.impl;
 
-import com.nivesh.authentication.dto.request.LoginRequest;
 import com.nivesh.authentication.dto.request.RegisterRequest;
+import com.nivesh.authentication.dto.request.ResetPasswordRequest;
 import com.nivesh.authentication.entity.Role;
 import com.nivesh.authentication.entity.User;
 import com.nivesh.authentication.entity.UserRole;
@@ -11,6 +11,8 @@ import com.nivesh.authentication.service.TokenService;
 import com.nivesh.authentication.service.UserService;
 import com.nivesh.library.constant.Constants;
 import com.nivesh.library.entity.enums.CustomerStatus;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class UserServiceImpl implements UserService {
     /** Encoder used to hash and verify passwords. */
     private final PasswordEncoder passwordEncoder;
 
+    private final RedisTemplate<String, String> redisTemplate;
+
     /** Service used to manage user roles. */
     private final RoleService roleService;
 
@@ -42,11 +46,12 @@ public class UserServiceImpl implements UserService {
      * Injects dependencies used to register, load, and update users.
      */
     public UserServiceImpl(PasswordEncoder passwordEncoder, RoleService roleService,
-                           TokenService tokenService, UserRepository userRepository) {
+                           TokenService tokenService, UserRepository userRepository, RedisTemplate<String, String> redisTemplate) {
         this.passwordEncoder = passwordEncoder;
         this.roleService = roleService;
         this.tokenService = tokenService;
         this.userRepository = userRepository;
+        this.redisTemplate = redisTemplate;
     }
 
 
@@ -127,9 +132,18 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public void forgotPassword(LoginRequest request) {
+    public void resetPassword(ResetPasswordRequest request) {
         User user = getUserByEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        if (request.getOldPassword() != null) {
+            if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+                throw new BadCredentialsException("Incorrect current password");
+            }
+        }
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new BadCredentialsException("New passwords don't match");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         save(user);
     }
 
@@ -153,7 +167,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void incrementTokenVersion(String userId) {
         User user = getUser(userId);
-        user.setTokenVersion(user.getTokenVersion() + 1);
+        int tokenVersion = user.getTokenVersion() + 1;
+        user.setTokenVersion(tokenVersion);
+        redisTemplate.opsForValue().set("tok_ver:" + userId, String.valueOf(tokenVersion));
     }
 
 

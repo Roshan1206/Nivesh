@@ -172,6 +172,7 @@ public class TokenServiceImpl implements TokenService {
         claims.put(Constants.PERMISSIONS, permissions);
         claims.put(Constants.EMAIL, user.getEmail());
         claims.put("jti", UUID.randomUUID());
+        claims.put("tok_ver", user.getTokenVersion());
         return claims;
     }
 }

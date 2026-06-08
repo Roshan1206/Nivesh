@@ -25,5 +25,5 @@ public class AuthCacheProperties {
     /**
      * Minutes an account remains locked after reaching the failed-login limit.
      */
-    private int lockDurationMin = 60;
+    private int lockDurationInHour = 60;
 }

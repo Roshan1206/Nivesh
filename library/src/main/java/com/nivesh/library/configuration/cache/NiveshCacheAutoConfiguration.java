@@ -1,3 +1,4 @@
+
 package com.nivesh.library.configuration.cache;
 
 import com.nivesh.library.properties.CacheProperties;
@@ -39,7 +40,8 @@ public class NiveshCacheAutoConfiguration {
             "idempotency-key", Duration.ofHours(24),
             "account-balance", Duration.ofSeconds(30),
             "customer-profile", Duration.ofMinutes(10),
-            "transaction", Duration.ofMinutes(30)
+            "transaction", Duration.ofMinutes(30),
+            "reset-password", Duration.ofMinutes(30)
     );
 
     /**

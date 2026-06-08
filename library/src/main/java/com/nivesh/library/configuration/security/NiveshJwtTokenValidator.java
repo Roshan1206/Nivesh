@@ -33,10 +33,10 @@ public class NiveshJwtTokenValidator implements OAuth2TokenValidator<Jwt> {
             return OAuth2TokenValidatorResult.failure(JTI_BLACKLISTED);
         }
 
-        Integer tokenVersion = token.getClaim("tok_ver");
+        Long tokenVersion = token.getClaim("tok_ver");
         String userId = token.getSubject();
         if (tokenVersion != null && userId != null) {
-            Integer currentVersion = getTokenCurrentVersion(userId);
+            Long currentVersion = getTokenCurrentVersion(userId);
             if (currentVersion != null && tokenVersion < currentVersion) {
                 return OAuth2TokenValidatorResult.failure(TOKEN_VERSION_STALE);
             }
@@ -51,11 +51,11 @@ public class NiveshJwtTokenValidator implements OAuth2TokenValidator<Jwt> {
      * @param userId The user ID to retrieve the version for.
      * @return The current version integer, or null if not found.
      */
-    private Integer getTokenCurrentVersion(String userId) {
+    private Long getTokenCurrentVersion(String userId) {
         String val = redisTemplate.opsForValue().get("tok_ver:" + userId);
         if (val == null) return null;
         try {
-            return Integer.parseInt(val);
+            return Long.parseLong(val);
         } catch (NumberFormatException exception) {
             return null;
         }

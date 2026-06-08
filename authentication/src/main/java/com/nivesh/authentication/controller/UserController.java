@@ -1,6 +1,7 @@
 package com.nivesh.authentication.controller;
 
 import com.nivesh.authentication.dto.request.LogoutRequest;
+import com.nivesh.authentication.dto.request.ResetPasswordRequest;
 import com.nivesh.authentication.service.RefreshTokenService;
 import com.nivesh.authentication.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,13 @@ public class UserController {
     }
 
 
+    @PostMapping("/reset")
+    public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request);
+        return ResponseEntity.noContent().build();
+    }
+
+
     /**
      * Logs out the currently authenticated user and returns a no-content response.
      *
@@ -53,7 +61,8 @@ public class UserController {
      */
     @PostMapping("/logout/all")
     public ResponseEntity<Void> logoutUserFromAllSession(@RequestBody LogoutRequest request) {
-        refreshTokenService.revokeUserAllRefreshToken(request);
+        String userId = refreshTokenService.revokeUserAllRefreshToken(request);
+        userService.incrementTokenVersion(userId);
         return ResponseEntity.noContent().build();
     }
 
