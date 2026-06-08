@@ -138,7 +138,7 @@ CREATE TABLE users (
     failed_attempt  INTEGER              NOT NULL DEFAULT 0,
     locked_until    TIMESTAMPTZ          DEFAULT NULL,
     customer_status customer_status_enum NOT NULL,
-    token_version   INTEGER              NOT NULL,
+    token_version   INTEGER              NOT NULL DEFAULT 0,
     created_at      TIMESTAMPTZ          NOT NULL,
     created_by      VARCHAR(50)          NOT NULL,
     updated_at      TIMESTAMPTZ          NOT NULL DEFAULT NOW(),
@@ -162,6 +162,18 @@ CREATE TABLE permissions (
     resource        VARCHAR(50)  NOT NULL,
     action_granted  action_enum  NOT NULL,
     description     VARCHAR(200) NOT NULL
+);
+
+CREATE TABLE refresh_tokens (
+    id UUID PRIMARY KEY ,
+    token_id UUID NOT NULL UNIQUE,
+    issued_at TIMESTAMPTZ NOT NULL,
+    expires_AT TIMESTAMPTZ NOT NULL,
+    revoked boolean NOT NULL DEFAULT false,
+    revoked_at TIMESTAMPTZ,
+    revoked_reason VARCHAR(200),
+    user_id UUID NOT NULL,
+    CONSTRAINT fk_rt_user FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
 -- Role → Permission (default grants; shared across all users with that role)

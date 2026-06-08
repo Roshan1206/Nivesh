@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -68,10 +69,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
      */
     @Override
     public String issueRefreshToken(User user) {
-        String tokenId = UUID.randomUUID().toString();
+        UUID tokenId = UUID.randomUUID();
         RefreshToken refreshToken = RefreshToken.builder()
                 .tokenId(tokenId)
                 .user(user)
+                .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plus(Long.parseLong(tokenProperties.refreshExpiry()), ChronoUnit.DAYS))
                 .build();
         RefreshToken saved = repository.save(refreshToken);
@@ -84,11 +86,12 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
      *
      * @param request The LogoutRequest containing the refresh token to revoke.
      */
+    @Transactional
     @Override
     public void revokeRefreshToken(LogoutRequest request) {
         String userId = getUserId();
         String tokenId = jwtDecoder.decode(request.getRefreshToken()).getClaimAsString("token_id");
-        repository.revokeUser(UUID.fromString(userId), "Logout", tokenId);
+        repository.revokeUser(UUID.fromString(userId), "Logout", UUID.fromString(tokenId));
         blacklistAccessToken(getToken(), userId);
     }
 
@@ -98,6 +101,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
      *
      * @param request LogoutRequest object containing the user ID to revoke tokens for.
      */
+    @Transactional
     @Override
     public void revokeUserAllRefreshToken(LogoutRequest request) {
         String userId = getUserId();

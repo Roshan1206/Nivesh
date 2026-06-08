@@ -33,7 +33,7 @@ public class RefreshToken {
     private UUID id;
 
     @Column(name = "token_id", nullable = false, unique = true, updatable = false)
-    private String tokenId;
+    private UUID tokenId;
 
     @CreatedDate
     @Column(name = "issued_at", nullable = false, updatable = false)
