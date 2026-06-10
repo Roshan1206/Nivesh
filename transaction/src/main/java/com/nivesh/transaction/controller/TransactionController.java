@@ -58,6 +58,6 @@ public class TransactionController {
     @PostMapping(value = "/{requestId}/verify", consumes = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<TransactionResponse> startTransaction(@PathVariable String requestId,  @RequestBody String otp) {
         TransactionResponse response = transactionService.startTransaction(requestId, otp);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

@@ -116,4 +116,12 @@ public class Transaction {
     /** Identifier of the user or process that initiated the transaction. */
     @Column(name = "initiated_by", updatable = false)
     private UUID initiatedBy;
+
+    @Builder.Default
+    @Column(name = "credit_retry_count", nullable = false)
+    private int creditRetryCount = 0;
+
+    @Builder.Default
+    @Column(name = "compensate_retry_count", nullable = false)
+    private int compensateRetryCount = 0;
 }

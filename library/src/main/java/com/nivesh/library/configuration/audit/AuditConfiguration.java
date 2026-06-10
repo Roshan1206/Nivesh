@@ -4,6 +4,7 @@ import com.nivesh.library.service.JwtTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -42,7 +43,7 @@ public class AuditConfiguration implements AuditorAware<String> {
      */
     @Override
     public Optional<String> getCurrentAuditor() {
-        String authHeader = servletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        String authHeader = SecurityContextHolder.getContext().getAuthentication().getName();
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return Optional.of("SYSTEM");
         }

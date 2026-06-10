@@ -8,14 +8,18 @@ import com.nivesh.library.exception.ServiceUnavailableException;
 import com.nivesh.transaction.service.AccountsClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import reactor.util.retry.RetryBackoffSpec;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -37,6 +41,23 @@ public class AccountClientImpl implements AccountsClient {
         this.webClient = client;
     }
 
+
+    @Override
+    public boolean isAccountServiceAvailable() {
+        String value = webClient.get()
+                .uri("actuator/health")
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, res -> res
+                        .bodyToMono(String.class)
+                        .map(body -> {
+                            log.error("Account service unavailable at {}", LocalDateTime.now());
+                            return new ServiceUnavailableException(body, "Account service unavailable");
+                        }))
+                .bodyToMono(String.class)
+                .block();
+
+        return value != null && value.contains("UP");
+    }
 
     /**
      * Validates an account based on the provided transaction request.

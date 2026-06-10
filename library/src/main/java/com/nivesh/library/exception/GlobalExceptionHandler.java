@@ -50,4 +50,28 @@ public class GlobalExceptionHandler {
         };
         return ResponseEntity.status(status).body(response);
     }
+
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleServiceUnavailableException(ServiceUnavailableException exception){
+        ErrorResponse response = new ErrorResponse(exception.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+    }
+
+    @ExceptionHandler(SessionExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleSessionExpiredException(SessionExpiredException exception){
+        ErrorResponse response = new ErrorResponse(exception.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(response);
+    }
+
+    @ExceptionHandler(CacheNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCacheNotFoundException(CacheNotFoundException exception){
+        ErrorResponse response = new ErrorResponse(exception.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(response);
+    }
+
+    @ExceptionHandler(ServiceTimeoutException.class)
+    public ResponseEntity<ErrorResponse> handleServiceTimeoutException(ServiceTimeoutException exception){
+        ErrorResponse response = new ErrorResponse(exception.getMessage(), request);
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(response);
+    }
 }

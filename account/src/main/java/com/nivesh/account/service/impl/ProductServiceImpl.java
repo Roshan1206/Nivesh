@@ -1,8 +1,9 @@
-package com.nivesh.account.service;
+package com.nivesh.account.service.impl;
 
 import com.nivesh.account.entity.Product;
 import com.nivesh.account.exception.ProductNotFoundException;
 import com.nivesh.account.repository.ProductRepository;
+import com.nivesh.account.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 

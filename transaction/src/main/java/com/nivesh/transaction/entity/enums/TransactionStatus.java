@@ -29,5 +29,10 @@ public enum TransactionStatus {
     BLOCKED,
 
     /** Compensating action has started for a failed or reversed flow. */
-    COMPENSATE_INITIATED
+    COMPENSATE_INITIATED,
+
+    /** Compensation Exhausted */
+    MANUAL_REVIEW,
+
+    CREDIT_RETRY
 }

@@ -42,8 +42,11 @@ CREATE TYPE txn.transaction_status AS ENUM (
     'FAILED',       -- TERMINAL. Saga compensation completed. Debit reversed.
     'REVERSED',     -- TERMINAL. Posted transaction reversed by manager/system.
     'BLOCKED',       -- TERMINAL. Fraud flagged. No money moved. No compensation needed.
-    'DEBIT_SUCCESS',
-    'COMPENSATE_INITIATED'
+    'DEBIT_SUCCESS',    -- Debit succeed
+    'COMPENSATE_INITIATED', -- Compensation initiated. Credit failed
+    'MANUAL_REVIEW',     -- Compensation exhausted
+    'CREDIT_RETRY',    -- Credit failed.
+    'TRANSFER'          -- Transfer initiated
     );
 
 -- How the transaction was initiated.
@@ -213,6 +216,8 @@ CREATE TABLE txn.transactions (
                                   settled_at             TIMESTAMPTZ,
     -- Self-referential FK. Non-null only for REVERSAL type.
                                   reversal_txn_id        UUID,
+                                  credit_retry_count     INTEGER                NOT NULL DEFAULT 0,
+                                  compensate_retry_count INTEGER                NOT NULL DEFAULT 0,
 
                                   CONSTRAINT pk_transaction
                                       PRIMARY KEY (txn_id),

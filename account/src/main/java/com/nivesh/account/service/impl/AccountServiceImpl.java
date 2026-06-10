@@ -1,4 +1,4 @@
-package com.nivesh.account.service;
+package com.nivesh.account.service.impl;
 
 import com.nivesh.account.dto.request.AccountRequest;
 import com.nivesh.account.dto.response.AccountResponse;
@@ -12,6 +12,8 @@ import com.nivesh.account.exception.AccountNotFoundException;
 import com.nivesh.account.exception.InsufficientBalanceException;
 import com.nivesh.account.repository.AccountRepository;
 import com.nivesh.account.repository.IdempotencyRepository;
+import com.nivesh.account.service.AccountService;
+import com.nivesh.account.service.ProductService;
 import com.nivesh.library.dto.request.AmountTransactionRequest;
 import com.nivesh.library.dto.request.TransactionRequest;
 import com.nivesh.library.dto.response.AccountTransactionResponse;
@@ -28,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -104,16 +105,22 @@ public class AccountServiceImpl implements AccountService {
      * Retrieves account information and maps it to the external account response contract.
      */
     @Override
-    public AccountResponse getAccountInfo(UUID accountId) {
-        return buildAccountResponse(getAccount(accountId));
+    public AccountResponse getAccountInfo(String accountNumber) {
+        Account account = accountRepository.findByAccountNumber(accountNumber).orElseThrow(
+                () -> new AccountNotFoundException("Account not found with given account number " + accountNumber)
+        );
+        return buildAccountResponse(account);
     }
 
     /**
      * Fetches only the available balance for lightweight balance checks.
      */
     @Override
-    public BigDecimal getAvailableBalance(UUID accountId) {
-        return getAccount(accountId).getAvailableBalance();
+    public BigDecimal getAvailableBalance(String accountNumber) {
+        Account account = accountRepository.findByAccountNumber(accountNumber).orElseThrow(
+                () -> new AccountNotFoundException("Account not found with given account number " + accountNumber)
+        );
+        return account.getAvailableBalance();
     }
 
 
@@ -154,26 +161,35 @@ public class AccountServiceImpl implements AccountService {
      */
     @Transactional
     @Override
-    public AccountTransactionResponse debit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request) {
+    public AccountTransactionResponse debit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {
         OperationType type = OperationType.DEBIT;
-        String newIdempotencyKey = type.name() + ":" + idempotencyKey;
-        Optional<IdempotencyRecord> record = idempotencyRepository.findByIdempotencyKey(newIdempotencyKey);
-        if (record.isPresent()) {
-            return new AccountTransactionResponse(record.get().getResponseStatusCode(), record.get().getRunningBalance());
-        }
+        AccountTransactionResponse record = getTransactionResponse(idempotencyKey);
+        if (record != null) return record;
         Account account = getAccount(accountId);
         BigDecimal availableBalance = account.getAvailableBalance();
-        BigDecimal newAvailableBalance = availableBalance;
         BigDecimal amount = request.getAmount();
         if(amount.compareTo(availableBalance) > 0) {
             AccountTransactionResponse conflictResponse = new AccountTransactionResponse(HttpStatus.CONFLICT.value(), availableBalance);
-            saveIdempotency(request, accountId, newIdempotencyKey, conflictResponse, type);
+            saveIdempotency(request, accountId, idempotencyKey, conflictResponse, type);
             return conflictResponse;
         }
-        newAvailableBalance = availableBalance.subtract(amount);
+        BigDecimal newAvailableBalance = availableBalance.subtract(amount);
         BigDecimal newBalance = account.getBalance().subtract(amount);
 
-        return getAccountTransactionResponse(accountId, newIdempotencyKey, request, type, account, newAvailableBalance, newBalance);
+        AccountTransactionResponse response = getAccountTransactionResponse(accountId, idempotencyKey, request, type, account, newAvailableBalance, newBalance);
+        if (response.getRunningBalance() == null) {
+            response.setRunningBalance(availableBalance);
+        }
+        return response;
+    }
+
+    @Override
+    public AccountTransactionResponse getTransactionResponse(String idempotencyKey) {
+        Optional<IdempotencyRecord> record = idempotencyRepository.findByIdempotencyKey(idempotencyKey);
+        if (record.isPresent()) {
+            return new AccountTransactionResponse(record.get().getResponseStatusCode(), record.get().getRunningBalance());
+        }
+        return null;
     }
 
 
@@ -187,20 +203,21 @@ public class AccountServiceImpl implements AccountService {
      */
     @Transactional
     @Override
-    public AccountTransactionResponse credit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request) {
+    public AccountTransactionResponse credit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {
         OperationType type = OperationType.CREDIT;
-        String newIdempotencyKey = type.name() + ":" + idempotencyKey;
-        Optional<IdempotencyRecord> record = idempotencyRepository.findByIdempotencyKey(newIdempotencyKey);
-        if (record.isPresent()) {
-            return new AccountTransactionResponse(record.get().getResponseStatusCode(), record.get().getRunningBalance());
-        }
+        AccountTransactionResponse record = getTransactionResponse(idempotencyKey);
+        if (record != null) return record;
         Account account = getAccount(accountId);
         BigDecimal availableBalance = account.getAvailableBalance();
         BigDecimal amount = request.getAmount();
         BigDecimal newAvailableBalance = availableBalance.add(amount);
         BigDecimal newBalance = account.getBalance().add(amount);
 
-        return getAccountTransactionResponse(accountId, newIdempotencyKey, request, type, account, newAvailableBalance, newBalance);
+        AccountTransactionResponse response = getAccountTransactionResponse(accountId, idempotencyKey, request, type, account, newAvailableBalance, newBalance);
+        if (response.getRunningBalance() == null){
+            response.setRunningBalance(availableBalance);
+        }
+        return response;
     }
 
 
@@ -220,14 +237,17 @@ public class AccountServiceImpl implements AccountService {
     private AccountTransactionResponse getAccountTransactionResponse(UUID accountId, String idempotencyKey, AmountTransactionRequest request, OperationType type, Account account, BigDecimal newAvailableBalance, BigDecimal newBalance) {
         account.setAvailableBalance(newAvailableBalance);
         account.setBalance(newBalance);
+        AccountTransactionResponse response;
 
         try {
             accountRepository.save(account);
         } catch (ObjectOptimisticLockingFailureException exception) {
-            throw new ConcurrentModificationException("Concurrent modification on account " + accountId + ". Retry required");
+            log.trace("Concurrent modification on account {}. Retry required", accountId);
+            response = new AccountTransactionResponse(HttpStatus.TOO_MANY_REQUESTS.value(), null);
+            return response;
         }
 
-        AccountTransactionResponse response = new AccountTransactionResponse(HttpStatus.OK.value(), newAvailableBalance);
+        response = new AccountTransactionResponse(HttpStatus.OK.value(), newAvailableBalance);
         saveIdempotency(request, accountId, idempotencyKey, response, type);
         return response;
     }

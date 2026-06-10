@@ -2,13 +2,19 @@ server:
   port: 8084
 
 nivesh:
-  auth:
-    url: http://localhost:8081
-  account:
-    url: http://localhost:8083
-  transaction:
-    database:
-      schema: txn
+  kafka.enabled: true
+  auth.url: http://localhost:8081
+  account.url: http://localhost:8083
+  transaction.database.schema: txn
+  scheduler:
+    credit-retry:
+      fixed-delay-ms: 120000      # run every 2 minutes
+      stuck-threshold-minutes: 5  # pick up transactions older than 5 min
+      max-retry-count: 15         # 15 x 2min = 30 min window
+    compensation:
+      fixed-delay-ms: 600000      # run every 10 minutes
+      stuck-threshold-minutes: 10
+      max-retry-count: 24
 
 spring:
   application:
@@ -41,3 +47,38 @@ spring:
           starttls:
             enable: true
             required: true
+  config:
+    import: optional:configserver:http://localhost:8888
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: transaction-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        spring.json:
+          trusted.packages: "com.nivesh.library.event"
+          add.type.headers: false
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    hostname: 127.0.0.1
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    enabled: false
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+logging:
+  level:
+    com.nivesh: TRACE

@@ -7,6 +7,7 @@ import com.nivesh.library.dto.response.OtpResponse;
 import com.nivesh.library.exception.CacheNotFoundException;
 import com.nivesh.library.exception.SessionExpiredException;
 import com.nivesh.library.service.OtpCacheService;
+import com.nivesh.transaction.dto.PendingTransaction;
 import com.nivesh.transaction.dto.response.TransactionResponse;
 import com.nivesh.transaction.entity.Transaction;
 import com.nivesh.transaction.entity.TransactionTypeConfig;
@@ -79,9 +80,15 @@ public class TransactionServiceImpl implements TransactionService {
         String requestId = UUID.randomUUID().toString();
         otpCacheService.generateAndSendOtp(requestId);
         TransactionTypeConfig typeConfig = transactionConfigService.getTransactionType(TransactionType.DEBIT);
-        Transaction transaction = buildTransaction(idempotencyKey, validationResponse, transactionRequest);
-        transaction.setTypeConfig(typeConfig);
-        getCache().put(requestId, transaction);
+        PendingTransaction pendingTxn = new PendingTransaction(
+                validationResponse.getSourceAccountId(),
+                validationResponse.getDestinationAccountId(),
+                idempotencyKey,
+                transactionRequest.getAmount(),
+                typeConfig.getTypeCode(),
+                transactionRequest.getDescription()
+        );
+        getCache().put(requestId, pendingTxn);
         return new OtpResponse(requestId);
     }
 
@@ -94,19 +101,31 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public TransactionResponse startTransaction(String requestId, String otp) {
         otpCacheService.validateOtp(requestId, otp);
-        Transaction transaction = getCache().get(requestId, Transaction.class);
-        if (transaction == null) {
+        PendingTransaction pendingTransaction = getCache().get(requestId, PendingTransaction.class);
+        if (pendingTransaction == null) {
             throw new SessionExpiredException(HttpStatus.REQUEST_TIMEOUT, "Session has been expired");
         }
+        Transaction transaction = buildTransaction(pendingTransaction);
+        TransactionTypeConfig typeConfig = transactionConfigService.getTransactionType(
+                TransactionType.valueOf(pendingTransaction.getTypeCode()));
+        transaction.setTypeConfig(typeConfig);
         performDebitTransaction(transaction);
-        performCreditTransaction(transaction);
-        persistAndCache(transaction);
-        return new TransactionResponse(transaction.getReferenceNumber(), HttpStatus.OK, "Transaction Completed");
+        boolean status = performCreditTransaction(transaction);
+        transactionRepository.save(transaction);
+        TransactionResponse response;
+
+        if (status) {
+            response = new TransactionResponse(transaction.getReferenceNumber(), HttpStatus.OK, "Transaction Completed.");
+        } else {
+            response = new TransactionResponse(transaction.getReferenceNumber(), HttpStatus.ACCEPTED, "Transaction Processing.");
+        }
+        getCache().put(transaction.getReferenceNumber(), response);
+        return response;
     }
 
 
     /** Perform credit operation from account. */
-    private void performCreditTransaction(Transaction transaction) {
+    private boolean performCreditTransaction(Transaction transaction) {
         UUID accountId = transaction.getDestinationAccountId();
         String idempotencyKey = transaction.getIdempotencyKey();
         String referenceNumber = transaction.getReferenceNumber();
@@ -117,11 +136,10 @@ public class TransactionServiceImpl implements TransactionService {
             transaction.setStatus(TransactionStatus.POSTED);
         } catch (Exception exception) {
             log.error("Transaction failed at credit stage. Reference number : {}, message : {}", referenceNumber, exception.getMessage());
-            transaction.setStatus(TransactionStatus.FAILED);
-            persistAndCache(transaction);
-            compensateTransaction(transaction);
-            throw new TransactionFailedException(exception.getMessage());
+            transaction.setStatus(TransactionStatus.CREDIT_RETRY);
+            return false;
         }
+        return true;
     }
 
 
@@ -141,52 +159,22 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
-    /** Starts the compensation after failed credit */
-    private void compensateTransaction(Transaction transaction) {
-        persistAndCache(transaction);
-        TransactionTypeConfig typeConfig = transactionConfigService.getTransactionType(TransactionType.REVERSAL);
-        AccountValidationResponse validationResponse =
-                new AccountValidationResponse(transaction.getDestinationAccountId(), transaction.getSourceAccountId(),
-                        null, true);
-        TransactionRequest transactionRequest = new TransactionRequest();
-        transactionRequest.setAmount(transaction.getAmount());
-        transaction.setDescription("Credit for failed transaction. Reference number : " + transaction.getReferenceNumber());
-        Transaction compensateTxn = buildTransaction(transaction.getIdempotencyKey(), validationResponse, transactionRequest);
-        compensateTxn.setTypeConfig(typeConfig);
-        performCreditTransaction(compensateTxn);
-    }
-
-
-    /** Save transaction in both DB and cache */
-    private void persistAndCache(Transaction transaction) {
-        Transaction savedTxn = transactionRepository.save(transaction);
-        getCache().put(savedTxn.getReferenceNumber(), savedTxn);
-    }
-
-    /** Get transaction by transaction id */
-    private Transaction getTransaction(UUID txnId) {
-        return transactionRepository.findById(txnId).orElseThrow(
-                () -> new TransactionNotFoundException("Transaction not found")
-        );
-    }
-
 
     /** Build the transaction object */
-    private static Transaction buildTransaction(String idempotencyKey, AccountValidationResponse validationResponse,
-                                                TransactionRequest request) {
+    private static Transaction buildTransaction(PendingTransaction transaction) {
         String s = String.valueOf(System.currentTimeMillis());
         int length = Math.min(s.length(), 8);
         String referenceNumber = LocalDate.now() + s.substring(length);
         return Transaction.builder()
-                .idempotencyKey(idempotencyKey)
+                .idempotencyKey(transaction.getIdempotencyKey())
                 .referenceNumber(referenceNumber)
-                .sourceAccountId(validationResponse.getSourceAccountId())
-                .destinationAccountId(validationResponse.getDestinationAccountId())
-                .amount(request.getAmount())
-                .description(request.getDescription())
+                .sourceAccountId(transaction.getSourceAccountId())
+                .destinationAccountId(transaction.getDestinationAccountId())
+                .amount(transaction.getAmount())
+                .description(transaction.getDescription())
                 .transactionChannel(TransactionChannel.API)
                 .transactionType(TransactionType.DEBIT)
-                .initiatedBy(validationResponse.getSourceAccountId())
+                .initiatedBy(transaction.getSourceAccountId())
                 .createdAt(LocalDateTime.now())
                 .externalPartyRef(null)
                 .status(TransactionStatus.INITIATED)

@@ -48,17 +48,17 @@ public class AccountController {
     /**
      * Returns account profile details for the supplied account identifier.
      */
-    @GetMapping("/{accountId}")
-    public ResponseEntity<AccountResponse> getAccountDetails(@PathVariable UUID accountId) {
-        return ResponseEntity.status(HttpStatus.OK).body(accountService.getAccountInfo(accountId));
+    @GetMapping("/{accountNumber}")
+    public ResponseEntity<AccountResponse> getAccountDetails(@PathVariable String accountNumber) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.getAccountInfo(accountNumber));
     }
 
     /**
      * Returns the currently available balance for the supplied account identifier.
      */
-    @GetMapping("/{accountId}/balance")
-    public ResponseEntity<BigDecimal> getAccountBalance(@PathVariable UUID accountId) {
-        return ResponseEntity.status(HttpStatus.OK).body(accountService.getAvailableBalance(accountId));
+    @GetMapping("/{accountNumber}/balance")
+    public ResponseEntity<BigDecimal> getAccountBalance(@PathVariable String accountNumber) {
+        return ResponseEntity.status(HttpStatus.OK).body(accountService.getAvailableBalance(accountNumber));
     }
 
 
@@ -87,7 +87,8 @@ public class AccountController {
     public ResponseEntity<AccountTransactionResponse> debitAccount(@RequestHeader String idempotencyKey,
                                                                    @PathVariable UUID accountId,
                                                                    @RequestBody AmountTransactionRequest request) {
-        AccountTransactionResponse debit = accountService.debit(accountId, UUID.fromString(idempotencyKey), request);
+        String key = "debit-" + idempotencyKey;
+        AccountTransactionResponse debit = accountService.debit(accountId, key, request);
         return ResponseEntity.status(debit.getStatus()).body(debit);
     }
 
@@ -104,7 +105,8 @@ public class AccountController {
     public ResponseEntity<AccountTransactionResponse> creditAccount(@RequestHeader String idempotencyKey,
                                                                     @PathVariable UUID accountId,
                                                                     @RequestBody AmountTransactionRequest request) {
-        AccountTransactionResponse credit = accountService.credit(accountId, UUID.fromString(idempotencyKey), request);
+        String key = "credit-" + idempotencyKey;
+        AccountTransactionResponse credit = accountService.credit(accountId, key, request);
         return ResponseEntity.status(credit.getStatus()).body(credit);
     }
 }

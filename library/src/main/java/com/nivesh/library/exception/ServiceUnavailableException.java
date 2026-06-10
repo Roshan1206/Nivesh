@@ -18,16 +18,6 @@ public class ServiceUnavailableException extends RuntimeException {
      */
     public ServiceUnavailableException(String message, String serviceName) {
         super(message);
-        log.error(message);
-        log.error("{} is down at {}", serviceName, LocalDateTime.now());
-    }
-
-    /**
-     * Constructs exception with default message.
-     *
-     * @param serviceName name of the unavailable service
-     */
-    public ServiceUnavailableException(String serviceName) {
-        this("We are experiencing some downtime. Please try again later.", serviceName);
+        log.error("{}. {} is down at {}", message, serviceName, LocalDateTime.now());
     }
 }

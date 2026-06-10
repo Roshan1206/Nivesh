@@ -25,15 +25,17 @@ public interface AccountService {
     AccountResponse createAccount(AccountRequest accountRequest);
 
     /** Builds account details for API consumers. */
-    AccountResponse getAccountInfo(UUID accountId);
+    AccountResponse getAccountInfo(String accountId);
 
     /** Returns the available balance for balance-only account lookups. */
-    BigDecimal getAvailableBalance(UUID accountId);
+    BigDecimal getAvailableBalance(String accountId);
 
     AccountValidationResponse validateAccount(TransactionRequest request);
 
-    AccountTransactionResponse debit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request);
+    AccountTransactionResponse debit(UUID accountId, String idempotencyKey, AmountTransactionRequest request);
 
-    AccountTransactionResponse credit(UUID accountId, UUID idempotencyKey, AmountTransactionRequest request);
+    AccountTransactionResponse credit(UUID accountId, String idempotencyKey, AmountTransactionRequest request);
+
+    AccountTransactionResponse getTransactionResponse(String idempotencyKey);
 
 }

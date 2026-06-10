@@ -1,9 +1,7 @@
 package com.nivesh.library.configuration.builder;
 
 import com.nivesh.library.constant.Constants;
-import com.nivesh.library.exception.ServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,10 +9,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.util.retry.Retry;
-
-import java.time.Duration;
 
 /**
  * Base client for building inter-service HTTP communication using WebClient.
