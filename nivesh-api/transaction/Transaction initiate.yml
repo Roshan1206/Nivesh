@@ -8,7 +8,7 @@ http:
   url: "{{transaction}}/transactions"
   headers:
     - name: idempotencyKey
-      value: 8c5f0ea4-f906-4288-a5b5-a32b58082c9e
+      value: "000001014"
   body:
     type: json
     data: |-

@@ -17,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -75,6 +76,7 @@ public class JournalEntry {
     private String narration;
 
     /** Timestamp when the journal entry was posted. */
+    @CreationTimestamp
     @Column(name = "posted_at", nullable = false, updatable = false)
     private Instant postedAt;
 }

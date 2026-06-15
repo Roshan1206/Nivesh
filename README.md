@@ -54,3 +54,8 @@ nivesh.otp:
   max-cache-size: 100 //max 100 otp in cache
   otp-length: 6     // otp length ex - 356842
 ```
+
+### Build docker image
+```shell
+./gradlew jibDockerBuild
+```

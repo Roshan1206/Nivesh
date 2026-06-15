@@ -1,0 +1,31 @@
+{
+  "name": "nivesh-txn-outbox-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "bootstrap.servers": "localhost:9092",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter.schemas.enable": "false",
+    "database.hostname": "host.docker.internal",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "password",
+    "database.dbname": "nivesh",
+    "topic.prefix": "transaction",
+    "schema.include.list": "txn",
+    "table.include.list": "txn.outbox_events",
+    "plugin.name": "pgoutput",
+    "publication.name": "nivesh_outbox_pub",
+    "slot.name": "nivesh_outbox_slot",
+    "transforms": "outbox",
+    "transforms.outbox.type": "io.debezium.transforms.outbox.EventRouter",
+    "transforms.outbox.table.field.event.id": "event_id",
+    "transforms.outbox.table.field.event.key": "aggregate_id",
+    "transforms.outbox.table.field.event.type": "event_type",
+    "transforms.outbox.table.field.event.payload": "payload",
+    "transforms.outbox.route.by.field": "topic",
+    "transforms.outbox.route.topic.replacement": "${routedByValue}",
+    "tombstones.on.delete": "false"
+  }
+}

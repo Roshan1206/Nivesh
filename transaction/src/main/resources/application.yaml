@@ -6,15 +6,6 @@ nivesh:
   auth.url: http://localhost:8081
   account.url: http://localhost:8083
   transaction.database.schema: txn
-  scheduler:
-    credit-retry:
-      fixed-delay-ms: 120000      # run every 2 minutes
-      stuck-threshold-minutes: 5  # pick up transactions older than 5 min
-      max-retry-count: 15         # 15 x 2min = 30 min window
-    compensation:
-      fixed-delay-ms: 600000      # run every 10 minutes
-      stuck-threshold-minutes: 10
-      max-retry-count: 24
 
 spring:
   application:

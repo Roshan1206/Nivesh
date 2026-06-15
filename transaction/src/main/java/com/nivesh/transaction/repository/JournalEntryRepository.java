@@ -11,4 +11,6 @@ import java.util.UUID;
  */
 @Repository
 public interface JournalEntryRepository extends JpaRepository<JournalEntry, UUID> {
+
+    int countByTransaction_Id(UUID transactionId);
 }

@@ -1,6 +1,5 @@
 package com.nivesh.transaction.service.impl;
 
-import com.nivesh.library.dto.request.AmountTransactionRequest;
 import com.nivesh.library.dto.request.TransactionRequest;
 import com.nivesh.library.dto.response.AccountValidationResponse;
 import com.nivesh.library.dto.response.OtpResponse;
@@ -14,10 +13,10 @@ import com.nivesh.transaction.entity.TransactionTypeConfig;
 import com.nivesh.transaction.entity.enums.TransactionChannel;
 import com.nivesh.transaction.entity.enums.TransactionStatus;
 import com.nivesh.transaction.entity.enums.TransactionType;
-import com.nivesh.transaction.exception.TransactionFailedException;
 import com.nivesh.transaction.exception.TransactionNotFoundException;
 import com.nivesh.transaction.repository.TransactionRepository;
 import com.nivesh.transaction.service.AccountsClient;
+import com.nivesh.transaction.service.OutboxEventService;
 import com.nivesh.transaction.service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -49,6 +48,8 @@ public class TransactionServiceImpl implements TransactionService {
     /** Service used to create and validate OTP cache entries. */
     private final OtpCacheService otpCacheService;
 
+    private final OutboxEventService outboxEventService;
+
     /** Repository used to persist transaction records. */
     private final TransactionRepository transactionRepository;
 
@@ -58,12 +59,13 @@ public class TransactionServiceImpl implements TransactionService {
     /**
      * Injects repositories and clients required to process transactions.
      */
-    public TransactionServiceImpl(AccountsClient accountsClient, CacheManager cacheManager,
+    public TransactionServiceImpl(AccountsClient accountsClient, CacheManager cacheManager, OutboxEventService outboxEventService,
                                   OtpCacheService otpCacheService, TransactionRepository transactionRepository,
                                   TransactionConfigServiceImpl transactionConfigService) {
         this.accountsClient = accountsClient;
         this.cacheManager = cacheManager;
         this.otpCacheService = otpCacheService;
+        this.outboxEventService = outboxEventService;
         this.transactionRepository = transactionRepository;
         this.transactionConfigService = transactionConfigService;
     }
@@ -79,7 +81,7 @@ public class TransactionServiceImpl implements TransactionService {
         AccountValidationResponse validationResponse = accountsClient.validateAccount(transactionRequest);
         String requestId = UUID.randomUUID().toString();
         otpCacheService.generateAndSendOtp(requestId);
-        TransactionTypeConfig typeConfig = transactionConfigService.getTransactionType(TransactionType.DEBIT);
+        TransactionTypeConfig typeConfig = transactionConfigService.getTransactionType(TransactionType.TRANSFER);
         PendingTransaction pendingTxn = new PendingTransaction(
                 validationResponse.getSourceAccountId(),
                 validationResponse.getDestinationAccountId(),
@@ -105,72 +107,43 @@ public class TransactionServiceImpl implements TransactionService {
         if (pendingTransaction == null) {
             throw new SessionExpiredException(HttpStatus.REQUEST_TIMEOUT, "Session has been expired");
         }
-        Transaction transaction = buildTransaction(pendingTransaction);
         TransactionTypeConfig typeConfig = transactionConfigService.getTransactionType(
                 TransactionType.valueOf(pendingTransaction.getTypeCode()));
-        transaction.setTypeConfig(typeConfig);
-        performDebitTransaction(transaction);
-        boolean status = performCreditTransaction(transaction);
+        Transaction transaction = buildTransaction(pendingTransaction, typeConfig);
         transactionRepository.save(transaction);
-        TransactionResponse response;
-
-        if (status) {
-            response = new TransactionResponse(transaction.getReferenceNumber(), HttpStatus.OK, "Transaction Completed.");
-        } else {
-            response = new TransactionResponse(transaction.getReferenceNumber(), HttpStatus.ACCEPTED, "Transaction Processing.");
-        }
+        outboxEventService.publishTransferRequested(transaction);
+        TransactionResponse response = new TransactionResponse(transaction.getReferenceNumber(), HttpStatus.OK, "Transaction Completed.");
         getCache().put(transaction.getReferenceNumber(), response);
+        log.debug("Transaction has been processed. Reference number: {}", transaction.getReferenceNumber());
         return response;
     }
 
 
-    /** Perform credit operation from account. */
-    private boolean performCreditTransaction(Transaction transaction) {
-        UUID accountId = transaction.getDestinationAccountId();
-        String idempotencyKey = transaction.getIdempotencyKey();
-        String referenceNumber = transaction.getReferenceNumber();
-        AmountTransactionRequest request = new AmountTransactionRequest(transaction.getAmount());
-        try {
-            accountsClient.credit(accountId, idempotencyKey, request);
-            log.debug("Credit completed. Reference Number : {}", referenceNumber);
-            transaction.setStatus(TransactionStatus.POSTED);
-        } catch (Exception exception) {
-            log.error("Transaction failed at credit stage. Reference number : {}, message : {}", referenceNumber, exception.getMessage());
-            transaction.setStatus(TransactionStatus.CREDIT_RETRY);
-            return false;
-        }
-        return true;
+    @Override
+    public Transaction getTransactionByRefNo(String refNo) {
+        return transactionRepository.findByReferenceNumber(refNo).orElseThrow(
+                () -> new TransactionNotFoundException("Transaction not found with id : " + refNo)
+        );
     }
 
-
-    /** Perform debit operation from account. */
-    private void performDebitTransaction(Transaction transaction) {
-        String idempotencyKey = transaction.getIdempotencyKey();
-        String referenceNumber = transaction.getReferenceNumber();
-        AmountTransactionRequest request = new AmountTransactionRequest(transaction.getAmount());
-        try {
-            accountsClient.debit(transaction.getSourceAccountId(), idempotencyKey, request);
-            log.debug("Debit completed. Reference Number : {}", referenceNumber);
-            transaction.setStatus(TransactionStatus.DEBIT_SUCCESS);
-        } catch (Exception exception) {
-            log.error("Transaction failed at debit stage. Reference number : {}, message : {}", referenceNumber, exception.getMessage());
-            transaction.setStatus(TransactionStatus.FAILED);
-            throw new TransactionFailedException(exception.getMessage());
-        }
+    @Override
+    public void markTransactionPosted(Transaction txn) {
+        txn.setStatus(TransactionStatus.POSTED);
+        transactionRepository.save(txn);
     }
-
 
     /** Build the transaction object */
-    private static Transaction buildTransaction(PendingTransaction transaction) {
+    private static Transaction buildTransaction(PendingTransaction transaction, TransactionTypeConfig typeConfig) {
         String s = String.valueOf(System.currentTimeMillis());
         int length = Math.min(s.length(), 8);
         String referenceNumber = LocalDate.now() + s.substring(length);
         return Transaction.builder()
                 .idempotencyKey(transaction.getIdempotencyKey())
-                .referenceNumber(referenceNumber)
+                .referenceNumber(referenceNumber.replace("-", ""))
                 .sourceAccountId(transaction.getSourceAccountId())
                 .destinationAccountId(transaction.getDestinationAccountId())
                 .amount(transaction.getAmount())
+                .typeConfig(typeConfig)
                 .description(transaction.getDescription())
                 .transactionChannel(TransactionChannel.API)
                 .transactionType(TransactionType.DEBIT)

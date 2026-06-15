@@ -8,13 +8,13 @@ http:
   url: "{{transaction}}/transactions/{{requestId}}/verify"
   body:
     type: text
-    data: "813286"
+    data: "155847"
   auth: inherit
 
 runtime:
   variables:
     - name: requestId
-      value: 96480423-a9a6-4cb1-88dd-23adc4d12752
+      value: a341f0cf-6998-4282-9ba9-5433a9443f63
 
 settings:
   encodeUrl: true

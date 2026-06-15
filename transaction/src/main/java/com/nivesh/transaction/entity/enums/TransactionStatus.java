@@ -32,7 +32,5 @@ public enum TransactionStatus {
     COMPENSATE_INITIATED,
 
     /** Compensation Exhausted */
-    MANUAL_REVIEW,
-
-    CREDIT_RETRY
+    MANUAL_REVIEW
 }

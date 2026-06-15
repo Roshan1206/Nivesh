@@ -12,6 +12,42 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicConfig {
 
     @Bean
+    public NewTopic debitRequestTopic() {
+        return TopicBuilder.name(KafkaTopics.DEBIT_REQUESTED)
+                .partitions(3).replicas(1).build();
+    }
+
+    @Bean
+    public NewTopic debitResultTopic() {
+        return TopicBuilder.name(KafkaTopics.DEBIT_RESULT)
+                .partitions(3).replicas(1).build();
+    }
+
+    @Bean
+    public NewTopic creditRequestTopic() {
+        return TopicBuilder.name(KafkaTopics.CREDIT_REQUESTED)
+                .partitions(3).replicas(1).build();
+    }
+
+    @Bean
+    public NewTopic creditResultTopic() {
+        return TopicBuilder.name(KafkaTopics.CREDIT_RESULT)
+                .partitions(3).replicas(1).build();
+    }
+
+    @Bean
+    public NewTopic transferRequestTopic() {
+        return TopicBuilder.name(KafkaTopics.TRANSFER_REQUESTED)
+                .partitions(3).replicas(1).build();
+    }
+
+    @Bean
+    public NewTopic transferResultTopic() {
+        return TopicBuilder.name(KafkaTopics.TRANSFER_RESULT)
+                .partitions(3).replicas(1).build();
+    }
+
+    @Bean
     public NewTopic compensateRequestTopic() {
         return TopicBuilder.name(KafkaTopics.COMPENSATE_REQUEST)
                 .partitions(3).replicas(1).build();

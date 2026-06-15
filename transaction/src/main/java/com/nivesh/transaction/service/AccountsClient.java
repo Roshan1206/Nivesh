@@ -11,11 +11,5 @@ import java.util.UUID;
  */
 public interface AccountsClient {
 
-    boolean isAccountServiceAvailable();
-
     AccountValidationResponse validateAccount(TransactionRequest request);
-
-    void debit(UUID accountId, String idempotencyKey, AmountTransactionRequest request);
-
-    void credit(UUID accountId, String idempotencyKey, AmountTransactionRequest request);
 }

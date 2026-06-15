@@ -21,24 +21,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
     Optional<Transaction> findByReferenceNumber(String referenceNumber);
 
     Optional<Transaction> findByIdempotencyKey(String idempotencyKey);
-
-    @Modifying
-//        AND t.createdAt <= :threshold
-    @Query("""
-        SELECT t FROM Transaction t
-        WHERE t.creditRetryCount <= :maxRetryCount
-        AND t.status IN ('DEBIT_SUCCESS', 'CREDIT_RETRY')
-    """)
-    List<Transaction> findStuckCreditTransaction(@Param("threshold") LocalDateTime threshold,
-                                                 @Param("maxRetryCount") int maxRetryCount);
-
-    @Modifying
-    @Query("""
-        SELECT t FROM Transaction t
-        WHERE t.creditRetryCount <= :maxRetryCount
-        AND t.createdAt <= :threshold
-        AND t.status IN ('COMPENSATE_INITIATED')
-    """)
-    List<Transaction> findStuckCompensateTransaction(@Param("threshold") LocalDateTime threshold,
-                                                 @Param("maxRetryCount") int maxRetryCount);
 }

@@ -1,26 +1,19 @@
 package com.nivesh.transaction.service.impl;
 
-import com.nivesh.library.constant.Constants;
-import com.nivesh.library.dto.request.AmountTransactionRequest;
 import com.nivesh.library.dto.request.TransactionRequest;
 import com.nivesh.library.dto.response.AccountValidationResponse;
 import com.nivesh.library.exception.ServiceUnavailableException;
 import com.nivesh.transaction.service.AccountsClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import reactor.util.retry.RetryBackoffSpec;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * Class that supports account client impl behavior in the transaction module.
@@ -42,23 +35,6 @@ public class AccountClientImpl implements AccountsClient {
     }
 
 
-    @Override
-    public boolean isAccountServiceAvailable() {
-        String value = webClient.get()
-                .uri("actuator/health")
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, res -> res
-                        .bodyToMono(String.class)
-                        .map(body -> {
-                            log.error("Account service unavailable at {}", LocalDateTime.now());
-                            return new ServiceUnavailableException(body, "Account service unavailable");
-                        }))
-                .bodyToMono(String.class)
-                .block();
-
-        return value != null && value.contains("UP");
-    }
-
     /**
      * Validates an account based on the provided transaction request.
      *
@@ -72,50 +48,6 @@ public class AccountClientImpl implements AccountsClient {
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(AccountValidationResponse.class)
-                .retryWhen(doRetry())
-                .block();
-    }
-
-
-    /**
-     * Processes a debit transaction for the specified account.
-     *
-     * @param accountId The unique identifier of the account to debit.
-     * @param idempotencyKey A key used to prevent duplicate transactions.
-     * @param request The transaction request containing the amount and other details.
-     */
-    @Override
-    public void debit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {
-        webClient.post()
-                .uri(uri -> uri
-                        .path(ACCOUNTS + "/{accountId}/debit")
-                        .build(accountId))
-                .header(Constants.IDEMPOTENCY_KEY, idempotencyKey)
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .retryWhen(doRetry())
-                .block();
-    }
-
-
-    /**
-     * Credits money to an account based on the provided transaction request.
-     *
-     * @param accountId The unique identifier of the account to credit.
-     * @param idempotencyKey A key used to prevent duplicate transactions.
-     * @param request The transaction request containing the amount and other details.
-     */
-    @Override
-    public void credit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {
-        webClient.post()
-                .uri(uri -> uri
-                        .path(ACCOUNTS + "/{accountId}/credit")
-                        .build(accountId))
-                .header(Constants.IDEMPOTENCY_KEY, idempotencyKey)
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(Void.class)
                 .retryWhen(doRetry())
                 .block();
     }

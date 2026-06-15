@@ -3,8 +3,7 @@ package com.nivesh.transaction.service;
 import com.nivesh.library.dto.request.TransactionRequest;
 import com.nivesh.library.dto.response.OtpResponse;
 import com.nivesh.transaction.dto.response.TransactionResponse;
-
-import java.util.UUID;
+import com.nivesh.transaction.entity.Transaction;
 
 /**
  * Service contract for transaction business logic related to transaction operations.
@@ -29,4 +28,8 @@ public interface TransactionService {
      * @return reference number and status for future use
      */
     TransactionResponse startTransaction(String requestId, String otp);
+
+    Transaction getTransactionByRefNo(String refNo);
+
+    void markTransactionPosted(Transaction txn);
 }
