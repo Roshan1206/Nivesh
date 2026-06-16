@@ -40,7 +40,7 @@ public class TransactionConsumer {
     @KafkaListener(
             topics = KafkaTopics.TRANSFER_RESULT,
             groupId = "transaction-group",
-            containerFactory = "compensateResultListenerFactory")
+            containerFactory = "transferResultListenerFactory")
     public void onTransferResult(TransferResultEvent event, Acknowledgment acknowledgement) {
         String ref = event.getTransferRequest().getReferenceNumber();
         if (!event.isSuccess()) {
@@ -64,7 +64,7 @@ public class TransactionConsumer {
     @KafkaListener(
             topics = KafkaTopics.COMPENSATE_SUCCESS,
             groupId = "transaction-group",
-            containerFactory = "compensateResultListenerFactory")
+            containerFactory = "compensateRequestListenerFactory")
     public void onCompensationSuccess(CompensateResultEvent event, Acknowledgment acknowledgement) {
         String ref = event.getReferenceNumber();
         log.trace("Compensation successful. Reference number: {}", ref);
@@ -88,7 +88,7 @@ public class TransactionConsumer {
     @KafkaListener(
             topics = KafkaTopics.COMPENSATE_FAILED,
             groupId = "transaction-group",
-            containerFactory = "compensateResultListenerFactory")
+            containerFactory = "compensateRequestListenerFactory")
     public void onCompensationFailure(CompensateResultEvent event, Acknowledgment acknowledgement) {
         String ref = event.getReferenceNumber();
         log.trace("Compensation Failed. Reference number: {}", ref);

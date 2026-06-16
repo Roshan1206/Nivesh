@@ -61,3 +61,12 @@ eureka:
 logging:
   level:
     com.nivesh: TRACE
+#    org.hibernate.sql: TRACE
+#    org.hibernate.orm.jdbc.bind: TRACE
+#    org.springframework.transaction: TRACE
+#    org.springframework.orm.jpa.JpaTransactionManager: TRACE
+#    org.springframework.kafka: TRACE
+#    org.apache.kafka.clients.producer: TRACE
+#    org.apache.kafka.clients.consumer: TRACE
+#    io.debezium: TRACE
+#    io.debezium.connector.postgresql: TRACE

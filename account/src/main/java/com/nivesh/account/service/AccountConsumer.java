@@ -3,6 +3,8 @@ package com.nivesh.account.service;
 import com.nivesh.library.constant.KafkaTopics;
 import com.nivesh.library.dto.event.CompensateRequestEvent;
 import com.nivesh.library.dto.event.CompensateResultEvent;
+import com.nivesh.library.dto.event.TransferRequestedEvent;
+import com.nivesh.library.dto.event.TransferResultEvent;
 import com.nivesh.library.dto.request.AmountTransactionRequest;
 import com.nivesh.library.dto.response.AccountTransactionResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +29,41 @@ public class AccountConsumer {
 
     @Transactional
     @KafkaListener(
+            topics = KafkaTopics.TRANSFER_REQUESTED,
+            groupId = "transaction-group",
+            containerFactory = "transferRequestListenerFactory"
+    )
+    public void onTransferRequest(TransferRequestedEvent event, Acknowledgment ack) {
+        String ref = event.getReferenceNumber();
+        log.trace("Transfer started in Account. Reference number: {}", ref);
+        AccountTransactionResponse debit = accountService.debit(event.getSourceAccountId(),
+                event.getIdempotencyKey(), new AmountTransactionRequest(event.getAmount()));
+        TransferResultEvent resultEvent = new TransferResultEvent();
+        resultEvent.setTransferRequest(event);
+        if (debit.getStatus() != 200) {
+            log.error("Debit failed for transfer request.");
+            resultEvent.setSuccess(false);
+            resultEvent.setFailureReason("Debit failed for transfer request.");
+            kafkaTemplate.send(KafkaTopics.TRANSFER_RESULT, ref, resultEvent);
+            ack.acknowledge();
+            return;
+        }
+        resultEvent.setPostDebitBalance(debit.getRunningBalance());
+        AccountTransactionResponse credit = accountService.credit(event.getDestinationAccountId(),
+                event.getIdempotencyKey(), new AmountTransactionRequest(event.getAmount()));
+        resultEvent.setPostCreditBalance(credit.getRunningBalance());
+        resultEvent.setSuccess(true);
+        ack.acknowledge();
+
+        log.trace("Transfer Succeed in Account. Reference number: {}", ref);
+        kafkaTemplate.send(KafkaTopics.TRANSFER_RESULT, ref, resultEvent);
+    }
+
+    @Transactional
+    @KafkaListener(
             topics = KafkaTopics.COMPENSATE_REQUEST,
             groupId = "transaction-group",
-            containerFactory = "compensateResultListenerFactory"
+            containerFactory = "compensateRequestListenerFactory"
     )
     public void onCompensateRequest(CompensateRequestEvent event, Acknowledgment ack) {
         String ref = event.getReferenceNumber();
@@ -41,7 +75,7 @@ public class AccountConsumer {
         String idempotencyKey = "comp-" + event.getIdempotencyKey();
         AmountTransactionRequest request = new AmountTransactionRequest(event.getAmount());
         AccountTransactionResponse transactionResponse = accountService.credit(event.getSourceAccountId(), idempotencyKey, request);
-        CompensateResultEvent resultEvent = new CompensateResultEvent(ref);
+        CompensateResultEvent resultEvent = new CompensateResultEvent();
         if (transactionResponse.getStatus() != 200) {
             log.trace("Compensation failed in Account. Reference number: {}", ref);
             kafkaTemplate.send(KafkaTopics.COMPENSATE_FAILED, ref, resultEvent);

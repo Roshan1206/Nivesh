@@ -1,9 +1,7 @@
 package com.nivesh.library.configuration.audit;
 
-import com.nivesh.library.service.JwtTokenService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -20,34 +18,16 @@ import java.util.Optional;
 public class AuditConfiguration implements AuditorAware<String> {
 
     /**
-     * Used for getting the request and header value.
-     */
-    private final HttpServletRequest servletRequest;
-
-    /**
-     * Responsible for getting user email
-     */
-    private final JwtTokenService jwtTokenService;
-
-    /**
-     * Injecting required dependency via Constructor Injection
-     */
-    public AuditConfiguration(HttpServletRequest servletRequest, JwtTokenService jwtTokenService) {
-        this.servletRequest = servletRequest;
-        this.jwtTokenService = jwtTokenService;
-    }
-
-    /**
      * Get current user email for token if authenticated else "SELF".
      * Used for auditing.
      */
     @Override
     public Optional<String> getCurrentAuditor() {
-        String authHeader = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
             return Optional.of("SYSTEM");
         }
-        String token = authHeader.substring(7);
-        return Optional.of(jwtTokenService.extractEmail(token));
+        String name = authentication.getName();
+        return Optional.of(name);
     }
 }

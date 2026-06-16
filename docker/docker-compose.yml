@@ -33,7 +33,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
 
-  connect:
+  debezium:
     image: debezium/connect:2.7.3.Final
     container_name: debezium
     depends_on:

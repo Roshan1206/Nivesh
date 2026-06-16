@@ -163,20 +163,22 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountTransactionResponse debit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {
         OperationType type = OperationType.DEBIT;
-        AccountTransactionResponse record = getTransactionResponse(idempotencyKey);
+        String newIdempotencyKey = idempotencyKey + "debit";
+        AccountTransactionResponse record = getTransactionResponse(newIdempotencyKey);
         if (record != null) return record;
         Account account = getAccount(accountId);
         BigDecimal availableBalance = account.getAvailableBalance();
         BigDecimal amount = request.getAmount();
         if(amount.compareTo(availableBalance) > 0) {
             AccountTransactionResponse conflictResponse = new AccountTransactionResponse(HttpStatus.CONFLICT.value(), availableBalance);
-            saveIdempotency(request, accountId, idempotencyKey, conflictResponse, type);
+            saveIdempotency(request, accountId, newIdempotencyKey, conflictResponse, type);
             return conflictResponse;
         }
         BigDecimal newAvailableBalance = availableBalance.subtract(amount);
         BigDecimal newBalance = account.getBalance().subtract(amount);
 
-        AccountTransactionResponse response = getAccountTransactionResponse(accountId, idempotencyKey, request, type, account, newAvailableBalance, newBalance);
+        AccountTransactionResponse response = getAccountTransactionResponse(accountId, newIdempotencyKey,
+                request, type, account, newAvailableBalance, newBalance);
         if (response.getRunningBalance() == null) {
             response.setRunningBalance(availableBalance);
         }
@@ -205,6 +207,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountTransactionResponse credit(UUID accountId, String idempotencyKey, AmountTransactionRequest request) {
         OperationType type = OperationType.CREDIT;
+        String newIdempotencyKey = idempotencyKey + "-credit";
         AccountTransactionResponse record = getTransactionResponse(idempotencyKey);
         if (record != null) return record;
         Account account = getAccount(accountId);
