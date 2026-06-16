@@ -3,21 +3,14 @@ package com.nivesh.transaction.service;
 import com.nivesh.library.constant.KafkaTopics;
 import com.nivesh.library.dto.event.CompensateResultEvent;
 import com.nivesh.library.dto.event.TransferResultEvent;
-import com.nivesh.transaction.entity.JournalEntry;
 import com.nivesh.transaction.entity.Transaction;
-import com.nivesh.transaction.entity.enums.DrCr;
 import com.nivesh.transaction.entity.enums.OutboxStatus;
 import com.nivesh.transaction.entity.enums.TransactionStatus;
-import com.nivesh.transaction.exception.TransactionNotFoundException;
-import com.nivesh.transaction.repository.OutboxEventRepository;
-import com.nivesh.transaction.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -27,13 +20,13 @@ public class TransactionConsumer {
 
     private final OutboxEventService outboxEventService;
 
-    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
     public TransactionConsumer(JournalEntryService journalEntryService, OutboxEventService outboxEventService,
-                               TransactionRepository transactionRepository) {
+                               TransactionService transactionService) {
         this.journalEntryService = journalEntryService;
         this.outboxEventService = outboxEventService;
-        this.transactionRepository = transactionRepository;
+        this.transactionService = transactionService;
     }
 
     @Transactional
@@ -45,19 +38,21 @@ public class TransactionConsumer {
         String ref = event.getTransferRequest().getReferenceNumber();
         if (!event.isSuccess()) {
             log.error("Transfer failed. Ref no: {}", ref);
-            return;
-        }
-        try {
-            journalEntryService.writeLedger(event);
-            outboxEventService.save(event.getTransferRequest().getReferenceNumber(), OutboxStatus.PUBLISHED);
-            log.trace("Transfer successful. Reference number: {}", ref);
-        } catch (Exception e) {
-            log.error("Error processing writing ledger entry for transfer request");
             acknowledgement.acknowledge();
             return;
         }
+        Transaction txn = transactionService.getTransactionByRefNo(ref);
+        try {
+            journalEntryService.writeLedger(event);
+            outboxEventService.save(event.getTransferRequest().getReferenceNumber(), OutboxStatus.PUBLISHED);
+            txn.setStatus(TransactionStatus.POSTED);
+            log.trace("Transfer successful. Reference number: {}", ref);
+        } catch (Exception e) {
+            txn.setStatus(TransactionStatus.FAILED);
+            log.error("Error processing writing ledger entry for transfer request");
+        }
+        transactionService.updateTransaction(txn);
         acknowledgement.acknowledge();
-        log.trace("Transfer completed. Reference number: {}", ref);
     }
 
     @Transactional
@@ -68,9 +63,7 @@ public class TransactionConsumer {
     public void onCompensationSuccess(CompensateResultEvent event, Acknowledgment acknowledgement) {
         String ref = event.getReferenceNumber();
         log.trace("Compensation successful. Reference number: {}", ref);
-        Transaction transaction = transactionRepository.findByReferenceNumber(ref).orElseThrow(
-                () -> new TransactionNotFoundException("Transaction not found. Reference number: " + ref));
-
+        Transaction transaction = transactionService.getTransactionByRefNo(ref);
         if (transaction.getStatus() == TransactionStatus.REVERSED) {
             log.trace("Duplicate compensation. Reference number: {}. Skipping", ref);
             acknowledgement.acknowledge();
@@ -78,7 +71,7 @@ public class TransactionConsumer {
         }
 
         transaction.setStatus(TransactionStatus.REVERSED);
-        transactionRepository.save(transaction);
+        transactionService.updateTransaction(transaction);
         acknowledgement.acknowledge();
         log.trace("Compensation completed. Reference number: {}", ref);
     }
@@ -92,11 +85,9 @@ public class TransactionConsumer {
     public void onCompensationFailure(CompensateResultEvent event, Acknowledgment acknowledgement) {
         String ref = event.getReferenceNumber();
         log.trace("Compensation Failed. Reference number: {}", ref);
-        Transaction transaction = transactionRepository.findByReferenceNumber(ref).orElseThrow(
-                () -> new TransactionNotFoundException("Transaction not found. Reference number: " + ref));
-
+        Transaction transaction = transactionService.getTransactionByRefNo(ref);
         transaction.setCompensateRetryCount(transaction.getCompensateRetryCount() + 1);
-        transactionRepository.save(transaction);
+        transactionService.updateTransaction(transaction);
         acknowledgement.acknowledge();
     }
 }

@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:8079/connectors/nivesh-txn-outbox-connector/status
+  url: http://localhost:8079/connectors/nivesh-txn-outbox-connector/config
   auth: inherit
 
 settings:

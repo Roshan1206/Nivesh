@@ -8,7 +8,7 @@ http:
   url: "{{transaction}}/transactions/{{requestId}}/verify"
   body:
     type: text
-    data: "294119"
+    data: "770295"
   auth: inherit
 
 runtime:

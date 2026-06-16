@@ -31,5 +31,5 @@ public interface TransactionService {
 
     Transaction getTransactionByRefNo(String refNo);
 
-    void markTransactionPosted(Transaction txn);
+    void updateTransaction(Transaction txn);
 }

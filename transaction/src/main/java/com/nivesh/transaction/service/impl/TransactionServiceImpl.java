@@ -127,8 +127,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void markTransactionPosted(Transaction txn) {
-        txn.setStatus(TransactionStatus.POSTED);
+    public void updateTransaction(Transaction txn) {
         transactionRepository.save(txn);
     }
 
