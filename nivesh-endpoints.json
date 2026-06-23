@@ -1,0 +1,770 @@
+{
+  "info": {
+    "name": "nivesh",
+    "description": null,
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "actuator",
+      "item": [
+        {
+          "name": "Actuator",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8081/actuator",
+              "protocol": "http",
+              "host": [
+                "localhost:8081"
+              ],
+              "path": [
+                "actuator"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Beans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "password",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "nivesh",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8081/actuator/beans",
+              "protocol": "http",
+              "host": [
+                "localhost:8081"
+              ],
+              "path": [
+                "actuator",
+                "beans"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{account}}/actuator/health",
+              "protocol": "",
+              "host": [
+                "{{account}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "Register Verify otp",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{auth}}/auth/register/verify/6153864b-b754-4872-8826-84bf9159d32f",
+              "protocol": "",
+              "host": [
+                "{{auth}}"
+              ],
+              "path": [
+                "auth",
+                "register",
+                "verify",
+                "6153864b-b754-4872-8826-84bf9159d32f"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "496866",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "System Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{auth}}/auth/login",
+              "protocol": "",
+              "host": [
+                "{{auth}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"system@nvsh.com\",\n  \"password\": \"Password@1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Forgot password",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8081/auth/forgot",
+              "protocol": "http",
+              "host": [
+                "localhost:8081"
+              ],
+              "path": [
+                "auth",
+                "forgot"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"system@nvsh.com\",\n  \"password\": \"Password@1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{auth}}/auth/login",
+              "protocol": "",
+              "host": [
+                "{{auth}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"Roshan@gmail.com\",\n  \"password\": \"Password@1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Refresh Access token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{auth}}/auth/refresh",
+              "protocol": "",
+              "host": [
+                "{{auth}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\" : \"eyJraWQiOiJrZXktdjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI0Zjk4N2M4My0wNDU5LTQwYzMtYWMyYS05MWYxYzQyMDQ1YzMiLCJ0b2tlbl9pZCI6ImQ2OTJjOGQ0LTYwYzAtNGZmZS04NzliLTk0MDY1MjZlNzZkMSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MSIsImV4cCI6MTc4MTY3OTY3MSwidG9rZW5fdHlwZSI6IlJFRlJFU0giLCJpYXQiOjE3ODEwNzQ4NzEsImp0aSI6ImEyZjdmY2UwLTZjNDUtNDY0OS1hODI5LTA2OTZhYzg5ZDFkNSJ9.mYZGCU1AFLk7cVD4bSWQ5VEu0n1ihS6cwltT6_JKPZ75-JzWBIQYKPiull1qPZQW8wPVyjAOokQt2OoAaJ3grQBzds1W2SyNSSGiSJ71ADVUW23AP1Mfl32IRv2zkk75MStplFR-FksUp5PBmQA-HdqgJlx4Sa5OmnD7f2JIqQa-hrhTabrXY4NQqEaSFRbDdMKOIaWlw5GOTjZR6JjGfdlfn1HGsNCx17ugOQ4Ha-Gf6tXZ0Iew2veMHLR6fGUYx7GdGcjdGyYuoEcVpzHUksdwtoTZsGi7Ki4A879DArreQF5LPZJFk-U1I_LLd7w_rokMXHRxkrFp7mN4bK_xeA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{auth}}/auth/register",
+              "protocol": "",
+              "host": [
+                "{{auth}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"Roshan1@gmail.com\",\n  \"mobileNumber\": \"9876543211\",\n  \"password\": \"Password@1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{auth}}/user/logout",
+              "protocol": "",
+              "host": [
+                "{{auth}}"
+              ],
+              "path": [
+                "user",
+                "logout"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\" : \"Logout\",\n  \"refreshToken\": \"eyJraWQiOiJrZXktdjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyYTk5ZWY5Yy1lMmUwLTQ1MTctYTliNy00OWFmMTUwZjE3ZTMiLCJ0b2tlbl9pZCI6IjA3NGRkMTI1LWQyYjctNDlhOC1iZTk3LTI3OTNkMWNlNDQzNSIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MSIsImV4cCI6MTc4MTU0NjkyNiwidG9rZW5fdHlwZSI6IlJFRlJFU0giLCJpYXQiOjE3ODA5NDIxMjYsImp0aSI6ImMwNmIzNGY3LTYxZjQtNDY2Yy04NzU5LTQzZmE5NDM5ODZlYyJ9.BdqiNOD5rY3fgOxuoht2Aet6lEiYKzj7Y8nJ9-k-w3bvcBSkharJoTvyyISuKtQV1YBHySPGEnOYK4_duOzDxqMb4-qyWCBRG6FCOM55lRF7Jb6oo0LJpzHae2lq6mjC2lGSqsmX3uIkcsxi7YEqoZNLKsnlrd3gdax7Av9dxclnMHT8_PDMy3q4bL6ADmO1ruURmTpyRguE7WbK0N56PSH6uNjRsCS8bztig9eROwPMKXn7cCicCyrvik1w3S9xquv4c2CjxeWd--KcwrbnnQxPG8wKlRrrqcVFye9HeN5Zo6SETUlsEKhDpL09bmTNA2mV6iVGxc2WyGjzON-_OQ\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Logout All",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "{{bearer}}",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{auth}}/user/logout",
+              "protocol": "",
+              "host": [
+                "{{auth}}"
+              ],
+              "path": [
+                "user",
+                "logout"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\" : \"Logout\",\n  \"refreshToken\": \"eyJraWQiOiJrZXktdjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyYTk5ZWY5Yy1lMmUwLTQ1MTctYTliNy00OWFmMTUwZjE3ZTMiLCJ0b2tlbl9pZCI6ImEzMTUyNDNjLWFmNTktNGRlMC1iNWQzLTBkMzljNWE1NzI2NCIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MSIsImV4cCI6MTc4MTUwMjI4NSwidG9rZW5fdHlwZSI6IlJFRlJFU0giLCJpYXQiOjE3ODA4OTc0ODUsImp0aSI6IjVmMDgyNDlhLTAzMTQtNDM2Yy1hZGMxLTgzZjQ2ZmUyOTUxMyJ9.BHeia7FEHcg2yj_ynDANIyG3E7JjXlixQcVSnJSn2pgNClH60qOkiHaPy3wh1vK9socCFsHhtkcNGhcVYlvTYMRc0CFYKus3bRzpI9Vw1WnLZw9T5NddN_ht9-oM9vCBmfiQcMndwqnboUBF8yCx1APvm49zY7GKbvgyiHasGXNJLJ7OjLyFBBRsrtsrn00h9aR_pNQc2vNp89-hP1d0IzjxQTW343pFVa8F8uGMB4QWJ4xqmEtpwcLi4XZlZsRv-dZuJrYtrlqRZTlp88itQshe96lUBxxdvrnubcPomM-uTy3Sq7lkLg4DDk3-W240QneYjMIDYxBhE6dBsAlLig\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "customer",
+      "item": [
+        {
+          "name": "Customer Registration",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{customer}}/customers",
+              "protocol": "",
+              "host": [
+                "{{customer}}"
+              ],
+              "path": [
+                "customers"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Roshan1\",\n  \"middleName\": null,\n  \"lastName\": \"Sahu\",\n  \"dateOfBirth\": \"2026-05-30\",\n  \"gender\": \"male\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Customer Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{customer}}/customers/info",
+              "protocol": "",
+              "host": [
+                "{{customer}}"
+              ],
+              "path": [
+                "customers",
+                "info"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "account",
+      "item": [
+        {
+          "name": "Account creation",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{account}}/accounts",
+              "protocol": "",
+              "host": [
+                "{{account}}"
+              ],
+              "path": [
+                "accounts"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerNumber\": \"00000101\",\n  \"openingBalance\": 15000,\n  \"productCode\": \"001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Account Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{account}}/accounts/{{accountId}}",
+              "protocol": "",
+              "host": [
+                "{{account}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Account Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{account}}/accounts/{{accountId}}/balance",
+              "protocol": "",
+              "host": [
+                "{{account}}"
+              ],
+              "path": [
+                "accounts",
+                "{{accountId}}",
+                "balance"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Debit internal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "idempotencyKey",
+                "value": "bbf01d96-f781-450c-87fd-5d2e6e5ad3b9",
+                "disabled": false,
+                "type": "default"
+              },
+              {
+                "key": "X-Internal-Role",
+                "value": "INTERNAL_SERVICE",
+                "disabled": false,
+                "type": "default"
+              },
+              {
+                "key": "X-Source-Service",
+                "value": "transaction",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{account}}/accounts/internal/{{accId}}/credit",
+              "protocol": "",
+              "host": [
+                "{{account}}"
+              ],
+              "path": [
+                "accounts",
+                "internal",
+                "{{accId}}",
+                "credit"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "transaction",
+      "item": [
+        {
+          "name": "Transaction initiate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "idempotencyKey",
+                "value": "00000201374",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{transaction}}/transactions",
+              "protocol": "",
+              "host": [
+                "{{transaction}}"
+              ],
+              "path": [
+                "transactions"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountNumber\": \"10000000025\",\n  \"destinationAccountNumber\": \"10000000017\",\n  \"amount\": 50.00,\n  \"message\": \"first\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Transaction start",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "{{transaction}}/transactions/{{requestId}}/verify",
+              "protocol": "",
+              "host": [
+                "{{transaction}}"
+              ],
+              "path": [
+                "transactions",
+                "{{requestId}}",
+                "verify"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "770295",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "debezium connector validate",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8079/connectors/nivesh-txn-outbox-connector/config",
+          "protocol": "http",
+          "host": [
+            "localhost:8079"
+          ],
+          "path": [
+            "connectors",
+            "nivesh-txn-outbox-connector",
+            "config"
+          ],
+          "query": [],
+          "variable": []
+        }
+      }
+    },
+    {
+      "name": "debezium connector",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "auth": {
+          "type": "noauth"
+        },
+        "description": "",
+        "url": {
+          "raw": "http://localhost:8079/connectors",
+          "protocol": "http",
+          "host": [
+            "localhost:8079"
+          ],
+          "path": [
+            "connectors"
+          ],
+          "query": [],
+          "variable": []
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"nivesh-txn-outbox-connector\",\n  \"config\": {\n    \"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\",\n    \"bootstrap.servers\": \"localhost:9092\",\n    \"key.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"value.converter\": \"org.apache.kafka.connect.json.JsonConverter\",\n    \"key.converter.schemas.enable\": \"false\",\n    \"value.converter.schemas.enable\": \"false\",\n    \"database.hostname\": \"host.docker.internal\",\n    \"database.port\": \"5432\",\n    \"database.user\": \"postgres\",\n    \"database.password\": \"password\",\n    \"database.dbname\": \"nivesh\",\n    \"topic.prefix\": \"transaction\",\n    \"schema.include.list\": \"txn\",\n    \"table.include.list\": \"txn.outbox_events\",\n    \"plugin.name\": \"pgoutput\",\n    \"publication.name\": \"nivesh_outbox_pub\",\n    \"slot.name\": \"nivesh_outbox_slot\",\n    \"transforms\": \"outbox\",\n    \"transforms.outbox.type\": \"io.debezium.transforms.outbox.EventRouter\",\n    \"transforms.outbox.table.field.event.id\": \"event_id\",\n    \"transforms.outbox.table.field.event.key\": \"aggregate_id\",\n    \"transforms.outbox.table.field.event.type\": \"event_type\",\n    \"transforms.outbox.table.field.event.payload\": \"payload\",\n    \"transforms.outbox.table.expand.json.payload\": \"true\",\n    \"transforms.outbox.route.by.field\": \"topic\",\n    \"transforms.outbox.route.topic.replacement\": \"${routedByValue}\",\n    \"tombstones.on.delete\": \"false\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "gateway",
+      "value": "http://localhost:8080",
+      "type": "default"
+    },
+    {
+      "key": "auth",
+      "value": "http://localhost:8081",
+      "type": "default"
+    },
+    {
+      "key": "customer",
+      "value": "http://localhost:8082",
+      "type": "default"
+    },
+    {
+      "key": "account",
+      "value": "http://localhost:8083",
+      "type": "default"
+    },
+    {
+      "key": "token",
+      "value": "eyJraWQiOiJrZXktdjEiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIyYTk5ZWY5Yy1lMmUwLTQ1MTctYTliNy00OWFmMTUwZjE3ZTMiLCJwZXJtaXNzaW9ucyI6WyJDVVNUT01FUl9TVkM6UFJPRklMRTpSRUFEOk9XTiIsIkNVU1RPTUVSX1NWQzpQUk9GSUxFOldSSVRFOk9XTiJdLCJyb2xlcyI6WyJDVVNUT01FUiJdLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODEiLCJ0b2tfdmVyIjowLCJleHAiOjE3ODE2MDg4NDMsInRva2VuX3R5cGUiOiJBQ0NFU1MiLCJpYXQiOjE3ODE2MDE2NDMsImp0aSI6IjRiZGYxNzAxLWYwZjYtNDkwOC1iYTIwLTNiNTBhZjM4NWMyZCIsImVtYWlsIjoiUm9zaGFuQGdtYWlsLmNvbSJ9.E5eFez-o_4E15lrVVaxqKndtx-RCYbE86JCnbIBCfEz1f674mo1jDPRHZH1fmmtPC6FnX8hNjICULZF23egeYFpIjKpYiRSqXBn3mevCkgg5NdiveXpvlOeRoHiid5uFAlZbxs169NhbnKL2SadxzNAeeJeYg3yrYcY-nfj7wu0X69zNEMtfl3e5nZr8nzBqnV-EF93dedvZ71OnyeWmOqsSFEGRd2RnqnyW579PSw4SLWxbTDv5CqKyaQgXuigF4OYya6XYvlFgr7JwFK5X4IBJ_KvantpxXU9yFB7MEmkffMBtDRfPkjhIKxx-ruPwi_SxKiJA4pe1kWCViHyvOg",
+      "type": "default"
+    },
+    {
+      "key": "bearer",
+      "value": "Bearer {{token}}",
+      "type": "default"
+    },
+    {
+      "key": "transaction",
+      "value": "http://localhost:8084",
+      "type": "default"
+    },
+    {
+      "key": "accountId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "accId",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "requestId",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
