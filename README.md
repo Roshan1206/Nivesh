@@ -1,184 +1,259 @@
-# 🏦 Nivesh Bank — Microservices Banking Platform
+[![Java 21](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)](https://openjdk.org/projects/jdk/21/)
+[![Spring Boot 3.5](https://img.shields.io/badge/Spring%20Boot-3.5-brightgreen?style=flat-square&logo=springboot)](https://spring.io/projects/spring-boot)
+[![Gradle](https://img.shields.io/badge/Gradle-8%2B-02303A?style=flat-square&logo=gradle)](https://gradle.org/)
+[![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
+[![Last Commit](https://img.shields.io/github/last-commit/Roshan1206/Nivesh?style=flat-square)](https://github.com/Roshan1206/Nivesh/commits/main)
 
-A production-grade, cloud-native banking backend built with Java 21 and Spring Boot 3.5. Nivesh Bank simulates the core operations of a modern retail bank — authentication, customer onboarding, account management, and fund transfers — across independently deployable microservices connected through an API Gateway, Kafka event bus, and Spring Cloud Config.
+# Nivesh Bank
+
+> A production-grade banking microservices platform built with Java 21 and Spring Boot 3.5
+
+---
+
+## About the Project
+
+Nivesh Bank is a self-initiated portfolio project built to go well beyond typical CRUD demos — it implements real-world distributed systems patterns including Choreography Saga for distributed transactions, double-entry bookkeeping enforced at the database level, CIF-based customer identity, OTP-gated fund transfers, and Luhn-protected account numbers. The platform simulates the core operations of a modern retail bank across independently deployable microservices, connected through an API Gateway, Kafka event bus, Redis cache, and Spring Cloud Config. Built by a Senior Java/Spring Boot engineer with 4 years of professional experience, this project is intended to demonstrate the kind of architectural thinking and engineering rigour that matters in production BFSI systems — not just the ability to scaffold a service.
 
 ---
 
 ## Architecture Overview
 
-```
-                        ┌─────────────────────────────────────────────────────────┐
-                        │                   API Gateway  :8080                    │
-                        │   JWT validation · Route filtering · Header sanitization │
-                        └──────────────┬──────────────────────────────────────────┘
-                                       │
-          ┌────────────────────────────┼────────────────────────────┐
-          ▼                            ▼                            ▼
-  Auth Service :8081         Customer Service :8082       Account Service :8083
-  OAuth2 Auth Server         KYC · Registration           Balance · Debit · Credit
-  JWT issuance               CIF number generation        Luhn account numbers
-  Refresh tokens             Aadhaar/PAN verification     Saga compensation
-  Role & permission RBAC     Contact management           Optimistic locking
+All traffic enters through the API Gateway, which validates JWT signatures against the Auth service's JWK endpoint and strips internal headers from external requests. Domain services (Auth, Customer, Account, Transaction) register with Eureka for discovery, pull runtime configuration from the Config Server, and write to their own isolated PostgreSQL schemas. Shared behaviour — JWT utilities, OTP generation, Kafka event DTOs, Luhn validation, and audit entities — lives in `library` (published to `mavenLocal`) and `nivesh-api` (shared DTOs/contracts).
 
-          └────────────────────────────┬────────────────────────────┘
-                                       ▼
-                           Transaction Service :8084
-                           OTP-gated transfers · Choreography Saga
-                           Idempotency · Retry scheduler
-                           Journal entries · GL accounts
+```mermaid
+graph TD
+  Client(Client)
 
-          ┌────────────────────────────┬────────────────────────────┐
-          ▼                            ▼                            ▼
-  Config Server :8888       Eureka Registry :8761        Kafka + Redis
-  Git-backed config          Service discovery            Event bus · Cache
-  RSA key distribution       Load balancing               Token blacklist
+  subgraph INF[Infrastructure]
+    GW[API Gateway :8080]
+    CFG[Config Server :8888]
+    EUR[Eureka Server :8761]
+  end
+
+  subgraph DOM[Domain Services]
+    AUTH[Auth Service :8081]
+    CUST[Customer Service :8082]
+    ACC[Account Service :8083]
+    TXN[Transaction Service :8084]
+  end
+
+  subgraph SHR[Shared Modules]
+    LIB[library]
+    API[nivesh-api]
+  end
+
+  DB[(PostgreSQL 16)]
+
+  Client --> GW
+  GW --> AUTH
+  GW --> CUST
+  GW --> ACC
+  GW --> TXN
+  AUTH --> CFG
+  CUST --> CFG
+  ACC --> CFG
+  TXN --> CFG
+  AUTH --> EUR
+  CUST --> EUR
+  ACC --> EUR
+  TXN --> EUR
+  AUTH --> DB
+  CUST --> DB
+  ACC --> DB
+  TXN --> DB
+  AUTH --> LIB
+  CUST --> LIB
+  ACC --> LIB
+  TXN --> LIB
+  AUTH --> API
+  CUST --> API
+  ACC --> API
+  TXN --> API
 ```
 
 ---
 
 ## Services
 
-| Service | Port | Description |
-|---|---|---|
-| `gateway` | 8080 | Spring Cloud Gateway — JWT auth, routing, header sanitization |
-| `authentication` | 8081 | OAuth2 Authorization Server — JWT issuance, refresh tokens, RBAC |
-| `customer` | 8082 | Customer registration, KYC initiation/verification |
-| `account` | 8083 | Account lifecycle, balance management, Saga compensation |
-| `transaction` | 8084 | OTP-gated fund transfers, choreography Saga, retry scheduler |
-| `config` | 8888 | Spring Cloud Config Server — Git-backed configuration |
-| `eureka` | 8761 | Netflix Eureka — service discovery and load balancing |
-| `library` | — | Shared library (`nivesh-lib`) — JWT, OTP, auditing, Kafka events |
+| Service | Port | Responsibility | README | Status |
+|---|---|---|---|---|
+| API Gateway | 8080 | JWT validation, route filtering, internal header sanitization | [README](gateway/README.md) | ✅ Implemented |
+| Auth Service | 8081 | OAuth2 Authorization Server — JWT issuance, refresh tokens, RBAC, token versioning | [README](authentication/README.md) | ✅ Implemented |
+| Customer Service | 8082 | Customer registration, KYC onboarding, CIF identity, contact management | [README](customer/README.md) | ✅ Implemented |
+| Account Service | 8083 | Account lifecycle, Luhn account numbers, balance management, Saga compensation | [README](account/README.md) | ✅ Implemented |
+| Transaction Service | 8084 | OTP-gated fund transfers, Choreography Saga, idempotency, double-entry ledger | [README](transaction/README.md) | ✅ Implemented |
+| Config Server | 8888 | Git-backed centralised configuration, RSA key distribution | [README](config/README.md) | ✅ Implemented |
+| Eureka Server | 8761 | Service discovery and client-side load balancing | [README](eureka/README.md) | ✅ Implemented |
+| library | — | Shared security, JWT/OTP utils, Kafka event DTOs, Luhn, audit entities | [README](library/README.md) | ✅ Implemented |
+| nivesh-api | — | Shared API DTOs, request/response contracts | [README](nivesh-api/README.md) | 🚧 In Progress |
+
+---
+
+## Key Design Patterns
+
+### Choreography Saga — Distributed Transactions
+
+The Transaction Service orchestrates fund transfers across two accounts via Kafka topics. On debit success, it publishes a credit event. If the credit fails, a compensation event triggers a rollback of the debit. Failures beyond the configured retry count are routed to a dead-letter topic and the transaction transitions to `MANUAL_REVIEW`, ensuring no silent money loss.
+
+### Double-Entry Bookkeeping
+
+The `txn` schema enforces double-entry accounting via a PostgreSQL trigger on `journal_entries`: every posted transaction must have exactly one DR row and one CR row with equal amounts. This makes the ledger self-auditing by design rather than by convention.
+
+### CIF-Based Customer Identity
+
+Internal UUIDs never leave the system. Every external API references the 8-character zero-padded CIF number (e.g. `00000042`), a standard BFSI pattern that decouples public identity from internal storage keys.
+
+### JWT / Spring Security Filter Chain
+
+The Auth Service is an OAuth2 Authorization Server using RSA key-pair JWTs (RS256). The Gateway validates signatures against the JWK endpoint and forwards identity downstream. Internal service-to-service calls use `X-Internal-Role: INTERNAL_SERVICE` headers, which the Gateway's `SecurityHeaderFilter` strips from any external request to prevent injection attacks.
+
+### Idempotency with Redis
+
+Every debit/credit operation requires an `idempotencyKey` header. Results are persisted in `idempotency_records` with a 24-hour TTL, so duplicate requests — from retries or network hiccups — replay the original response without re-executing the transaction.
+
+### Optimistic Locking on Balances
+
+The `accounts` table carries a `version` column. Concurrent balance updates trigger `ObjectOptimisticLockingFailureException`, which the service maps to HTTP 429 rather than silently corrupting balance — a pattern appropriate for high-concurrency BFSI workloads.
+
+### OTP-Gated Transactions
+
+Every fund transfer requires a 6-digit OTP verified before money moves. OTPs are stored in Redis with a 5-minute TTL, capped at 3 attempts, and evicted immediately on success or exhaustion.
+
+### Flyway Migrations
+
+Every service manages its own schema lifecycle via Flyway, keeping DDL changes version-controlled, repeatable, and auditable alongside application code.
+
+### Gradle Multi-Module Build
+
+The repository is a Gradle multi-module project. The shared `library` module is published to `mavenLocal()` and consumed by domain services as a local Maven dependency — allowing independent versioning without a private registry.
+
+### Eureka Service Discovery
+
+All domain services self-register with the Eureka Server at startup. The API Gateway performs client-side load balancing via Spring Cloud LoadBalancer, using logical service names rather than hardcoded hosts.
+
+### Spring Cloud Config
+
+Runtime configuration — including Kafka bootstrap servers, mail credentials, token expiry, and Redis settings — is served from a Git-backed repository via the Config Server. Sensitive values are environment-variable interpolated, keeping secrets out of source control.
 
 ---
 
 ## Tech Stack
 
-**Core:** Java 21, Spring Boot 3.5, Spring Security, Spring Data JPA, Spring Cloud 2025.0
-
-**Messaging:** Apache Kafka — Choreography Saga pattern (compensate-request/success/failed topics)
-
-**Databases:** PostgreSQL 16 (schema-per-service isolation), Flyway migrations, optimistic locking
-
-**Caching:** Redis — JWT blacklist, OTP cache, token version tracking, idempotency records
-
-**Service Mesh:** Spring Cloud Gateway, Eureka, Spring Cloud Config (Git-backed)
-
-**Security:** RSA key-pair JWT (RS256), BCrypt password encoding, OTP-gated transactions, token versioning for logout-all
-
-**Observability:** Spring Boot Actuator, structured logging at TRACE level
-
-**Build:** Gradle multi-module, `mavenLocal()` for shared library
+| Category | Technology | Version |
+|---|---|---|
+| Language | Java | 21 |
+| Framework | Spring Boot | 3.5 |
+| Security | Spring Security / OAuth2 Authorization Server | Spring Cloud 2025.0 |
+| Build Tool | Gradle | 8+ |
+| Database | PostgreSQL | 16 |
+| Migrations | Flyway | Latest compatible with Boot 3.5 |
+| Messaging | Apache Kafka | Latest |
+| Caching | Redis | Latest |
+| Service Discovery | Netflix Eureka (Spring Cloud) | 2025.0 |
+| Config | Spring Cloud Config | 2025.0 |
+| API Gateway | Spring Cloud Gateway | 2025.0 |
+| Containerisation | Docker / Docker Compose | — |
 
 ---
 
-## Key Engineering Decisions
+## API Reference
 
-### Account Numbers — 11-digit Luhn-protected
+> ⚡ Full API documentation — endpoints, request/response bodies, auth requirements, and error codes — lives in each service's README. A Postman collection will be added to the root of this repo shortly.
+
+| Service | Base Path | Postman Collection | Full Docs |
+|---|---|---|---|
+| Auth Service | `/auth` | Coming soon | [README](authentication/README.md) |
+| Customer Service | `/customers`, `/kyc` | Coming soon | [README](customer/README.md) |
+| Account Service | `/accounts` | Coming soon | [README](account/README.md) |
+| Transaction Service | `/transactions` | Coming soon | [README](transaction/README.md) |
+
+**End-to-end flow summary:**
+
 ```
-Digit 1     : Product prefix (1=Savings, 2=Current, 3=Salary, 4=Premium)
-Digits 2–10 : Zero-padded PostgreSQL sequence (per product, max 99,999,999)
-Digit 11    : Luhn check digit computed at runtime
+1. POST /auth/register              → OTP sent to email
+2. POST /auth/register/verify/{id}  → Returns ONBOARDED access token
+
+3. POST /customers                  → Register customer profile
+                                      Returns REGISTERED access token
+
+4. POST /kyc                        → Submit KYC document, OTP sent
+5. POST /kyc/verify/{id}            → Verify OTP → ACTIVE access token
+
+6. POST /accounts                   → Open bank account (product code: 001)
+
+7. POST /transactions               → Initiate transfer, OTP sent
+   Header: idempotencyKey: <uuid>
+
+8. POST /transactions/{id}/verify   → Submit OTP → funds move via Saga
 ```
-
-### Customer Numbers — 8-digit zero-padded CIF
-Internal UUIDs stay internal. All external APIs reference the 8-character CIF number (e.g. `00000042`).
-
-### IFSC Code Format
-`NVSH0` + `PIN_ZONE (3 digits)` + `BRANCH_SEQ (3 digits)` = 11 characters. One branch per 5 km radius via PostGIS (planned).
-
-### Choreography Saga — Distributed Transactions
-```
-Transaction Service                  Account Service
-      │                                    │
-      ├─── debit(sourceAccount) ──────────►│
-      │◄── DEBIT_SUCCESS ─────────────────┤
-      │                                    │
-      ├─── credit(destinationAccount) ────►│
-      │                                    │
-      │   [Credit fails]                   │
-      │◄── CREDIT_RETRY ──────────────────┤
-      │                                    │
-      ├─── Kafka: compensate.request ─────►│
-      │◄── Kafka: compensate.success ──────┤
-      │                                    │
-      └─── status: REVERSED ───────────────┘
-```
-
-Dead-letter topic (`transaction.dead.letter`) captures compensation failures after `compensateRetryCount` is exhausted. Status transitions to `MANUAL_REVIEW`.
-
-### Idempotency
-Every debit/credit operation requires an `idempotencyKey` header. Results are persisted in `idempotency_records` (TTL: 24 hours) so duplicate requests replay the original response without re-executing the transaction.
-
-### Optimistic Locking on Accounts
-The `accounts` table carries a `version` column. Concurrent balance updates trigger `ObjectOptimisticLockingFailureException`, which returns HTTP 429 (Too Many Requests) to the caller rather than silently corrupting balance.
-
-### OTP-Gated Transactions
-Every fund transfer requires a 6-digit OTP verified before money moves. OTPs are stored in Redis with a 5-minute TTL, maximum 3 attempts, and evicted on success or exhaustion.
-
-### Role Hierarchy & Per-User Permission Overrides
-```
-SUPER_ADMIN → ADMIN → BRANCH_MGR → TELLER
-CUSTOMER_ACTIVE → CUSTOMER_REGISTERED → CUSTOMER
-```
-Permissions follow the format `SERVICE:RESOURCE:ACTION[:SCOPE]` (e.g. `ACCOUNT_SVC:ACCOUNT:WRITE:OPEN`). Each user can receive `GRANT` or `REVOKE` overrides on top of their role defaults, with optional expiry timestamps.
-
-### Token Versioning — Logout All Sessions
-Incrementing `token_version` in the `users` table and publishing it to Redis invalidates all previously issued tokens for that user simultaneously, without requiring a database lookup per request.
 
 ---
 
 ## Project Structure
 
 ```
-nivesh-bank/
-├── gateway/              # Spring Cloud Gateway
-├── authentication/       # OAuth2 Authorization Server
-├── customer/             # Customer & KYC service
-├── account/              # Account & balance service
-├── transaction/          # Transaction orchestration
-├── config/               # Spring Cloud Config Server
-├── eureka/               # Service registry
-└── library/              # Shared library (nivesh-lib)
-    ├── configuration/    # Security, cache, Kafka, audit configs
-    ├── service/          # JWT, OTP, sequence generator
-    ├── dto/              # Shared request/response/event DTOs
-    ├── entity/           # BaseAudit, shared enums
-    └── util/             # LuhnUtil, validation annotations
+Nivesh/
+├── authentication/          # OAuth2 Authorization Server
+├── customer/                # Customer registration & KYC
+├── account/                 # Account lifecycle & balance management
+├── transaction/             # Fund transfers, Saga, ledger
+├── gateway/                 # Spring Cloud Gateway
+├── config/                  # Spring Cloud Config Server
+├── eureka/                  # Netflix Eureka registry
+├── library/                 # Shared library (nivesh-lib)
+│   ├── configuration/       # Security, cache, Kafka, audit configs
+│   ├── service/             # JWT, OTP, sequence generator
+│   ├── dto/                 # Shared request/response/event DTOs
+│   ├── entity/              # BaseAudit, shared enums
+│   └── util/                # LuhnUtil, validation annotations
+├── nivesh-api/              # Shared API DTOs and contracts
+├── docker/                  # Docker infrastructure files
+├── Nivesh_Bank_Microservices_Architecture.pdf
+├── README.md
+└── .gitignore
 ```
 
 ---
 
-## Database Design
-
-Each service owns its PostgreSQL schema (schema-per-service isolation):
-
-| Schema | Service | Key Tables |
-|---|---|---|
-| `auth` | Authentication | `users`, `roles`, `permissions`, `refresh_tokens`, `user_permission_overrides` |
-| `customer` | Customer | `customers`, `contacts`, `addresses`, `kyc_documents`, `nominees` |
-| `account` | Account | `accounts`, `products`, `fixed_deposits`, `recurring_deposits`, `idempotency_records` |
-| `txn` | Transaction | `transactions`, `journal_entries`, `gl_accounts`, `transaction_type_configs`, `standing_instructions` |
-
-The `txn` schema enforces **double-entry bookkeeping** via a PostgreSQL trigger on `journal_entries`: every posted transaction must have exactly one DR and one CR row with equal amounts.
-
----
-
-## Running Locally
+## Getting Started
 
 ### Prerequisites
+
 - Java 21
+- Gradle 8+
 - PostgreSQL 16
 - Redis
 - Apache Kafka
-- Gradle 8+
+- Docker (optional, for infrastructure)
 
-### 1. Start infrastructure
+### Clone
+
 ```bash
-# PostgreSQL, Redis, Kafka via Docker Compose (add your own compose file)
-docker-compose up -d
+git clone https://github.com/Roshan1206/Nivesh.git
+cd Nivesh
 ```
 
-### 2. Create database schemas
+### Configure
+
+Runtime config is served by the Config Server from a separate Git repo (`nivesh-config`). Before starting services, ensure your environment has:
+
+```bash
+export MAIL_ID=your-email@example.com
+export MAIL_PWD=your-email-password
+```
+
+Or configure `application.yml` in each service directly for local development.
+
+**RSA Keys** — generate and place at:
+
+```bash
+openssl genrsa -out private.pem 2048
+openssl rsa -in private.pem -pubout -out public.pem
+# Place at: authentication/src/main/resources/keys/
+```
+
+### Create Database Schemas
+
 ```sql
 CREATE SCHEMA auth;
 CREATE SCHEMA customer;
@@ -186,113 +261,97 @@ CREATE SCHEMA account;
 CREATE SCHEMA txn;
 ```
 
-### 3. Publish shared library to mavenLocal
+### Run with Docker Compose
+
 ```bash
-cd library
-./gradlew publishToMavenLocal
+# Start PostgreSQL, Redis, Kafka
+docker-compose up -d
 ```
 
-### 4. Start services in order
+> A `docker-compose.yml` covering all infrastructure is located in the `docker/` folder.
+
+### Run Services Individually
+
+Start in this order — Config and Eureka must be up before domain services:
+
 ```bash
-# 1. Config Server
+# 1. Publish shared library
+cd library && ./gradlew publishToMavenLocal
+
+# 2. Config Server
 cd config && ./gradlew bootRun
 
-# 2. Eureka
+# 3. Eureka
 cd eureka && ./gradlew bootRun
 
-# 3. Authentication
+# 4. Auth Service
 cd authentication && ./gradlew bootRun
 
-# 4. Customer, Account, Transaction (any order)
+# 5. Domain services (any order)
 cd customer && ./gradlew bootRun
 cd account && ./gradlew bootRun
 cd transaction && ./gradlew bootRun
 
-# 5. Gateway (last)
+# 6. Gateway (last)
 cd gateway && ./gradlew bootRun
 ```
 
-### 5. RSA Keys
-Place your RSA key pair at:
-```
-authentication/src/main/resources/keys/private.pem
-authentication/src/main/resources/keys/public.pem
-```
-Generate with:
-```bash
-openssl genrsa -out private.pem 2048
-openssl rsa -in private.pem -pubout -out public.pem
-```
+### Health Check URLs
+
+| Service | Health Endpoint |
+|---|---|
+| API Gateway | http://localhost:8080/actuator/health |
+| Auth Service | http://localhost:8081/actuator/health |
+| Customer Service | http://localhost:8082/actuator/health |
+| Account Service | http://localhost:8083/actuator/health |
+| Transaction Service | http://localhost:8084/actuator/health |
+| Config Server | http://localhost:8888/actuator/health |
+| Eureka Dashboard | http://localhost:8761 |
 
 ---
 
-## API Flow — End to End
+## Roadmap
 
-### Register → KYC → Transfer
+### Done
 
-```
-1. POST /auth/register             → OTP sent to email
-2. POST /auth/register/verify/{id} → Returns ONBOARDED access token
+- [x] API Gateway — JWT validation, route filtering, internal header sanitization
+- [x] Auth Service — OAuth2 Authorization Server, RSA JWT, refresh tokens, token versioning, RBAC with per-user permission overrides
+- [x] Customer Service — registration, CIF number generation, KYC document submission/verification, OTP flow
+- [x] Account Service — account creation, Luhn-protected 11-digit account numbers, balance debit/credit, optimistic locking, Saga compensation endpoints
+- [x] Transaction Service — OTP-gated transfers, Choreography Saga, idempotency, double-entry journal entries, GL accounts, retry scheduler, dead-letter handling
+- [x] Config Server — Git-backed centralised configuration
+- [x] Eureka Server — service discovery
+- [x] Shared Library — JWT, OTP, Luhn, Kafka event DTOs, audit base entities
+- [x] Flyway migrations (schema-per-service)
+- [x] Gradle multi-module build
+- [x] Docker infrastructure setup
 
-3. POST /customers                 → Register customer profile
-                                     Returns REGISTERED access token
+### Planned
 
-4. POST /kyc                       → Submit document, OTP sent
-5. POST /kyc/verify/{id}           → Verify OTP → ACTIVE access token
-
-6. POST /accounts                  → Open bank account (product code: 001)
-
-7. POST /transactions              → Initiate transfer, OTP sent
-   Header: idempotencyKey: <uuid>
-
-8. POST /transactions/{id}/verify  → Submit OTP → funds move
-```
-
----
-
-## Security Architecture
-
-All traffic enters through the API Gateway, which validates JWT signatures against the Auth service's JWK endpoint. Internal service-to-service calls bypass end-user JWT checks using a shared header:
-
-```
-X-Internal-Role: INTERNAL_SERVICE
-X-Source-Service: <service-name>
-```
-
-Internal endpoints (`/*/internal/**`) are protected by `InternalServiceAuthorizationManager`, which verifies both headers rather than user roles. The Gateway's `SecurityHeaderFilter` strips these headers from external requests, preventing injection attacks.
-
----
-
-## Configuration (Spring Cloud Config)
-
-Runtime configuration is served from a Git repository (`nivesh-config`) via the Config Server at port 8888. Sensitive values (mail credentials, token expiry, Kafka bootstrap servers) are environment-variable interpolated:
-
-```yaml
-spring.mail.username: ${MAIL_ID:fallback@example.com}
-spring.mail.password: ${MAIL_PWD:changeme}
-```
-
----
-
-## Planned Enhancements
-
-- Payments Service (8085) — UPI, NEFT, RTGS, IMPS rails
-- Loans Service (8086)
-- Cards Service (8087)
-- Notifications Service (8088) — Kafka-driven email/SMS
-- Fraud Service (8089) — real-time scoring
-- Cassandra for transaction history older than 90 days
-- HashiCorp Vault for secrets management
-- Distributed tracing (Micrometer + Zipkin)
-- Docker Compose + Kubernetes manifests
+- [ ] Payments Service (:8085) — UPI, NEFT, RTGS, IMPS rails
+- [ ] Loans Service (:8086)
+- [ ] Cards Service (:8087)
+- [ ] Notifications Service (:8088) — Kafka-driven email/SMS
+- [ ] Fraud Service (:8089) — real-time transaction scoring
+- [ ] Reporting Service (:8090)
+- [ ] Audit Service (:8091)
+- [ ] Investment Service (:8092)
+- [ ] Branch & ATM Service (:8093)
+- [ ] Cassandra for transaction history older than 90 days (cold storage tiering)
+- [ ] HashiCorp Vault for secrets management
+- [ ] Kafka + Debezium Outbox Pattern for guaranteed event delivery
+- [ ] Distributed tracing (Micrometer + Zipkin)
+- [ ] PostGIS for branch geolocation and 5 km radius constraint
+- [ ] Kubernetes manifests + Helm charts
 
 ---
 
 ## Author
 
-**Roshan Lal Sahu** — Senior Software Engineer  
+**Roshan Lal Sahu** — Senior Software Engineer (Java / Spring Boot / Microservices)
+
 [LinkedIn](https://linkedin.com/in/roshansahu96) · [GitHub](https://github.com/Roshan1206)
 
 ---
 
-> Built to demonstrate production-grade microservices architecture patterns: Saga orchestration, idempotency, optimistic concurrency, RBAC with permission overrides, distributed caching, and event-driven compensation flows.
+> Built to demonstrate production-grade microservices architecture patterns: Choreography Saga, double-entry bookkeeping, OTP-gated transactions, idempotency, optimistic concurrency, RBAC with permission overrides, distributed caching, and event-driven compensation flows.
