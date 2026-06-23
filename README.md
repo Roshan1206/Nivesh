@@ -22,53 +22,47 @@ All traffic enters through the API Gateway, which validates JWT signatures again
 
 ```mermaid
 graph TD
-  Client(Client)
-
-  subgraph INF[Infrastructure]
-    GW[API Gateway :8080]
-    CFG[Config Server :8888]
-    EUR[Eureka Server :8761]
-  end
-
-  subgraph DOM[Domain Services]
-    AUTH[Auth Service :8081]
-    CUST[Customer Service :8082]
-    ACC[Account Service :8083]
-    TXN[Transaction Service :8084]
-  end
-
-  subgraph SHR[Shared Modules]
-    LIB[library]
-    API[nivesh-api]
-  end
-
-  DB[(PostgreSQL 16)]
-
-  Client --> GW
-  GW --> AUTH
-  GW --> CUST
-  GW --> ACC
-  GW --> TXN
-  AUTH --> CFG
-  CUST --> CFG
-  ACC --> CFG
-  TXN --> CFG
-  AUTH --> EUR
-  CUST --> EUR
-  ACC --> EUR
-  TXN --> EUR
-  AUTH --> DB
-  CUST --> DB
-  ACC --> DB
-  TXN --> DB
-  AUTH --> LIB
-  CUST --> LIB
-  ACC --> LIB
-  TXN --> LIB
-  AUTH --> API
-  CUST --> API
-  ACC --> API
-  TXN --> API
+    Client(["🧑 Client"])
+ 
+    subgraph INF["Infrastructure"]
+        GW["API Gateway\n:8080"]
+        CFG["Config Server\n:8888"]
+        EUR["Eureka Server\n:8761"]
+    end
+ 
+    subgraph DOM["Domain Services"]
+        AUTH["Auth Service\n:8081"]
+        CUST["Customer Service\n:8082"]
+        ACC["Account Service\n:8083"]
+        TXN["Transaction Service\n:8084"]
+    end
+ 
+    subgraph SHR["Shared Modules"]
+        LIB["library"]
+        API["nivesh-api"]
+    end
+ 
+    DB[("PostgreSQL 16")]
+ 
+    %% Client → Gateway
+    Client --> GW
+ 
+    %% Gateway → Domain Services
+    GW --> AUTH
+    GW --> CUST
+    GW --> ACC
+    GW --> TXN
+ 
+    %% Domain Services → Infrastructure
+    AUTH & CUST & ACC & TXN --> CFG
+    AUTH & CUST & ACC & TXN --> EUR
+ 
+    %% Domain Services → Database
+    AUTH & CUST & ACC & TXN --> DB
+ 
+    %% Domain Services → Shared Modules
+    AUTH & CUST & ACC & TXN --> LIB
+    AUTH & CUST & ACC & TXN --> API
 ```
 
 ---
