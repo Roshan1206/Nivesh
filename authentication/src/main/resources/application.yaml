@@ -66,8 +66,11 @@ management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health, info, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
 
-#logging:
-#  level:
-#    org.springframework: TRACE
+logging:
+  level:
+    com.nivesh.library.service.OtpCacheService: TRACE

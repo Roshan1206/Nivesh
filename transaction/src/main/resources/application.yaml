@@ -65,3 +65,16 @@ spring:
 eureka:
   client:
     enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    com.nivesh.library.service.OtpCacheService: TRACE

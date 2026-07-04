@@ -15,11 +15,14 @@ spring:
           force-pull: true
 
 management:
-  endpoints:
-    web:
-      exposure:
-        include: health
   endpoint:
     health:
       probes:
         enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}

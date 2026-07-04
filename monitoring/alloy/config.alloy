@@ -1,0 +1,26 @@
+discovery.docker "nivesh_containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "nivesh_containers" {
+  targets = discovery.docker.nivesh_containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+}
+
+loki.source.docker "nivesh_logs" {
+  host             = "unix:///var/run/docker.sock"
+  targets          = discovery.relabel.nivesh_containers.output
+  forward_to       = [loki.write.nivesh.receiver]
+  relabel_rules    = discovery.relabel.nivesh_containers.rules
+}
+
+loki.write "nivesh" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

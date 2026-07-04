@@ -45,3 +45,16 @@ spring:
     redis:
       port: 6379
       host: ${REDIS_HOST:localhost}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    com.nivesh.library.service.OtpCacheService: TRACE

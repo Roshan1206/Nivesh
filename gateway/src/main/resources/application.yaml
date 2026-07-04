@@ -48,9 +48,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info
-  endpoint:
-    env:
-      show-values: ALWAYS
-    gateway:
-      access: unrestricted
+        include: health, info, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
