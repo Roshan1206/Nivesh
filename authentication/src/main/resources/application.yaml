@@ -3,7 +3,7 @@
 
 nivesh:
   auth:
-    url: http://localhost:${server.port}
+    url: ${AUTH_URL:http://localhost:${server.port}}
     token:
       onboarded-expiry: 10
       access-expiry: 15
@@ -18,10 +18,12 @@ nivesh:
 spring:
   application:
     name: authentication
+  config:
+    import: optional:configserver:${CONFIG_SERVER:http://localhost:8888}
   datasource:
-    url: jdbc:postgresql://localhost:5432/nivesh?currentSchema=${nivesh.auth.database.schema}
-    username: postgres
-    password: password
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/nivesh}?currentSchema=${nivesh.auth.database.schema}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
@@ -54,20 +56,11 @@ spring:
   data:
     redis:
       port: 6379
-      host: localhost
+      host: ${REDIS_HOST:localhost}
 
 eureka:
-  instance:
-    prefer-ip-address: true
-    ip-address: 127.0.0.1
-    hostname: 127.0.0.1
-    instance-id: ${spring.application.name}:${server.port}
   client:
     enabled: false
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
 
 management:
   endpoints:

@@ -73,7 +73,7 @@ public class OtpCacheService {
         );
 
         OtpEntry entry = new OtpEntry(plainOtp);
-        log.info("OTP: {}", plainOtp);
+        log.trace("OTP: for requestId {} : {}", requestId, plainOtp);
         getCache().put(requestId, entry);
         sender.send(email, plainOtp);
     }

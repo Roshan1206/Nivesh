@@ -3,16 +3,16 @@ server:
 
 nivesh:
   auth:
-    url: http://localhost:8081
+    url: ${AUTH_URL:http://localhost:8081}
   customer:
     database:
       schema: customer
-#  otp:
-#    expiry-in-min: 5
 
 spring:
   application:
     name: customer
+  config:
+    import: optional:configserver:${CONFIG_SERVER:http://localhost:8888}
   datasource:
     url: jdbc:postgresql://localhost:5432/nivesh?currentSchema=${nivesh.customer.database.schema}
     username: postgres
@@ -41,8 +41,7 @@ spring:
           starttls:
             enable: true
             required: true
-
-logging:
-  level:
-    org.springframework.security: TRACE
-
+  data:
+    redis:
+      port: 6379
+      host: ${REDIS_HOST:localhost}

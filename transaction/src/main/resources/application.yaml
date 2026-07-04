@@ -3,8 +3,8 @@ server:
 
 nivesh:
   kafka.enabled: true
-  auth.url: http://localhost:8081
-  account.url: http://localhost:8083
+  auth.url: ${AUTH_URL:http://localhost:8081}
+  account.url: ${ACCOUNT_URL:http://localhost:8083}
   transaction.database.schema: txn
 
 spring:
@@ -38,10 +38,14 @@ spring:
           starttls:
             enable: true
             required: true
+  data:
+    redis:
+      port: 6379
+      host: ${REDIS_HOST:localhost}
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:${CONFIG_SERVER:http://localhost:8888}
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -59,27 +63,5 @@ spring:
           add.type.headers: false
 
 eureka:
-  instance:
-    prefer-ip-address: true
-    ip-address: 127.0.0.1
-    hostname: 127.0.0.1
-    instance-id: ${spring.application.name}:${server.port}
   client:
     enabled: false
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
-logging:
-  level:
-    com.nivesh: TRACE
-#    org.hibernate.sql: TRACE
-#    org.hibernate.orm.jdbc.bind: TRACE
-#    org.springframework.transaction: TRACE
-#    org.springframework.orm.jpa.JpaTransactionManager: TRACE
-#    org.springframework.kafka: TRACE
-#    org.apache.kafka.clients.producer: TRACE
-#    org.apache.kafka.clients.consumer: TRACE
-#    io.debezium: TRACE
-#    io.debezium.connector.postgresql: TRACE

@@ -69,8 +69,8 @@ graph TD
 
 ## Services
 
-| Service | Port | Responsibility | README | Status |
-|---|---|---|---|---|
+| Service | Port | Responsibility | README | Status        |
+|---|---|---|---|---------------|
 | API Gateway | 8080 | JWT validation, route filtering, internal header sanitization | [README](gateway/README.md) | ✅ Implemented |
 | Auth Service | 8081 | OAuth2 Authorization Server — JWT issuance, refresh tokens, RBAC, token versioning | [README](authentication/README.md) | ✅ Implemented |
 | Customer Service | 8082 | Customer registration, KYC onboarding, CIF identity, contact management | [README](customer/README.md) | ✅ Implemented |
@@ -79,7 +79,7 @@ graph TD
 | Config Server | 8888 | Git-backed centralised configuration, RSA key distribution | [README](config/README.md) | ✅ Implemented |
 | Eureka Server | 8761 | Service discovery and client-side load balancing | [README](eureka/README.md) | ✅ Implemented |
 | library | — | Shared security, JWT/OTP utils, Kafka event DTOs, Luhn, audit entities | [README](library/README.md) | ✅ Implemented |
-| nivesh-api | — | Shared API DTOs, request/response contracts | [README](nivesh-api/README.md) | 🚧 In Progress |
+| nivesh-api | — | Shared API DTOs, request/response contracts | [README](nivesh-api/README.md) | ✅ Added           |
 
 ---
 

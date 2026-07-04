@@ -1,7 +1,7 @@
 server:
   port: 8080
 
-nivesh.auth.url: http://localhost:8081
+nivesh.auth.url: ${AUTH_URL:http://localhost:8081}
 
 spring:
   application:
@@ -9,7 +9,11 @@ spring:
   webflux:
     base-path: /nivesh
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:${CONFIG_SERVER:http://localhost:8888}
+  security:
+    user:
+      name: nivesh
+      password: password
   cloud:
     gateway:
       server:
@@ -37,24 +41,16 @@ spring:
               predicates:
                 - Path=/transactions/**
 eureka:
-  instance:
-    prefer-ip-address: true
-    ip-address: 127.0.0.1
-    hostname: 127.0.0.1
-    instance-id: ${spring.application.name}:${server.port}
   client:
-    enabled: true
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
+    enabled: false
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
-
-#logging:
-#  level:
-#    org.springframework: TRACE
+        include: health, info
+  endpoint:
+    env:
+      show-values: ALWAYS
+    gateway:
+      access: unrestricted
