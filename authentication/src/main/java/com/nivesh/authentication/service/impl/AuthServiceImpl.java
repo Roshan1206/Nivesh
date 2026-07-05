@@ -8,6 +8,7 @@ import com.nivesh.authentication.dto.request.ResetPasswordRequest;
 import com.nivesh.authentication.dto.response.RegisterResponse;
 import com.nivesh.authentication.dto.response.TokenResponse;
 import com.nivesh.authentication.entity.User;
+import com.nivesh.authentication.exception.UserAlreadyExistsException;
 import com.nivesh.authentication.exception.InvalidUserStatusException;
 import com.nivesh.authentication.service.RefreshTokenService;
 import com.nivesh.authentication.service.TokenService;
@@ -32,7 +33,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -101,6 +101,12 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public OtpResponse initiateRegistration(RegisterRequest request) {
+        if (userService.isUserExistByEmail(request.getEmail())){
+            throw new UserAlreadyExistsException("Email already exists. Please Register it  with different email");
+        }
+        if (userService.isUserExistByMobile(request.getMobileNumber())){
+            throw new UserAlreadyExistsException("Mobile number already exists. Please Register it  with different mobile number");
+        }
         String requestId = UUID.randomUUID().toString();
         otpCacheService.generateAndSendOtp(requestId, request.getEmail());
         getCache(REGISTER_CACHE_NAME).put(requestId, request);

@@ -36,12 +36,14 @@ public class TransactionConsumer {
             containerFactory = "transferResultListenerFactory")
     public void onTransferResult(TransferResultEvent event, Acknowledgment acknowledgement) {
         String ref = event.getTransferRequest().getReferenceNumber();
+        Transaction txn = transactionService.getTransactionByRefNo(ref);
         if (!event.isSuccess()) {
             log.error("Transfer failed. Ref no: {}", ref);
+            txn.setStatus(TransactionStatus.FAILED);
+            transactionService.updateTransaction(txn);
             acknowledgement.acknowledge();
             return;
         }
-        Transaction txn = transactionService.getTransactionByRefNo(ref);
         try {
             journalEntryService.writeLedger(event);
             outboxEventService.save(event.getTransferRequest().getReferenceNumber(), OutboxStatus.PUBLISHED);

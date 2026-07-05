@@ -46,4 +46,26 @@ public class ExceptionalHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(exception.getMessage(), request));
     }
+
+
+    /**
+     * Throw error if user already exists.
+     */
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(UserAlreadyExistsException exception,
+                                                                           WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                .body(new ErrorResponse(exception.getMessage(), request));
+    }
+
+
+    /**
+     * old and new password cannot be same
+     */
+    @ExceptionHandler(SamePasswordException.class)
+    public ResponseEntity<ErrorResponse> handleSamePasswordException(SamePasswordException exception,
+                                                               WebRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                .body(new ErrorResponse(exception.getMessage(), request));
+    }
 }

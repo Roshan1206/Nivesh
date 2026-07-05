@@ -45,8 +45,8 @@ scrape_configs:
           service: 'account'
 
   - job_name: 'gateway'
-    metrics_path: '/actuator/prometheus'
+    metrics_path: '/nivesh/actuator/prometheus'
     static_configs:
-      - targets: [ 'gateway:8081' ]
+      - targets: [ 'gateway:8080' ]
         labels:
           service: 'gateway'

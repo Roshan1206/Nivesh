@@ -14,19 +14,31 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Communication class using kafka for consuming and producing events related to account balance.
+ */
 @Slf4j
 @Component
 public class AccountConsumer {
 
+    /** Responsible for managing accounts */
     private final AccountService accountService;
 
+    /** Emits events */
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    /**
+     * Injecting required dependency using constructor injection
+     */
     public AccountConsumer(AccountService accountService, KafkaTemplate<String, Object> kafkaTemplate) {
         this.accountService = accountService;
         this.kafkaTemplate = kafkaTemplate;
     }
 
+
+    /**
+     * Transfer funds from one account to another. Sends result using kafka.
+     */
     @Transactional
     @KafkaListener(
             topics = KafkaTopics.TRANSFER_REQUESTED,
@@ -37,7 +49,7 @@ public class AccountConsumer {
         String ref = event.getReferenceNumber();
         log.trace("Transfer started in Account. Reference number: {}", ref);
         AccountTransactionResponse debit = accountService.debit(event.getSourceAccountId(),
-                event.getIdempotencyKey(), new AmountTransactionRequest(event.getAmount()));
+                "debit-" + event.getIdempotencyKey(), new AmountTransactionRequest(event.getAmount()));
         TransferResultEvent resultEvent = new TransferResultEvent();
         resultEvent.setTransferRequest(event);
         if (debit.getStatus() != 200) {
@@ -50,7 +62,7 @@ public class AccountConsumer {
         }
         resultEvent.setPostDebitBalance(debit.getRunningBalance());
         AccountTransactionResponse credit = accountService.credit(event.getDestinationAccountId(),
-                event.getIdempotencyKey(), new AmountTransactionRequest(event.getAmount()));
+                "credit-" + event.getIdempotencyKey(), new AmountTransactionRequest(event.getAmount()));
         resultEvent.setPostCreditBalance(credit.getRunningBalance());
         resultEvent.setSuccess(true);
         ack.acknowledge();
@@ -59,6 +71,10 @@ public class AccountConsumer {
         kafkaTemplate.send(KafkaTopics.TRANSFER_RESULT, ref, resultEvent);
     }
 
+
+    /**
+     * Compensate funds for failed transactions. Sends result using kafka.
+     */
     @Transactional
     @KafkaListener(
             topics = KafkaTopics.COMPENSATE_REQUEST,

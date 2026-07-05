@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -185,5 +186,27 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId).orElseThrow(
                 () -> new UsernameNotFoundException("User not found")
         );
+    }
+
+
+    /**
+     * Returns true is user exists by email
+     *
+     * @param email user email
+     */
+    @Override
+    public boolean isUserExistByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+
+    /**
+     * Returns true is user exists by email
+     *
+     * @param mobileNumber user's mobile number
+     */
+    @Override
+    public boolean isUserExistByMobile(String mobileNumber) {
+        return userRepository.existByMobileNumber(mobileNumber);
     }
 }

@@ -25,4 +25,8 @@ public interface UserService {
     User getUser(String userId);
 
     void incrementTokenVersion(String userId);
+
+    boolean isUserExistByEmail(String email);
+
+    boolean isUserExistByMobile(String mobileNumber);
 }

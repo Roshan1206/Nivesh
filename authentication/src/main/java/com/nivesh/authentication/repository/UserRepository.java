@@ -16,6 +16,17 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     /**
+     * Find user by their email
+     */
+    boolean existsByEmail(String email);
+
+
+    /**
+     * Find user by their email
+     */
+    boolean existByMobileNumber(String mobileNumber);
+
+    /**
      * Fetches user with all data needed to build getAuthorities():
      *  - userRoles -> role -> permission (role-based grants)
      *  - permissionOverrides -> permission (per-user GRANT/REVOKE exceptions)

@@ -25,9 +25,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Service implementation that coordinates transaction business logic for transaction operations.
@@ -110,7 +111,7 @@ public class TransactionServiceImpl implements TransactionService {
         TransactionTypeConfig typeConfig = transactionConfigService.getTransactionType(
                 TransactionType.valueOf(pendingTransaction.getTypeCode()));
         Transaction transaction = buildTransaction(pendingTransaction, typeConfig);
-        transactionRepository.save(transaction);
+        this.updateTransaction(transaction);
         outboxEventService.publishTransferRequested(transaction);
         TransactionResponse response = new TransactionResponse(transaction.getReferenceNumber(), HttpStatus.OK, "Transaction Completed.");
         getCache().put(transaction.getReferenceNumber(), response);
@@ -119,6 +120,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
 
+    /**
+     * Get transaction info using reference number
+     */
     @Override
     public Transaction getTransactionByRefNo(String refNo) {
         return transactionRepository.findByReferenceNumber(refNo).orElseThrow(
@@ -126,19 +130,22 @@ public class TransactionServiceImpl implements TransactionService {
         );
     }
 
+
+    /**
+     * save updated transaction
+     */
     @Override
     public void updateTransaction(Transaction txn) {
         transactionRepository.save(txn);
     }
 
-    /** Build the transaction object */
+    /**
+     *  Build the transaction object with all the required metadata
+     */
     private static Transaction buildTransaction(PendingTransaction transaction, TransactionTypeConfig typeConfig) {
-        String s = String.valueOf(System.currentTimeMillis());
-        int length = Math.min(s.length(), 8);
-        String referenceNumber = LocalDate.now() + s.substring(length);
         return Transaction.builder()
                 .idempotencyKey(transaction.getIdempotencyKey())
-                .referenceNumber(referenceNumber.replace("-", ""))
+                .referenceNumber(generateReferenceNumber())
                 .sourceAccountId(transaction.getSourceAccountId())
                 .destinationAccountId(transaction.getDestinationAccountId())
                 .amount(transaction.getAmount())
@@ -151,6 +158,18 @@ public class TransactionServiceImpl implements TransactionService {
                 .externalPartyRef(null)
                 .status(TransactionStatus.INITIATED)
                 .build();
+    }
+
+
+    /**
+     * Generate a unique reference number consisting of 20 digits where first 17 are time down to ms and last 3 are random number.
+     * This ensures a max of 1000 unique number per millisecond.
+     */
+    private static String generateReferenceNumber() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+        String timestamp = LocalDateTime.now().format(formatter);
+        int random = ThreadLocalRandom.current().nextInt(100, 1000);
+        return timestamp + random;
     }
 
     /**
