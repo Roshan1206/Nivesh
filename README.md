@@ -117,10 +117,6 @@ Every fund transfer requires a 6-digit OTP verified before money moves. OTPs are
 
 Every service manages its own schema lifecycle via Flyway, keeping DDL changes version-controlled, repeatable, and auditable alongside application code.
 
-### Gradle Multi-Module Build
-
-The repository is a Gradle multi-module project. The shared `library` module is published to `mavenLocal()` and consumed by domain services as a local Maven dependency — allowing independent versioning without a private registry.
-
 ### Eureka Service Discovery
 
 All domain services self-register with the Eureka Server at startup. The API Gateway performs client-side load balancing via Spring Cloud LoadBalancer, using logical service names rather than hardcoded hosts.
@@ -150,9 +146,24 @@ Runtime configuration — including Kafka bootstrap servers, mail credentials, t
 
 ---
 
+## Load Testing / Performance
+
+**Latest run:** Auth Service registration flow (`Initiate Registration → Fetch OTP → Verify Registration`), 1000 concurrent users, 2026-07-06.
+
+| Metric | Result |
+|---|---|
+| Full flow completions | 903 / 1000 (90.3%) |
+| Total errors | 201 / 3000 samples (6.7%) |
+| Root cause | HikariCP connection pool exhaustion — pool sized at **10**, confirmed saturated (`active=10, idle=0`) with up to **~189 requests queued** behind it |
+| Failure signature | `SQLTransientConnectionException` — every failure traces back to connection-pool saturation, including the earlier cascading 500/404s |
+
+📄 Full report with methodology, percentile breakdowns, and remediation steps: [`test/auth-registration-1000-concurrency.md`](test/auth-registration-1000-concurrency.md)
+
+---
+
 ## API Reference
 
-> ⚡ Full API documentation — endpoints, request/response bodies, auth requirements, and error codes — lives in each service's README. A Postman collection will be added to the root of this repo shortly.
+> ⚡ Full API documentation — endpoints, request/response bodies, auth requirements, and error codes — lives in each service's README.
 
 | Service | Base Path | Postman Collection | Full Docs |
 |---|---|---|---|
@@ -292,15 +303,15 @@ cd gateway && ./gradlew bootRun
 
 ### Health Check URLs
 
-| Service | Health Endpoint |
-|---|---|
-| API Gateway | http://localhost:8080/actuator/health |
-| Auth Service | http://localhost:8081/actuator/health |
-| Customer Service | http://localhost:8082/actuator/health |
-| Account Service | http://localhost:8083/actuator/health |
-| Transaction Service | http://localhost:8084/actuator/health |
-| Config Server | http://localhost:8888/actuator/health |
-| Eureka Dashboard | http://localhost:8761 |
+| Service | Health Endpoint                              |
+|---|----------------------------------------------|
+| API Gateway | http://localhost:8080/nivesh/actuator/health |
+| Auth Service | http://localhost:8081/actuator/health        |
+| Customer Service | http://localhost:8082/actuator/health        |
+| Account Service | http://localhost:8083/actuator/health        |
+| Transaction Service | http://localhost:8084/actuator/health        |
+| Config Server | http://localhost:8888/actuator/health        |
+| Eureka Dashboard | http://localhost:8761                        |
 
 ---
 
@@ -312,13 +323,14 @@ cd gateway && ./gradlew bootRun
 - [x] Auth Service — OAuth2 Authorization Server, RSA JWT, refresh tokens, token versioning, RBAC with per-user permission overrides
 - [x] Customer Service — registration, CIF number generation, KYC document submission/verification, OTP flow
 - [x] Account Service — account creation, Luhn-protected 11-digit account numbers, balance debit/credit, optimistic locking, Saga compensation endpoints
-- [x] Transaction Service — OTP-gated transfers, Choreography Saga, idempotency, double-entry journal entries, GL accounts, retry scheduler, dead-letter handling
+- [x] Transaction Service — OTP-gated transfers, Choreography Saga, idempotency, double-entry journal entries
 - [x] Config Server — Git-backed centralised configuration
 - [x] Eureka Server — service discovery
 - [x] Shared Library — JWT, OTP, Luhn, Kafka event DTOs, audit base entities
 - [x] Flyway migrations (schema-per-service)
 - [x] Gradle multi-module build
 - [x] Docker infrastructure setup
+- [x] Kafka + Debezium Outbox Pattern for guaranteed event delivery
 
 ### Planned
 
@@ -333,7 +345,6 @@ cd gateway && ./gradlew bootRun
 - [ ] Branch & ATM Service (:8093)
 - [ ] Cassandra for transaction history older than 90 days (cold storage tiering)
 - [ ] HashiCorp Vault for secrets management
-- [ ] Kafka + Debezium Outbox Pattern for guaranteed event delivery
 - [ ] Distributed tracing (Micrometer + Zipkin)
 - [ ] PostGIS for branch geolocation and 5 km radius constraint
 - [ ] Kubernetes manifests + Helm charts

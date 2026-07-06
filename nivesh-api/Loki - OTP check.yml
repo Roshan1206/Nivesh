@@ -1,0 +1,25 @@
+info:
+  name: Loki - OTP check
+  type: http
+  seq: 8
+
+http:
+  method: get
+  url: http://localhost:3100/loki/api/v1/query_range?query=%7Bservice_name=%22auth%22%7D%20%7C=%20%22OTP:%20for%20requestId%20985e751c-30df-45b2-a198-ff760907ffe2%22&start=$(($(date%20+%s%N)%20-%20300000000000))&end=$(date%20+%s%N)
+  params:
+    - name: query
+      value: "%7Bservice_name=%22auth%22%7D%20%7C=%20%22OTP:%20for%20requestId%20985e751c-30df-45b2-a198-ff760907ffe2%22"
+      type: query
+    - name: start
+      value: $(($(date%20+%s%N)%20-%20300000000000))
+      type: query
+    - name: end
+      value: $(date%20+%s%N)
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: false
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
