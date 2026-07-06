@@ -5,13 +5,13 @@ info:
 
 http:
   method: POST
-  url: "{{auth}}/auth/login"
+  url: "{{gateway}}/auth/login"
   body:
     type: json
     data: |-
       {
-        "email": "Roshan1@gmail.com",
-        "password": "Password@1234"
+        "email": "ananya.khanna9@gmail.com",
+        "password": "Passw0rd@09"
       }
   auth: inherit
 

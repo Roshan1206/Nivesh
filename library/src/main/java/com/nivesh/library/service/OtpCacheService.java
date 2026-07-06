@@ -86,10 +86,10 @@ public class OtpCacheService {
      * @throws OtpException for invalid otp
      */
     public void validateOtp(String requestId, String submittedOtp) {
-//        Cache.ValueWrapper cache = getCache().get(requestId);
         OtpEntry entry = getCache().get(requestId, OtpEntry.class);
 
         if (entry == null) {
+            log.error("OTP expired for request id: {}", requestId);
             throw new OtpException("OTP Expired", OtpErrorCode.EXPIRED);
         }
 
@@ -98,10 +98,12 @@ public class OtpCacheService {
             entry.incrementCount();
             if (entry.isMaxAttemptReached()) {
                 getCache().evict(requestId);
+                log.error("Max attempts reached for requestId: {}", requestId);
                 throw new OtpException("Max attempts reached. Request new OTP", OtpErrorCode.MAX_ATTEMPTS_EXCEEDED);
             }
             getCache().put(requestId, entry);
             int remaining = entry.getRemainingAttempts();
+            log.error("Invalid OTP for requestId: {}", requestId);
             throw new OtpException("Invalid OTP. " + remaining + " attempts remaining", OtpErrorCode.INVALID);
         }
         getCache().evict(requestId);

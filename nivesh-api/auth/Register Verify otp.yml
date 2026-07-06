@@ -5,10 +5,10 @@ info:
 
 http:
   method: POST
-  url: "{{auth}}/auth/register/verify/9e1a69ca-ed61-4087-9d8c-5101f5c5d84b"
+  url: "{{gateway}}/auth/register/verify/a38c3f06-5540-40e1-b48f-cf73f16b0c3d"
   body:
     type: text
-    data: "177248"
+    data: "208768"
   auth: inherit
 
 settings:

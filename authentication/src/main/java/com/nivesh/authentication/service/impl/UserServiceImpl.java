@@ -207,6 +207,6 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public boolean isUserExistByMobile(String mobileNumber) {
-        return userRepository.existByMobileNumber(mobileNumber);
+        return userRepository.existsByMobileNumber(mobileNumber);
     }
 }

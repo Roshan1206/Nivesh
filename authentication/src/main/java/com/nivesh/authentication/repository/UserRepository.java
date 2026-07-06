@@ -16,15 +16,15 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     /**
-     * Find user by their email
+     * check if user exists by their email
      */
     boolean existsByEmail(String email);
 
 
     /**
-     * Find user by their email
+     * check if user exists by their mobile number
      */
-    boolean existByMobileNumber(String mobileNumber);
+    boolean existsByMobileNumber(String mobileNumber);
 
     /**
      * Fetches user with all data needed to build getAuthorities():

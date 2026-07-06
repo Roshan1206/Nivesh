@@ -102,14 +102,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public OtpResponse initiateRegistration(RegisterRequest request) {
         if (userService.isUserExistByEmail(request.getEmail())){
+            log.error("Email already exists. Please Register it  with different email");
             throw new UserAlreadyExistsException("Email already exists. Please Register it  with different email");
         }
         if (userService.isUserExistByMobile(request.getMobileNumber())){
+            log.error("Mobile number already exists. Please Register it  with different mobile number");
             throw new UserAlreadyExistsException("Mobile number already exists. Please Register it  with different mobile number");
         }
         String requestId = UUID.randomUUID().toString();
         otpCacheService.generateAndSendOtp(requestId, request.getEmail());
         getCache(REGISTER_CACHE_NAME).put(requestId, request);
+        log.debug("Registration initiation completed for requestId: {}", requestId);
         return new OtpResponse(requestId);
     }
 
@@ -123,14 +126,17 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public RegisterResponse registerUser(String requestId, String otp) {
+        log.debug("Initiating auth registration for requestId: {}", requestId);
         RegisterRequest registerRequest = getCache(REGISTER_CACHE_NAME).get(requestId, RegisterRequest.class);
         if (registerRequest == null) {
-            throw new OtpException("Otp expired", OtpErrorCode.EXPIRED);
+            log.error("Register cache not found for requestId: {}", requestId);
+            throw new OtpException("Cache expired", OtpErrorCode.EXPIRED);
         }
         otpCacheService.validateOtp(requestId, otp);
         User savedUser = userService.createNewUser(registerRequest);
         String accessToken = tokenService.generateAccessToken(savedUser, Constants.ONBOARDED_TOKEN);
         String refreshToken = refreshTokenService.issueRefreshToken(savedUser);
+        log.debug("Auth registration completed successfully.");
         return new RegisterResponse(registerRequest.getEmail(), new TokenResponse(accessToken, refreshToken));
     }
 
