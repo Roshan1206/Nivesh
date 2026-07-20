@@ -105,6 +105,7 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionResponse startTransaction(String requestId, String otp) {
         otpCacheService.validateOtp(requestId, otp);
         PendingTransaction pendingTransaction = getCache().get(requestId, PendingTransaction.class);
+        getCache().evict(requestId);
         if (pendingTransaction == null) {
             throw new SessionExpiredException(HttpStatus.REQUEST_TIMEOUT, "Session has been expired");
         }
